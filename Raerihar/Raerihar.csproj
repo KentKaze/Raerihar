@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>Aritiafel.Organizations.RaeriharUniversity</AssemblyName>
+    <RootNamespace>Aritiafel.Organizations.RaeriharUniversity</RootNamespace>
+  </PropertyGroup>
+
+</Project>
