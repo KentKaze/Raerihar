@@ -23,16 +23,23 @@ namespace Aritiafel.Organizations.RaeriharUniversity
     //0     1~3         2Bytes
     //1     4~6         3Bytes
     //2     7~9         4Bytes
-    //3     10~12       5Bytes * 
+    //3     10~12       5Bytes 
     //4     13~15       7Bytes
     //5     16~18       8Bytes
     //6     19~21       9Bytes
-    //7     22~24       10Bytes *
+    //7     22~24       10Bytes
     //8     25~27       12Bytes
+    //9     28~30       13Bytes
+    //10    31~33       14Bytes
+    //11    34~36       15Bytes
+    //12    37~39       17Bytes
 
-    //digits * 5 / 12 = bytes
-    //bytes * 12 / 5 = digits
+    //bytes = index * 5 / 4 + 2
+    //index = (bytes - 1) * 4 / 5
+    //index = (digits - 1) / 3
 
+    //bytes = ((digits - 1) / 3) * 5 / 4 + 1
+    //X bytes = (5digits + 19) / 12
     //Special Number
     // 1000 NaN
     // 1001 Positive Infinity
@@ -122,24 +129,16 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             get
             {
                 StringBuilder result = new StringBuilder();
-                for (int i = 0; i < _Digits.Length * 4 / 5; i++)
-                    if (false) // || i + 1 > _Digits.Length * 4 / 5 && i % 5 == 0)
-                        break;
-                    else
+                for (int i = 0; i < (_Digits.Length - 1) * 4 / 5 + 1; i++)
                         result.Append(GetDigits(i));
                 return result.ToString();
             }
             private set
             {
                 //No Check
-
-                if(value.Length % 12 != 0)
-                    _Digits = new byte[value.Length * 5 / 12 + 1];
-                else
-                    _Digits = new byte[value.Length * 5 / 12];
-
+                _Digits = new byte[(value.Length - 1) / 3 * 5 / 4 + 2];
                 ushort v;    
-                for(int i = 0; i < value.Length * 5 / 12; i++ )
+                for(int i = 0; i < (value.Length - 1) / 3 + 1; i++)
                 {
                     if (i * 3 + 2 < value.Length)
                         v = ushort.Parse(value.Substring(i * 3, 3));
@@ -158,7 +157,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             else
                 buffer = Reverse(BitConverter.GetBytes(value));
             int j = index * 5 / 4;
-            switch(j % 4)
+            switch (j % 4)
             {
                 case 0:
                     _Digits[j] = buffer[0]; // 8
@@ -223,8 +222,12 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         //{
         //    _Data = new byte[1];// To Do
         //}
-        //public ArNumber(double value);
-        //public ArNumber(int lo, int mid, int hi, bool isNegative, byte scale);
+        public ArNumber(double value)
+        {   
+            _Data = new byte[1];
+            _Digits = new byte[2]; // To DO
+            ParseSelf(value.ToString());
+        }        
         private byte[] Reverse(byte[] array)
         {          
             for(int i = 0; i < array.Length / 2; i++)
@@ -239,7 +242,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public ArNumber(sbyte value)
         {
             _Data = new byte[1];
-            _Digits = new byte[1];
+            _Digits = new byte[2];
             if (value < 0)
                 _Data[0] |= 128;
             if (Math.Abs(value) >= 100)
@@ -249,7 +252,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             _Digits[0] = (byte)Math.Abs(value);
         }
 
-        private void ParseSelf(string s, NumberStyles style, IFormatProvider provider)
+        private void ParseSelf(string s, NumberStyles style = NumberStyles.None, IFormatProvider provider = null)
         {
             _Data = new byte[1];
             if (string.IsNullOrEmpty(s))
@@ -311,6 +314,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 numberString = numberString.Remove(pointIndex, 1);
                 if (numberString.Length == 0)
                 {
+                    IsNegative = false;
                     Digits = "0";
                     return;
                 }
@@ -367,6 +371,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 format = 'E';
             StringBuilder result = new StringBuilder();
             result.Append(Digits);
+            while (result.Length > 1 && result[result.Length - 1] == '0')
+                result.Remove(result.Length - 1, 1);
             if (result.Length != 1 && format == 'E')
                 result.Insert(1, '.');
             if (e != 0 && format == 'E')

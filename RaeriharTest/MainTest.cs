@@ -1,6 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Aritiafel.Organizations.RaeriharUniversity;
 using System;
+using Aritiafel.Artifacts;
 
 namespace RaeriharTest
 {
@@ -66,25 +67,25 @@ namespace RaeriharTest
         {
             ArNumber ar = new ArNumber();
             string[] testStrings = {
-                "-0.00589662145E-103",
-                "-0.03611895678E+51",
-                "-0000.0006871800",
-                "35678943580000000000000000000000000000000",
-                "+568.68100E-8",
-                "-.00035E-20",
-                "0.00",
-                "-0.000",
-                "+300",
-                "-0.008",
-                "0.00681E+98",
-                "0.01",
-                "0"
+                "-0.00589662145E-103", //0
+                "-0.03611895678E+51", //1
+                "-0000.0006871800", //2
+                "35678943580000000000000000000000000000000", //3
+                "+568.68100E-8", //4
+                "-.00035E-20", //5
+                "0.00", //6
+                "-0.000", //7
+                "+300", //8
+                "-0.008", //9
+                "0.00681E+98", //10
+                "0.01", //11
+                "0" //12
             };
 
-            ar = ArNumber.Parse(testStrings[0]);            
+            ar = ArNumber.Parse(testStrings[0]);
             Assert.IsTrue(ar.ToString() == "-5.89662145E-106");
             ar = ArNumber.Parse(testStrings[1]);
-            TestContext.WriteLine(ar.ToString());
+            
             //-3.61189567800E+49
             Assert.IsTrue(ar.ToString() == "-3.611895678E+49");
             ar = ArNumber.Parse(testStrings[2]);
@@ -99,6 +100,7 @@ namespace RaeriharTest
             //Assert.IsTrue(sn.ToString("C3") == "0.00000569");
             //Assert.IsTrue(sn.ToString("C3") == "0.00");
             ar = ArNumber.Parse(testStrings[5]);
+            
             Assert.IsTrue(ar.ToString() == "-3.5E-24");
             ar = ArNumber.Parse(testStrings[6]);
             Assert.IsTrue(ar.ToString() == "0");
@@ -116,6 +118,14 @@ namespace RaeriharTest
             Assert.IsTrue(ar.ToString() == "1E-2");
             ar = ArNumber.Parse(testStrings[12]);
             Assert.IsTrue(ar.ToString() == "0");
+
+            ChaosBox cb = new ChaosBox();
+            for (int i = 0; i < 10000; i++)
+            {
+                double d = cb.DrawOutDiversityDouble();
+                ar = new ArNumber(d);
+                TestContext.WriteLine($"{d}: {ar.ToString()}");
+            }
         }
 
         [TestMethod]
