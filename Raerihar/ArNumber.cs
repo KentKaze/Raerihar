@@ -19,7 +19,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public int Legnth { get; set; }
         public void Test()
         {
-            //BitConverter.
+            //BitConverter.s
         }
         
     }
