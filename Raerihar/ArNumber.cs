@@ -33,13 +33,16 @@ namespace Aritiafel.Organizations.RaeriharUniversity
     //10    31~33       14Bytes
     //11    34~36       15Bytes
     //12    37~39       17Bytes
+    //13    40~42       18Bytes
+    //14    43~45       19Bytes
+    //15    46~48       20Bytes
+    //16    49~51       22Bytes
 
     //bytes = index * 5 / 4 + 2
     //index = (bytes - 1) * 4 / 5
     //index = (digits - 1) / 3
 
     //bytes = ((digits - 1) / 3) * 5 / 4 + 1
-    //X bytes = (5digits + 19) / 12
     //Special Number
     // 1000 NaN
     // 1001 Positive Infinity
@@ -47,7 +50,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 
     //128, 64, 32, 16, 8, 4, 2, 1
     public struct ArNumber //: IComparable, IComparable<ArNumber>, IConvertible, IEquatable<ArNumber>, IFormattable
-    {   
+    {
         private byte[] _Data;
         private byte[] _Digits;
         public bool IsNegative
@@ -56,15 +59,15 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             set => _Data[0] = value ? (byte)(_Data[0] | 128) : (byte)(_Data[0] & 127);
         }
         public long Exponent
-        {  
+        {
             get
             {
                 switch ((byte)(_Data[0] & 96) >> 5)
                 {
                     case 0:
                         return (sbyte)((sbyte)(_Data[0] << 3) >> 3);
-                    case 1:                    
-                        if(BitConverter.IsLittleEndian)
+                    case 1:
+                        if (BitConverter.IsLittleEndian)
                             return BitConverter.ToInt16(new byte[] { _Data[1], (byte)((sbyte)(_Data[0] << 3) >> 3) }, 0);
                         else
                             return BitConverter.ToInt16(new byte[] { (byte)((sbyte)(_Data[0] << 3) >> 3), _Data[1] }, 0);
@@ -82,7 +85,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                         throw new NotImplementedException();
                 }
             }
-            set 
+            set
             {
                 byte[] result;
                 if (value < 16 && value > -17)
@@ -130,15 +133,15 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             {
                 StringBuilder result = new StringBuilder();
                 for (int i = 0; i < (_Digits.Length - 1) * 4 / 5 + 1; i++)
-                        result.Append(GetDigits(i));
+                    result.Append(GetDigits(i));
                 return result.ToString();
             }
             private set
             {
                 //No Check
                 _Digits = new byte[(value.Length - 1) / 3 * 5 / 4 + 2];
-                ushort v;    
-                for(int i = 0; i < (value.Length - 1) / 3 + 1; i++)
+                ushort v;
+                for (int i = 0; i < (value.Length - 1) / 3 + 1; i++)
                 {
                     if (i * 3 + 2 < value.Length)
                         v = ushort.Parse(value.Substring(i * 3, 3));
@@ -157,7 +160,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             else
                 buffer = Reverse(BitConverter.GetBytes(value));
             int j = index * 5 / 4;
-            switch (j % 4)
+            switch (index % 4)
             {
                 case 0:
                     _Digits[j] = buffer[0]; // 8
@@ -185,25 +188,25 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 
         private ushort GetDigits(int index)
         {
-            int i = index;
-            switch (i % 4)
+            int j = index * 5 / 4;            
+            switch (index % 4)
             {
                 case 0:
                     return BitConverter.ToUInt16(new byte[] {
-                        _Digits[i], 
-                        (byte)(_Digits[i + 1] >> 6 & 3) }, 0);
+                        _Digits[j],
+                        (byte)(_Digits[j + 1] >> 6 & 3) }, 0);
                 case 1:
                     return BitConverter.ToUInt16(new byte[] {
-                        (byte)(_Digits[i] << 2 | _Digits[i + 1] >> 6 & 3),
-                        (byte)(_Digits[i + 1] >> 4 & 3) }, 0);
+                        (byte)(_Digits[j] << 2 | _Digits[j + 1] >> 6 & 3),
+                        (byte)(_Digits[j + 1] >> 4 & 3) }, 0);
                 case 2:
                     return BitConverter.ToUInt16(new byte[] {
-                        (byte)(_Digits[i] << 4 | _Digits[i + 1] >> 4 & 15),
-                        (byte)(_Digits[i + 1] >> 2 & 3) }, 0);
+                        (byte)(_Digits[j] << 4 | _Digits[j + 1] >> 4 & 15),
+                        (byte)(_Digits[j + 1] >> 2 & 3) }, 0);
                 case 3:
                     return BitConverter.ToUInt16(new byte[] {
-                        (byte)(_Digits[i] << 6 | _Digits[i + 1] >> 2 & 63), 
-                        (byte)(_Digits[i + 1] & 3) }, 0);
+                        (byte)(_Digits[j] << 6 | _Digits[j + 1] >> 2 & 63),
+                        (byte)(_Digits[j + 1] & 3) }, 0);
                 default:
                     throw new NotImplementedException();
             }
@@ -223,14 +226,14 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         //    _Data = new byte[1];// To Do
         //}
         public ArNumber(double value)
-        {   
+        {
             _Data = new byte[1];
             _Digits = new byte[2]; // To DO
             ParseSelf(value.ToString());
-        }        
+        }
         private byte[] Reverse(byte[] array)
-        {          
-            for(int i = 0; i < array.Length / 2; i++)
+        {
+            for (int i = 0; i < array.Length / 2; i++)
             {
                 byte buffer = array[i];
                 array[i] = array[array.Length - i - 1];
@@ -262,7 +265,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 
             string numberString = s;
             if (style.HasFlag(NumberStyles.AllowThousands))
-                numberString = numberString.Replace(",", "");            
+                numberString = numberString.Replace(",", "");
             numberString = numberString.Trim();
 
             int eIndex = -2, pointIndex = -1;
@@ -352,7 +355,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 
         public static bool TryParse(string s, NumberStyles style, IFormatProvider provider, out ArNumber result)
         {
-            try 
+            try
             {
                 result = Parse(s, style, provider);
                 return true;
@@ -365,7 +368,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         }
 
         private string ToString(int digits, char format, IFormatProvider provider)
-        {   
+        {
             long e = Exponent;
             if (format == 'G')
                 format = 'E';

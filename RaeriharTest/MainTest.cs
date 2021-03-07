@@ -13,59 +13,68 @@ namespace RaeriharTest
         [TestMethod]
         public void ExponentGetSetTest()
         {
-            ArNumber a = new ArNumber(3);
-            a.Exponent = 0;
-            Assert.IsTrue(a.ToString() == "3");
-            a.Exponent = 10;
-            Assert.IsTrue(a.ToString() == "3E+10");
-            a.Exponent = -11;
-            Assert.IsTrue(a.ToString() == "3E-11");
-            a.Exponent = 15;
-            Assert.IsTrue(a.ToString() == "3E+15");
-            a.Exponent = 16;
-            Assert.IsTrue(a.ToString() == "3E+16");
-            a.Exponent = -16;
-            Assert.IsTrue(a.ToString() == "3E-16");
-            a.Exponent = -17;
-            Assert.IsTrue(a.ToString() == "3E-17");
-            a.Exponent = 4095;
-            Assert.IsTrue(a.ToString() == "3E+4095");
-            a.Exponent = 4096;
-            Assert.IsTrue(a.ToString() == "3E+4096");
-            a.Exponent = -4096;
-            Assert.IsTrue(a.ToString() == "3E-4096");
-            a.Exponent = -4097;
-            Assert.IsTrue(a.ToString() == "3E-4097");
-            a.Exponent = 65883;
-            Assert.IsTrue(a.ToString() == "3E+65883");
-            a.Exponent = 73813185;
-            Assert.IsTrue(a.ToString() == "3E+73813185");
-            a.Exponent = -3185;
-            Assert.IsTrue(a.ToString() == "3E-3185");
-            a.Exponent = 268435456;
-            Assert.IsTrue(a.ToString() == "3E+268435456");
-            a.Exponent = 268435455;
-            Assert.IsTrue(a.ToString() == "3E+268435455");
-            a.Exponent = -268435456;
-            Assert.IsTrue(a.ToString() == "3E-268435456");
-            a.Exponent = -268435457;
-            Assert.IsTrue(a.ToString() == "3E-268435457");
-            a.Exponent = 9999999999999999;
-            Assert.IsTrue(a.ToString() == "3E+9999999999999999");
-            a.Exponent = -99998899999999999;
-            Assert.IsTrue(a.ToString() == "3E-99998899999999999");
-            a.Exponent = 1152921504606846975;
-            Assert.IsTrue(a.ToString() == "3E+1152921504606846975");
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => a.Exponent = 1152921504606846976);
-            a.Exponent = -1152921504606846976;
-            Assert.IsTrue(a.ToString() == "3E-1152921504606846976");
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => a.Exponent = -1152921504606846977);
+            ArNumber ar = new ArNumber(3);
+            ar.Exponent = 0;
+            Assert.IsTrue(ar.ToString() == "3");
+            ar.Exponent = 10;
+            Assert.IsTrue(ar.ToString() == "3E+10");
+            ar.Exponent = -11;
+            Assert.IsTrue(ar.ToString() == "3E-11");
+            ar.Exponent = 15;
+            Assert.IsTrue(ar.ToString() == "3E+15");
+            ar.Exponent = 16;
+            Assert.IsTrue(ar.ToString() == "3E+16");
+            ar.Exponent = -16;
+            Assert.IsTrue(ar.ToString() == "3E-16");
+            ar.Exponent = -17;
+            Assert.IsTrue(ar.ToString() == "3E-17");
+            ar.Exponent = 4095;
+            Assert.IsTrue(ar.ToString() == "3E+4095");
+            ar.Exponent = 4096;
+            Assert.IsTrue(ar.ToString() == "3E+4096");
+            ar.Exponent = -4096;
+            Assert.IsTrue(ar.ToString() == "3E-4096");
+            ar.Exponent = -4097;
+            Assert.IsTrue(ar.ToString() == "3E-4097");
+            ar.Exponent = 65883;
+            Assert.IsTrue(ar.ToString() == "3E+65883");
+            ar.Exponent = 73813185;
+            Assert.IsTrue(ar.ToString() == "3E+73813185");
+            ar.Exponent = -3185;
+            Assert.IsTrue(ar.ToString() == "3E-3185");
+            ar.Exponent = 268435456;
+            Assert.IsTrue(ar.ToString() == "3E+268435456");
+            ar.Exponent = 268435455;
+            Assert.IsTrue(ar.ToString() == "3E+268435455");
+            ar.Exponent = -268435456;
+            Assert.IsTrue(ar.ToString() == "3E-268435456");
+            ar.Exponent = -268435457;
+            Assert.IsTrue(ar.ToString() == "3E-268435457");
+            ar.Exponent = 9999999999999999;
+            Assert.IsTrue(ar.ToString() == "3E+9999999999999999");
+            ar.Exponent = -99998899999999999;
+            Assert.IsTrue(ar.ToString() == "3E-99998899999999999");
+            ar.Exponent = 1152921504606846975;
+            Assert.IsTrue(ar.ToString() == "3E+1152921504606846975");
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => ar.Exponent = 1152921504606846976);
+            ar.Exponent = -1152921504606846976;
+            Assert.IsTrue(ar.ToString() == "3E-1152921504606846976");
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => ar.Exponent = -1152921504606846977);
         }
 
         [TestMethod]
         public void ParseTest()
         {
             ArNumber ar = new ArNumber();
+
+            ChaosBox cb = new ChaosBox();
+            for (int i = 0; i < 10000; i++)
+            {
+                double d = cb.DrawOutDiversityDouble();
+                ar = new ArNumber(d);
+                TestContext.WriteLine($"{d}: {ar}");
+            }
+
             string[] testStrings = {
                 "-0.00589662145E-103", //0
                 "-0.03611895678E+51", //1
@@ -119,13 +128,7 @@ namespace RaeriharTest
             ar = ArNumber.Parse(testStrings[12]);
             Assert.IsTrue(ar.ToString() == "0");
 
-            ChaosBox cb = new ChaosBox();
-            for (int i = 0; i < 10000; i++)
-            {
-                double d = cb.DrawOutDiversityDouble();
-                ar = new ArNumber(d);
-                TestContext.WriteLine($"{d}: {ar.ToString()}");
-            }
+            
         }
 
         [TestMethod]
