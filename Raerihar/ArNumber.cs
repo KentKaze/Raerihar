@@ -41,27 +41,39 @@ namespace Aritiafel.Organizations.RaeriharUniversity
     //bytes = index * 5 / 4 + 2
     //index = (bytes - 1) * 4 / 5
     //index = (digits - 1) / 3
-
     //bytes = ((digits - 1) / 3) * 5 / 4 + 1
+
     //Special Number
     // 1000 NaN
     // 1001 Positive Infinity
     // 1002 Negative Infinity 
 
     //128, 64, 32, 16, 8, 4, 2, 1
-    public struct ArNumber //: IComparable, IComparable<ArNumber>, IConvertible, IEquatable<ArNumber>, IFormattable
+    public struct ArNumber : IEquatable<ArNumber>, IFormattable //: IComparable, IComparable<ArNumber>, IConvertible
     {
         private byte[] _Data;
         private byte[] _Digits;
         public bool IsNegative
         {
-            get => _Data[0] >> 7 == 1;
-            set => _Data[0] = value ? (byte)(_Data[0] | 128) : (byte)(_Data[0] & 127);
+            get
+            {
+                if (_Data.Length == 0)
+                    Initialize();
+                return _Data[0] >> 7 == 1;
+            }
+            set
+            {
+                if (_Data.Length == 0)
+                    Initialize();
+                _Data[0] = value ? (byte)(_Data[0] | 128) : (byte)(_Data[0] & 127);
+            }
         }
         public long Exponent
         {
             get
             {
+                if (_Data.Length == 0)
+                    Initialize();
                 switch ((byte)(_Data[0] & 96) >> 5)
                 {
                     case 0:
@@ -87,6 +99,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             }
             set
             {
+                if (_Data.Length == 0)
+                    Initialize();
                 byte[] result;
                 if (value < 16 && value > -17)
                 {
@@ -131,9 +145,13 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         {
             get
             {
+                if (_Data.Length == 0)
+                    Initialize();
                 StringBuilder result = new StringBuilder();
                 for (int i = 0; i < (_Digits.Length - 1) * 4 / 5 + 1; i++)
-                    result.Append(GetDigits(i));
+                    result.AppendFormat("{0:D3}", GetDigits(i));
+                while (result.Length > 1 && result[0] == '0')
+                    result.Remove(0, 1);
                 return result.ToString();
             }
             private set
@@ -188,7 +206,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 
         private ushort GetDigits(int index)
         {
-            int j = index * 5 / 4;            
+            int j = index * 5 / 4;
             switch (index % 4)
             {
                 case 0:
@@ -226,9 +244,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         //    _Data = new byte[1];// To Do
         //}
         public ArNumber(double value)
+            : this()
         {
-            _Data = new byte[1];
-            _Digits = new byte[2]; // To DO
             ParseSelf(value.ToString());
         }
         private byte[] Reverse(byte[] array)
@@ -252,12 +269,19 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 _Data[0] |= 2;
             else if (Math.Abs(value) >= 10)
                 _Data[0] |= 1;
-            _Digits[0] = (byte)Math.Abs(value);
+            SetDigits(0, (ushort)Math.Abs(value));
+        }
+
+        private void Initialize()
+        {
+            _Data = new byte[1];
+            _Digits = new byte[2];
         }
 
         private void ParseSelf(string s, NumberStyles style = NumberStyles.None, IFormatProvider provider = null)
         {
-            _Data = new byte[1];
+            if (_Data.Length == 0)
+                Initialize();
             if (string.IsNullOrEmpty(s))
                 throw new ArgumentNullException(nameof(s));
             IsNegative = false;
@@ -417,7 +441,21 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             }
         }
 
+        public bool Equals(ArNumber other)
+        {
+            for (int i = 0; i < _Data.Length; i++)
+                if (_Data[i] != other._Data[i])
+                    return false;
+            for (int i = 0; i < _Digits.Length; i++)
+                if (_Digits[i] != other._Digits[i])
+                    return false;
+            return true;
+        }
+
         public static implicit operator ArNumber(sbyte a)
+            => new ArNumber(a);
+
+        public static implicit operator ArNumber(double a)
             => new ArNumber(a);
 
         //public static implicit operator ArNumber(int a)

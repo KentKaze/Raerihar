@@ -66,7 +66,8 @@ namespace RaeriharTest
         public void ParseTest()
         {
             ArNumber ar = new ArNumber();
-
+            //9.810030755230452E-231: 9.81375523452E-231
+            //-4.970069320087064E-275: -4.97693287064E-275
             ChaosBox cb = new ChaosBox();
             for (int i = 0; i < 10000; i++)
             {
@@ -93,8 +94,7 @@ namespace RaeriharTest
 
             ar = ArNumber.Parse(testStrings[0]);
             Assert.IsTrue(ar.ToString() == "-5.89662145E-106");
-            ar = ArNumber.Parse(testStrings[1]);
-            
+            ar = ArNumber.Parse(testStrings[1]);            
             //-3.61189567800E+49
             Assert.IsTrue(ar.ToString() == "-3.611895678E+49");
             ar = ArNumber.Parse(testStrings[2]);
@@ -145,6 +145,13 @@ namespace RaeriharTest
             a = -13;
             TestContext.WriteLine(a.ToString());
 
+            //3
+            //2E+1
+            //5.6E+1
+            //1.27E+2
+            //- 1.3E+1
+            ArNumber b = new ArNumber();
+            b.IsNegative = true;
         }
 
         [TestMethod]
