@@ -42,13 +42,21 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 {
                     case 0:
                         return (sbyte)((sbyte)(_Data[0] << 3) >> 3);
-                    case 1:
-                        //LittleEndian TO DO
-                        return BitConverter.ToInt16(new byte[] { _Data[1], (byte)((sbyte)(_Data[0] << 3) >> 3) }, 0);
-                    case 2:                        
-                        return BitConverter.ToInt32(new byte[] { _Data[3], _Data[2], _Data[1], (byte)((sbyte)(_Data[0] << 3) >> 3) }, 0);
+                    case 1:                    
+                        if(BitConverter.IsLittleEndian)
+                            return BitConverter.ToInt16(new byte[] { _Data[1], (byte)((sbyte)(_Data[0] << 3) >> 3) }, 0);
+                        else
+                            return BitConverter.ToInt16(new byte[] { (byte)((sbyte)(_Data[0] << 3) >> 3), _Data[1] }, 0);
+                    case 2:
+                        if (BitConverter.IsLittleEndian)
+                            return BitConverter.ToInt32(new byte[] { _Data[3], _Data[2], _Data[1], (byte)((sbyte)(_Data[0] << 3) >> 3) }, 0);
+                        else
+                            return BitConverter.ToInt32(new byte[] { (byte)((sbyte)(_Data[0] << 3) >> 3), _Data[1], _Data[2], _Data[3] }, 0);
                     case 3:
-                        return BitConverter.ToInt64(new byte[] { _Data[7], _Data[6], _Data[5], _Data[4], _Data[3], _Data[2], _Data[1], (byte)((sbyte)(_Data[0] << 3) >> 3) }, 0);
+                        if (BitConverter.IsLittleEndian)
+                            return BitConverter.ToInt64(new byte[] { _Data[7], _Data[6], _Data[5], _Data[4], _Data[3], _Data[2], _Data[1], (byte)((sbyte)(_Data[0] << 3) >> 3) }, 0);
+                        else
+                            return BitConverter.ToInt64(new byte[] { (byte)((sbyte)(_Data[0] << 3) >> 3), _Data[1], _Data[2], _Data[3], _Data[4], _Data[5], _Data[6], _Data[7] }, 0);
                     default:
                         throw new NotImplementedException();
                 }
@@ -61,25 +69,36 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                     result = new byte[] { (byte)value };
                     result[0] &= 31;
                     result[0] |= (byte)(_Data[0] & 128);
-                }   
+                }
                 else if (value < 4096 && value > -4097)
                 {
-                    result = Reverse(BitConverter.GetBytes((short)value));
+                    if (BitConverter.IsLittleEndian)
+                        result = Reverse(BitConverter.GetBytes((short)value));
+                    else
+                        result = BitConverter.GetBytes((short)value);
                     result[0] &= 31;
                     result[0] |= (byte)(_Data[0] & 128 | 32);
-                }                    
+                }
                 else if (value < 268435456 && value > -268435457)
-                {   
-                    result = Reverse(BitConverter.GetBytes((int)value));
+                {
+                    if (BitConverter.IsLittleEndian)
+                        result = Reverse(BitConverter.GetBytes((int)value));
+                    else
+                        result = BitConverter.GetBytes((int)value);
                     result[0] &= 31;
                     result[0] |= (byte)(_Data[0] & 128 | 64);
-                }   
-                else
+                }
+                else if (value < 1152921504606846976 && value > -1152921504606846977)
                 {
-                    result = Reverse(BitConverter.GetBytes(value));
+                    if (BitConverter.IsLittleEndian)
+                        result = Reverse(BitConverter.GetBytes(value));
+                    else
+                        result = BitConverter.GetBytes(value);
                     result[0] &= 31;
                     result[0] |= (byte)(_Data[0] & 128 | 96);
-                }   
+                }
+                else
+                    throw new ArgumentOutOfRangeException(nameof(Exponent));
                 _Data = result;
             }
         }

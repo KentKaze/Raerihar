@@ -13,6 +13,8 @@ namespace RaeriharTest
         public void ExponentGetSetTest()
         {
             ArNumber a = new ArNumber(3);
+            a.Exponent = 0;
+            Assert.IsTrue(a.ToString() == "3");
             a.Exponent = 10;
             Assert.IsTrue(a.ToString() == "3E+10");
             a.Exponent = -11;
@@ -49,6 +51,14 @@ namespace RaeriharTest
             Assert.IsTrue(a.ToString() == "3E-268435457");
             a.Exponent = 9999999999999999;
             Assert.IsTrue(a.ToString() == "3E+9999999999999999");
+            a.Exponent = -99998899999999999;
+            Assert.IsTrue(a.ToString() == "3E-99998899999999999");
+            a.Exponent = 1152921504606846975;
+            Assert.IsTrue(a.ToString() == "3E+1152921504606846975");
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => a.Exponent = 1152921504606846976);
+            a.Exponent = -1152921504606846976;
+            Assert.IsTrue(a.ToString() == "3E-1152921504606846976");
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => a.Exponent = -1152921504606846977);
         }
 
         [TestMethod]
