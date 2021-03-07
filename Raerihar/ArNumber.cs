@@ -19,18 +19,20 @@ namespace Aritiafel.Organizations.RaeriharUniversity
     //N21-30    999 -> 000
     //N31-40    999 -> 000
 
-    //1~3       2Bytes
-    //4~6       3Bytes
-    //7~9       4Bytes
-    //10~12     5Bytes * 
-    //13~15     7Bytes
-    //16~18     8Bytes
-    //19~21     9Bytes
-    //22~24    10Bytes *
-    //25~27    12Bytes
+    //Index Digits      Bytes
+    //0     1~3         2Bytes
+    //1     4~6         3Bytes
+    //2     7~9         4Bytes
+    //3     10~12       5Bytes * 
+    //4     13~15       7Bytes
+    //5     16~18       8Bytes
+    //6     19~21       9Bytes
+    //7     22~24       10Bytes *
+    //8     25~27       12Bytes
 
-    //digits / 12 * 5 = bytes
+    //digits * 5 / 12 = bytes
     //bytes * 12 / 5 = digits
+
     //Special Number
     // 1000 NaN
     // 1001 Positive Infinity
@@ -121,7 +123,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             {
                 StringBuilder result = new StringBuilder();
                 for (int i = 0; i < _Digits.Length * 4 / 5; i++)
-                    if (false || i + 1 > _Digits.Length * 4 / 5 && i % 5 == 0)
+                    if (false) // || i + 1 > _Digits.Length * 4 / 5 && i % 5 == 0)
                         break;
                     else
                         result.Append(GetDigits(i));
@@ -136,48 +138,49 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 else
                     _Digits = new byte[value.Length * 5 / 12];
 
-                ushort v;
-                byte[] buffer;
-                int j = 0;
-                for(int i = 0; i < value.Length; i += 3)
+                ushort v;    
+                for(int i = 0; i < value.Length * 5 / 12; i++ )
                 {
-                    if (i + 3 < value.Length)
-                        v = ushort.Parse(value.Substring(i, 3));
+                    if (i * 3 + 2 < value.Length)
+                        v = ushort.Parse(value.Substring(i * 3, 3));
                     else
-                        v = ushort.Parse(value.Substring(i));
-                    if (BitConverter.IsLittleEndian)
-                        buffer = BitConverter.GetBytes(v);
-                    else
-                        buffer = Reverse(BitConverter.GetBytes(v));
-
-                    if(i % 4 == 0)
-                    {   
-                        _Digits[j] = buffer[1]; // 8
-                        _Digits[j + 1] = (byte)(buffer[0] << 6); //2
-                        j++;
-                    }
-                    else if(i % 4 == 3)
-                    {
-                        _Digits[j] |= (byte)(buffer[1] >> 2 & 63); //6
-                        _Digits[j + 1] = (byte)(buffer[1] << 6); //2
-                        _Digits[j + 1] |= (byte)(buffer[0] << 4); //2
-                        j++;
-                    }
-                    else if(i % 4 == 2)
-                    {
-                        _Digits[j] |= (byte)(buffer[1] >> 4 & 15); //4
-                        _Digits[j + 1] = (byte)(buffer[1] << 4); //4
-                        _Digits[j + 1] |= (byte)(buffer[0] << 2); //2
-                        j++;
-                    }
-                    else if(i % 4 == 1)
-                    {
-                        _Digits[j] |= (byte)(buffer[1] >> 6 & 3); //2
-                        _Digits[j + 1] = (byte)(buffer[1] << 2); //6
-                        _Digits[j + 1] |= (byte)(buffer[0]); //2
-                        j+=2;
-                    }
+                        v = ushort.Parse(value.Substring(i * 3).PadRight(3, '0'));
+                    SetDigits(i, v);
                 }
+            }
+        }
+
+        private void SetDigits(int index, ushort value)
+        {
+            byte[] buffer;
+            if (BitConverter.IsLittleEndian)
+                buffer = BitConverter.GetBytes(value);
+            else
+                buffer = Reverse(BitConverter.GetBytes(value));
+            int j = index * 5 / 4;
+            switch(j % 4)
+            {
+                case 0:
+                    _Digits[j] = buffer[0]; // 8
+                    _Digits[j + 1] = (byte)(buffer[1] << 6); //2
+                    break;
+                case 1:
+                    _Digits[j] |= (byte)(buffer[0] >> 2 & 63); //6
+                    _Digits[j + 1] = (byte)(buffer[0] << 6); //2
+                    _Digits[j + 1] |= (byte)(buffer[1] << 4); //2
+                    break;
+                case 2:
+                    _Digits[j] |= (byte)(buffer[0] >> 4 & 15); //4
+                    _Digits[j + 1] = (byte)(buffer[0] << 4); //4
+                    _Digits[j + 1] |= (byte)(buffer[1] << 2); //2
+                    break;
+                case 3:
+                    _Digits[j] |= (byte)(buffer[0] >> 6 & 3); //2
+                    _Digits[j + 1] = (byte)(buffer[0] << 2); //6
+                    _Digits[j + 1] |= (byte)(buffer[1]); //2
+                    break;
+                default:
+                    throw new NotImplementedException();
             }
         }
 
@@ -187,27 +190,25 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             switch (i % 4)
             {
                 case 0:
-                    return BitConverter.ToUInt16(new byte[] { _Digits[i],
-                        (byte)(_Digits[i + 1] >> 6 & 3) }, 0);
-                case 3:
-                    return BitConverter.ToUInt16(new byte[] { _Digits[i],
-                        (byte)(_Digits[i + 1] >> 6 & 3) }, 0);
-                case 2:
-                    return BitConverter.ToUInt16(new byte[] { _Digits[i],
+                    return BitConverter.ToUInt16(new byte[] {
+                        _Digits[i], 
                         (byte)(_Digits[i + 1] >> 6 & 3) }, 0);
                 case 1:
-                    return BitConverter.ToUInt16(new byte[] { _Digits[i],
-                        (byte)(_Digits[i + 1] >> 6 & 3) }, 0);
+                    return BitConverter.ToUInt16(new byte[] {
+                        (byte)(_Digits[i] << 2 | _Digits[i + 1] >> 6 & 3),
+                        (byte)(_Digits[i + 1] >> 4 & 3) }, 0);
+                case 2:
+                    return BitConverter.ToUInt16(new byte[] {
+                        (byte)(_Digits[i] << 4 | _Digits[i + 1] >> 4 & 15),
+                        (byte)(_Digits[i + 1] >> 2 & 3) }, 0);
+                case 3:
+                    return BitConverter.ToUInt16(new byte[] {
+                        (byte)(_Digits[i] << 6 | _Digits[i + 1] >> 2 & 63), 
+                        (byte)(_Digits[i + 1] & 3) }, 0);
                 default:
                     throw new NotImplementedException();
             }
         }
-
-        private void SetDigits(short s)
-        {
-
-        }
-
 
         public int Length { get => _Digits.Length; }
 

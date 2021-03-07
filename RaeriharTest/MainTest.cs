@@ -81,10 +81,11 @@ namespace RaeriharTest
                 "0"
             };
 
-            ar = ArNumber.Parse(testStrings[0]);
-            TestContext.WriteLine(ar.ToString());
+            ar = ArNumber.Parse(testStrings[0]);            
             Assert.IsTrue(ar.ToString() == "-5.89662145E-106");
             ar = ArNumber.Parse(testStrings[1]);
+            TestContext.WriteLine(ar.ToString());
+            //-3.61189567800E+49
             Assert.IsTrue(ar.ToString() == "-3.611895678E+49");
             ar = ArNumber.Parse(testStrings[2]);
             Assert.IsTrue(ar.ToString() == "-6.8718E-4");
