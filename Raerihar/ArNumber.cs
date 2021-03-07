@@ -105,9 +105,62 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 
         public string Digits
         {
-            get {
+            get
+            {
                 return Convert.ToUInt16(_Digits[0]).ToString();
-            }           
+            }
+            private set
+            {
+                //No Check
+
+                if(value.Length % 12 != 0)
+                    _Digits = new byte[value.Length / 3 + 1];
+                else
+                    _Digits = new byte[value.Length / 3];
+
+                ushort v;
+                byte[] buffer;
+                int j = 0;
+                for(int i = 0; i < value.Length; i += 3)
+                {
+                    if (i + 3 < value.Length)
+                        v = ushort.Parse(value.Substring(i, 3));
+                    else
+                        v = ushort.Parse(value.Substring(i));
+                    if (BitConverter.IsLittleEndian)
+                        buffer = BitConverter.GetBytes(v);
+                    else
+                        buffer = Reverse(BitConverter.GetBytes(v));
+
+                    if(i % 4 == 0)
+                    {   
+                        _Digits[j] = buffer[1]; // 8
+                        _Digits[j + 1] = (byte)(buffer[0] << 6); //2
+                        j++;
+                    }
+                    else if(i % 4 == 3)
+                    {
+                        _Digits[j] |= (byte)(buffer[1] >> 2 & 63); //6
+                        _Digits[j + 1] = (byte)(buffer[1] << 6); //2
+                        _Digits[j + 1] |= (byte)(buffer[0] << 4); //2
+                        j++;
+                    }
+                    else if(i % 4 == 1)
+                    {
+                        _Digits[j] |= (byte)(buffer[1] >> 4 & 15); //4
+                        _Digits[j + 1] = (byte)(buffer[1] << 4); //4
+                        _Digits[j + 1] |= (byte)(buffer[0] << 2); //2
+                        j++;
+                    }
+                    else if(i % 4 == 4)
+                    {
+                        _Digits[j] |= (byte)(buffer[1] >> 6 & 3); //2
+                        _Digits[j + 1] = (byte)(buffer[1] << 2); //6
+                        _Digits[j + 1] |= (byte)(buffer[0]); //2
+                        j+=2;
+                    }
+                }
+            }
         }
 
 
@@ -151,78 +204,83 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         }
 
         private void ParseSelf(string s, NumberStyles style, IFormatProvider provider)
-        {
-            //if (string.IsNullOrEmpty(s))
-            //    throw new ArgumentNullException(nameof(s));
-            //bool negative = false;
-            //long e;
+        {   
+            if (string.IsNullOrEmpty(s))
+                throw new ArgumentNullException(nameof(s));
+            IsNegative = false;
+            long e;
 
-            //string numberString = s;
-            //int eIndex = -2, pointIndex = -1;
-            //if (numberString[0] == '+')
-            //    numberString = numberString.Remove(0, 1);
-            //else if (numberString[0] == '-')
-            //{
-            //    negative = true;
-            //    numberString = numberString.Remove(0, 1);
-            //}
-            //while (numberString.Length > 1 && numberString[0] == '0')
-            //    numberString = numberString.Remove(0, 1);
+            string numberString = s;
+            if (style.HasFlag(NumberStyles.AllowThousands))
+                numberString = numberString.Replace(",", "");            
+            numberString = numberString.Trim();
 
-            //for (int i = 0; i < numberString.Length; i++)
-            //{
-            //    if (i == eIndex + 1)
-            //    {
-            //        if (numberString[i] != '+' && numberString[i] != '-')
-            //            throw new ArgumentException($"{nameof(s)}:{s}");
-            //    }
-            //    else if (numberString[i] == '.')
-            //        if (pointIndex == -1)
-            //            pointIndex = i;
-            //        else
-            //            throw new ArgumentException($"{nameof(s)}:{s}");
-            //    else if (numberString[i] == 'E' || numberString[i] == 'e')
-            //        if (i == 0)
-            //            throw new ArgumentException($"{nameof(s)}:{s}");
-            //        else if (eIndex == -2)
-            //            eIndex = i;
-            //        else
-            //            throw new ArgumentException($"{nameof(s)}:{s}");
-            //    else if (!char.IsDigit(numberString[i]))
-            //        throw new ArgumentException($"{nameof(s)}:{s}");
-            //}
+            int eIndex = -2, pointIndex = -1;
+            if (numberString[0] == '+')
+                numberString = numberString.Remove(0, 1);
+            else if (numberString[0] == '-')
+            {
+                IsNegative = true;
+                numberString = numberString.Remove(0, 1);
+            }
+            while (numberString.Length > 1 && numberString[0] == '0')
+                numberString = numberString.Remove(0, 1);
 
-            //if (eIndex != -2)
-            //{
-            //    Exponent = int.Parse(numberString.Substring(eIndex + 1));
-            //    numberString = numberString.Remove(eIndex);
-            //}
-            //else
-            //    Exponent = 0;
+            for (int i = 0; i < numberString.Length; i++)
+            {
+                if (i == eIndex + 1)
+                {
+                    if (numberString[i] != '+' && numberString[i] != '-')
+                        throw new ArgumentException($"{nameof(s)}:{s}");
+                }
+                else if (numberString[i] == '.')
+                    if (pointIndex == -1)
+                        pointIndex = i;
+                    else
+                        throw new ArgumentException($"{nameof(s)}:{s}");
+                else if (numberString[i] == 'E' || numberString[i] == 'e')
+                    if (i == 0)
+                        throw new ArgumentException($"{nameof(s)}:{s}");
+                    else if (eIndex == -2)
+                        eIndex = i;
+                    else
+                        throw new ArgumentException($"{nameof(s)}:{s}");
+                else if (!char.IsDigit(numberString[i]))
+                    throw new ArgumentException($"{nameof(s)}:{s}");
+            }
 
-            //if (pointIndex != -1)
-            //{
-            //    while (numberString[numberString.Length - 1] == '0')
-            //        numberString = numberString.Remove(numberString.Length - 1, 1);
-            //    numberString = numberString.Remove(pointIndex, 1);
-            //    if (numberString.Length == 0)
-            //    {
-            //        Digits = "0";
-            //        return;
-            //    }
-            //    Exponent += pointIndex - 1;
-            //    while (numberString[0] == '0')
-            //    {
-            //        numberString = numberString.Remove(0, 1);
-            //        Exponent--;
-            //    }
-            //}
-            //else
-            //    Exponent += numberString.Length - 1;
+            if (eIndex != -2)
+            {
+                e = int.Parse(numberString.Substring(eIndex + 1));
+                numberString = numberString.Remove(eIndex);
+            }
+            else
+                e = 0;
 
-            //while (numberString.Length > 1 && numberString[numberString.Length - 1] == '0')
-            //    numberString = numberString.Remove(numberString.Length - 1, 1);
-            //Digits = numberString;
+            if (pointIndex != -1)
+            {
+                while (numberString[numberString.Length - 1] == '0')
+                    numberString = numberString.Remove(numberString.Length - 1, 1);
+                numberString = numberString.Remove(pointIndex, 1);
+                if (numberString.Length == 0)
+                {
+                    Digits = "0";
+                    return;
+                }
+                e += pointIndex - 1;
+                while (numberString[0] == '0')
+                {
+                    numberString = numberString.Remove(0, 1);
+                    e--;
+                }
+            }
+            else
+                e += numberString.Length - 1;
+
+            while (numberString.Length > 1 && numberString[numberString.Length - 1] == '0')
+                numberString = numberString.Remove(numberString.Length - 1, 1);
+            Digits = numberString;
+            Exponent = e;
         }
 
         public static ArNumber Parse(string s, NumberStyles style, IFormatProvider provider)
@@ -246,45 +304,6 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             }
         }
 
-        //private void SetDigits()
-        //{
-
-        //}
-
-        //private string GetDigits(int startIndex)
-        //{
-        //    if(_Data.Length - startIndex == 1)
-        //    {
-        //        return _Data[startIndex].ToString();
-        //    }
-        //    return "";
-        //}
-        //private void SetExponent()
-        //{
-
-        //}
-
-        //private long GetExponent(out int exponentLength)
-        //{
-        //    switch ((byte)(_Data[0] << 1) >> 7)
-        //    {
-        //        case 0:
-        //            exponentLength = 1;
-        //            return (byte)(_Data[0] << 3) >> 3;
-        //        case 1:
-        //            exponentLength = 2;
-        //            return BitConverter.ToInt64(new byte[] { (byte)(_Data[0] << 3), _Data[1] }, 0);
-        //        case 2:
-        //            exponentLength = 4;
-        //            return BitConverter.ToInt64(new byte[] { (byte)(_Data[0] << 3), _Data[1], _Data[2], _Data[3] }, 0);
-        //        case 3:
-        //            exponentLength = 8;
-        //            return BitConverter.ToInt64(new byte[] { (byte)(_Data[0] << 3), _Data[1], _Data[2], _Data[3], _Data[4], _Data[5], _Data[6], _Data[7] }, 0);
-        //        default:
-        //            throw new NotImplementedException();
-        //    }
-        //}
-
         private string ToString(int digits, char format, IFormatProvider provider)
         {
             bool negative = _Data[0] >> 7 == 1;
@@ -292,7 +311,6 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             if (format == 'G')
                 format = 'E';
             StringBuilder result = new StringBuilder();
-            //result.Append(GetDigits(exponentLength));
             result.Append(Digits);
             if (result.Length != 1 && format == 'E')
                 result.Insert(1, '.');

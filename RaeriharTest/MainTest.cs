@@ -63,7 +63,7 @@ namespace RaeriharTest
 
         [TestMethod]
         public void NewArNumber()
-        {   
+        {
             ArNumber a = new ArNumber(3);
             TestContext.WriteLine(a.ToString());
             a = 20;
@@ -76,5 +76,14 @@ namespace RaeriharTest
             TestContext.WriteLine(a.ToString());
 
         }
+
+        [TestMethod]
+        public void Test()
+        {
+            string s = "dddd";
+            TestContext.WriteLine(s.Substring(2, 5));
+        }
+
+
     }
 }
