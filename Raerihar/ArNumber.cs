@@ -14,10 +14,10 @@ namespace Aritiafel.Organizations.RaeriharUniversity
     //          3 => 61 bit  Exponent(Log 10) 8
     //N         Exponent (First 1 is sign)
     //N         Digits 連續的二進位來表示十進位
-    //N1-10     999 -> 000
-    //N11-20    999 -> 000
-    //N21-30    999 -> 000
-    //N31-40    999 -> 000
+    //N1-10     000 -> 999
+    //N11-20    000 -> 999
+    //N21-30    000 -> 999
+    //N31-40    000 -> 999
 
     //Index Digits      Bytes
     //0     1~3         2Bytes
@@ -57,14 +57,16 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         {
             get
             {
-                if (_Data.Length == 0)
+                if (_Data == null || _Data.Length == 0)
                     Initialize();
                 return _Data[0] >> 7 == 1;
             }
             set
             {
-                if (_Data.Length == 0)
+                if (_Data == null || _Data.Length == 0)
                     Initialize();
+                if (Digits == "0")
+                    return;
                 _Data[0] = value ? (byte)(_Data[0] | 128) : (byte)(_Data[0] & 127);
             }
         }
@@ -72,7 +74,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         {
             get
             {
-                if (_Data.Length == 0)
+                if (_Data == null || _Data.Length == 0)
                     Initialize();
                 switch ((byte)(_Data[0] & 96) >> 5)
                 {
@@ -99,7 +101,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             }
             set
             {
-                if (_Data.Length == 0)
+                if (_Data == null || _Data.Length == 0)
                     Initialize();
                 byte[] result;
                 if (value < 16 && value > -17)
@@ -145,7 +147,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         {
             get
             {
-                if (_Data.Length == 0)
+                if (_Data == null || _Data.Length == 0)
                     Initialize();
                 StringBuilder result = new StringBuilder();
                 for (int i = 0; i < (_Digits.Length - 1) * 4 / 5 + 1; i++)
@@ -280,7 +282,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 
         private void ParseSelf(string s, NumberStyles style = NumberStyles.None, IFormatProvider provider = null)
         {
-            if (_Data.Length == 0)
+            if (_Data == null || _Data.Length == 0)
                 Initialize();
             if (string.IsNullOrEmpty(s))
                 throw new ArgumentNullException(nameof(s));

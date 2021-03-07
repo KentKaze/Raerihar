@@ -150,8 +150,11 @@ namespace RaeriharTest
             //5.6E+1
             //1.27E+2
             //- 1.3E+1
-            ArNumber b = new ArNumber();
+            ArNumber b = new ArNumber(50.7);
             b.IsNegative = true;
+
+            ArNumber c = b;
+            TestContext.WriteLine(c.ToString());
         }
 
         [TestMethod]
