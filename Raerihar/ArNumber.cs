@@ -26,7 +26,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 
     //128, 64, 32, 16, 8, 4, 2, 1
     public struct ArNumber //: IComparable, IComparable<ArNumber>, IConvertible, IEquatable<ArNumber>, IFormattable
-    {
+    {   
         private byte[] _Data;
         private byte[] _Digits;
         public bool IsNegative
@@ -38,43 +38,61 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         {  
             get
             {
-                switch ((byte)(_Data[0] << 1) >> 7)
+                switch ((byte)(_Data[0] & 96) >> 5)
                 {
                     case 0:
-                        return (byte)(_Data[0] << 3) >> 3;
+                        return (sbyte)((sbyte)(_Data[0] << 3) >> 3);
                     case 1:
-                        return BitConverter.ToInt64(new byte[] { (byte)((byte)(_Data[0] << 3) >> 3), _Data[1] }, 0);
+                        //LittleEndian TO DO
+                        return BitConverter.ToInt16(new byte[] { _Data[1], (byte)((sbyte)(_Data[0] << 3) >> 3) }, 0);
                     case 2:                        
-                        return BitConverter.ToInt64(new byte[] { (byte)((byte)(_Data[0] << 3) >> 3), _Data[1], _Data[2], _Data[3] }, 0);
+                        return BitConverter.ToInt32(new byte[] { _Data[3], _Data[2], _Data[1], (byte)((sbyte)(_Data[0] << 3) >> 3) }, 0);
                     case 3:
-                        return BitConverter.ToInt64(new byte[] { (byte)((byte)(_Data[0] << 3) >> 3), _Data[1], _Data[2], _Data[3], _Data[4], _Data[5], _Data[6], _Data[7] }, 0);
+                        return BitConverter.ToInt64(new byte[] { _Data[7], _Data[6], _Data[5], _Data[4], _Data[3], _Data[2], _Data[1], (byte)((sbyte)(_Data[0] << 3) >> 3) }, 0);
                     default:
                         throw new NotImplementedException();
                 }
             }
-            set {
-                byte[] result = BitConverter.GetBytes(value);
-                result[0] &= 224;
+            set 
+            {
+                byte[] result;
                 if (value < 16 && value > -17)
+                {
+                    result = new byte[] { (byte)value };
+                    result[0] &= 31;
                     result[0] |= (byte)(_Data[0] & 128);
+                }   
                 else if (value < 4096 && value > -4097)
+                {
+                    result = Reverse(BitConverter.GetBytes((short)value));
+                    result[0] &= 31;
                     result[0] |= (byte)(_Data[0] & 128 | 32);
-                else if (value < 536870912 && value > -536870913)
+                }                    
+                else if (value < 268435456 && value > -268435457)
+                {   
+                    result = Reverse(BitConverter.GetBytes((int)value));
+                    result[0] &= 31;
                     result[0] |= (byte)(_Data[0] & 128 | 64);
+                }   
                 else
+                {
+                    result = Reverse(BitConverter.GetBytes(value));
+                    result[0] &= 31;
                     result[0] |= (byte)(_Data[0] & 128 | 96);
+                }   
                 _Data = result;
             }
         }
 
         public string Digits
         {
-            get => "";
-            set { }
+            get {
+                return Convert.ToUInt16(_Digits[0]).ToString();
+            }           
         }
 
 
-        public int Legnth { get => _Data.Length; }
+        public int Length { get => _Digits.Length; }
 
         //[CLSCompliant(false)]
         //public ArNumber(ulong value);
@@ -89,6 +107,17 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         //}
         //public ArNumber(double value);
         //public ArNumber(int lo, int mid, int hi, bool isNegative, byte scale);
+        private byte[] Reverse(byte[] array)
+        {          
+            for(int i = 0; i < array.Length / 2; i++)
+            {
+                byte buffer = array[i];
+                array[i] = array[array.Length - i - 1];
+                array[array.Length - i - 1] = buffer;
+            }
+            return array;
+        }
+
         public ArNumber(sbyte value)
         {
             _Data = new byte[1];
@@ -245,7 +274,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 format = 'E';
             StringBuilder result = new StringBuilder();
             //result.Append(GetDigits(exponentLength));
-            
+            result.Append(Digits);
             if (result.Length != 1 && format == 'E')
                 result.Insert(1, '.');
             if (e != 0 && format == 'E')
