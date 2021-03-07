@@ -107,7 +107,34 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         {
             get
             {
-                return Convert.ToUInt16(_Digits[0]).ToString();
+                byte b1, b2;
+                StringBuilder result = new StringBuilder();
+                for (int i = 0; i < _Digits.Length; i++)
+                {
+                    if (i == _Digits.Length && i % 4 != 1)
+                        break;
+                    if (i % 4 == 0)
+                    {
+                        result.Append(BitConverter.ToUInt16(new byte[] {
+                            _Digits[i], (byte)(_Digits[i + 1] >> 6 & 3) }, 0).ToString());
+                    }
+                    else if (i % 4 == 3)
+                    {
+                        result.Append(BitConverter.ToUInt16(new byte[] {
+                            _Digits[i] << 2 | _Digits[i + 1] , (byte)(_Digits[i + 1] >> 6 & 3) }, 0).ToString());
+                    }
+                    else if (i % 4 == 2)
+                    {
+                        result.Append(BitConverter.ToUInt16(new byte[] {
+                            _Digits[i], (byte)(_Digits[i + 1] >> 6 & 3) }, 0).ToString());
+                    }
+                    else if (i % 4 == 1)
+                    {
+                        result.Append(BitConverter.ToUInt16(new byte[] { 
+                            _Digits[i], (byte)(_Digits[i + 1] >> 6 & 3) }, 0).ToString());
+                    }
+                }
+                return result.ToString();
             }
             private set
             {
@@ -145,14 +172,14 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                         _Digits[j + 1] |= (byte)(buffer[0] << 4); //2
                         j++;
                     }
-                    else if(i % 4 == 1)
+                    else if(i % 4 == 2)
                     {
                         _Digits[j] |= (byte)(buffer[1] >> 4 & 15); //4
                         _Digits[j + 1] = (byte)(buffer[1] << 4); //4
                         _Digits[j + 1] |= (byte)(buffer[0] << 2); //2
                         j++;
                     }
-                    else if(i % 4 == 4)
+                    else if(i % 4 == 1)
                     {
                         _Digits[j] |= (byte)(buffer[1] >> 6 & 3); //2
                         _Digits[j + 1] = (byte)(buffer[1] << 2); //6
@@ -204,7 +231,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         }
 
         private void ParseSelf(string s, NumberStyles style, IFormatProvider provider)
-        {   
+        {
+            _Data = new byte[1];
             if (string.IsNullOrEmpty(s))
                 throw new ArgumentNullException(nameof(s));
             IsNegative = false;
@@ -282,6 +310,15 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             Digits = numberString;
             Exponent = e;
         }
+
+        public static ArNumber Parse(string s)
+            => Parse(s, NumberStyles.None, null);
+
+        public static ArNumber Parse(string s, NumberStyles style)
+            => Parse(s, style, null);
+
+        public static ArNumber Parse(string s, IFormatProvider provider)
+            => Parse(s, NumberStyles.None, provider);
 
         public static ArNumber Parse(string s, NumberStyles style, IFormatProvider provider)
         {

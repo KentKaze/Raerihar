@@ -62,6 +62,62 @@ namespace RaeriharTest
         }
 
         [TestMethod]
+        public void ParseTest()
+        {
+            ArNumber sn = new ArNumber();
+            string[] testStrings = {
+                "-0.00589662145E-103",
+                "-0.03611895678E+51",
+                "-0000.0006871800",
+                "35678943580000000000000000000000000000000",
+                "+568.68100E-8",
+                "-.00035E-20",
+                "0.00",
+                "-0.000",
+                "+300",
+                "-0.008",
+                "0.00681E+98",
+                "0.01",
+                "0"
+            };
+
+            sn = ArNumber.Parse(testStrings[0]);
+            TestContext.WriteLine(sn.ToString());
+            Assert.IsTrue(sn.ToString() == "-5.89662145E-106");
+            sn = ArNumber.Parse(testStrings[1]);
+            Assert.IsTrue(sn.ToString() == "-3.611895678E+49");
+            sn = ArNumber.Parse(testStrings[2]);
+            Assert.IsTrue(sn.ToString() == "-6.8718E-4");
+            //Assert.IsTrue(sn.ToString("C") == "-0.00068718");
+            sn = ArNumber.Parse(testStrings[3]);
+            Assert.IsTrue(sn.ToString() == "3.567894358E+40");
+            sn = ArNumber.Parse(testStrings[4]);
+            Assert.IsTrue(sn.ToString() == "5.68681E-6");
+            //Assert.IsTrue(sn.ToString("C") == "0.00000568681");
+            //TestContext.WriteLine(sn.ToString("C3"));
+            //Assert.IsTrue(sn.ToString("C3") == "0.00000569");
+            //Assert.IsTrue(sn.ToString("C3") == "0.00");
+            sn = ArNumber.Parse(testStrings[5]);
+            Assert.IsTrue(sn.ToString() == "-3.5E-24");
+            sn = ArNumber.Parse(testStrings[6]);
+            Assert.IsTrue(sn.ToString() == "0");
+            //Assert.IsTrue(sn.ToString("C") == "0");
+            sn = ArNumber.Parse(testStrings[7]);
+            Assert.IsTrue(sn.ToString() == "0");
+            //Assert.IsTrue(sn.ToString("C") == "0");
+            sn = ArNumber.Parse(testStrings[8]);
+            Assert.IsTrue(sn.ToString() == "3E+2");
+            sn = ArNumber.Parse(testStrings[9]);
+            Assert.IsTrue(sn.ToString() == "-8E-3");
+            sn = ArNumber.Parse(testStrings[10]);
+            Assert.IsTrue(sn.ToString() == "6.81E+95");
+            sn = ArNumber.Parse(testStrings[11]);
+            Assert.IsTrue(sn.ToString() == "1E-2");
+            sn = ArNumber.Parse(testStrings[12]);
+            Assert.IsTrue(sn.ToString() == "0");
+        }
+
+        [TestMethod]
         public void NewArNumber()
         {
             ArNumber a = new ArNumber(3);
@@ -80,8 +136,7 @@ namespace RaeriharTest
         [TestMethod]
         public void Test()
         {
-            string s = "dddd";
-            TestContext.WriteLine(s.Substring(2, 5));
+            
         }
 
 
