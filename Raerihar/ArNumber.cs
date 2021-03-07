@@ -19,6 +19,18 @@ namespace Aritiafel.Organizations.RaeriharUniversity
     //N21-30    999 -> 000
     //N31-40    999 -> 000
 
+    //1~3       2Bytes
+    //4~6       3Bytes
+    //7~9       4Bytes
+    //10~12     5Bytes * 
+    //13~15     7Bytes
+    //16~18     8Bytes
+    //19~21     9Bytes
+    //22~24    10Bytes *
+    //25~27    12Bytes
+
+    //digits / 12 * 5 = bytes
+    //bytes * 12 / 5 = digits
     //Special Number
     // 1000 NaN
     // 1001 Positive Infinity
@@ -107,33 +119,12 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         {
             get
             {
-                byte b1, b2;
                 StringBuilder result = new StringBuilder();
-                for (int i = 0; i < _Digits.Length; i++)
-                {
-                    if (i == _Digits.Length && i % 4 != 1)
+                for (int i = 0; i < _Digits.Length * 4 / 5; i++)
+                    if (false || i + 1 > _Digits.Length * 4 / 5 && i % 5 == 0)
                         break;
-                    if (i % 4 == 0)
-                    {
-                        result.Append(BitConverter.ToUInt16(new byte[] {
-                            _Digits[i], (byte)(_Digits[i + 1] >> 6 & 3) }, 0).ToString());
-                    }
-                    else if (i % 4 == 3)
-                    {
-                        result.Append(BitConverter.ToUInt16(new byte[] {
-                            _Digits[i] << 2 | _Digits[i + 1] , (byte)(_Digits[i + 1] >> 6 & 3) }, 0).ToString());
-                    }
-                    else if (i % 4 == 2)
-                    {
-                        result.Append(BitConverter.ToUInt16(new byte[] {
-                            _Digits[i], (byte)(_Digits[i + 1] >> 6 & 3) }, 0).ToString());
-                    }
-                    else if (i % 4 == 1)
-                    {
-                        result.Append(BitConverter.ToUInt16(new byte[] { 
-                            _Digits[i], (byte)(_Digits[i + 1] >> 6 & 3) }, 0).ToString());
-                    }
-                }
+                    else
+                        result.Append(GetDigits(i));
                 return result.ToString();
             }
             private set
@@ -141,9 +132,9 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 //No Check
 
                 if(value.Length % 12 != 0)
-                    _Digits = new byte[value.Length / 3 + 1];
+                    _Digits = new byte[value.Length * 5 / 12 + 1];
                 else
-                    _Digits = new byte[value.Length / 3];
+                    _Digits = new byte[value.Length * 5 / 12];
 
                 ushort v;
                 byte[] buffer;
@@ -188,6 +179,33 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                     }
                 }
             }
+        }
+
+        private ushort GetDigits(int index)
+        {
+            int i = index;
+            switch (i % 4)
+            {
+                case 0:
+                    return BitConverter.ToUInt16(new byte[] { _Digits[i],
+                        (byte)(_Digits[i + 1] >> 6 & 3) }, 0);
+                case 3:
+                    return BitConverter.ToUInt16(new byte[] { _Digits[i],
+                        (byte)(_Digits[i + 1] >> 6 & 3) }, 0);
+                case 2:
+                    return BitConverter.ToUInt16(new byte[] { _Digits[i],
+                        (byte)(_Digits[i + 1] >> 6 & 3) }, 0);
+                case 1:
+                    return BitConverter.ToUInt16(new byte[] { _Digits[i],
+                        (byte)(_Digits[i + 1] >> 6 & 3) }, 0);
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        private void SetDigits(short s)
+        {
+
         }
 
 
@@ -342,8 +360,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         }
 
         private string ToString(int digits, char format, IFormatProvider provider)
-        {
-            bool negative = _Data[0] >> 7 == 1;
+        {   
             long e = Exponent;
             if (format == 'G')
                 format = 'E';
@@ -353,7 +370,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 result.Insert(1, '.');
             if (e != 0 && format == 'E')
                 result.AppendFormat("E{0}{1}", e > 0 ? "+" : "", e);
-            if (negative)
+            if (IsNegative)
                 result.Insert(0, '-');
             return result.ToString();
         }
