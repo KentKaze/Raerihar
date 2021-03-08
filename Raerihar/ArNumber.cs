@@ -57,7 +57,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         private byte[] _Data;
         private byte[] _Numbers;
 
-        private int DigitSetLength => (_Numbers.Length * 4 - 6) / 15;
+        private int DigitSetLength => (_Numbers.Length * 4 - 6) / 15 + 1;
         public bool Negative
         {
             get => _Data[_Data.Length - 1] >> 7 == 1;
@@ -74,12 +74,13 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             {
                 long result;
                 byte lastByte = _Data[_Data.Length - 1];
+                _Data[_Data.Length - 1] &= 127;
                 _Data[_Data.Length - 1] |= (byte)(_Data[_Data.Length - 1] << 1 & 128);
 
                 switch (_Data.Length)
                 {
                     case 1:
-                        result = _Data[0];
+                        result = (sbyte)_Data[0];
                         break;
                     case 2:
                         if (BitConverter.IsLittleEndian)
@@ -108,13 +109,13 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             set
             {
                 byte[] result;
-                if (value > -64 && value < 63)
+                if (value > -65 && value < 64)
                     result = new byte[] { (byte)value };
-                else if (value > -16384 && value < 16383)
+                else if (value > -16385 && value < 16384)
                     result = BitConverter.GetBytes((short)value);
-                else if (value > -1073741824 && value < 1073741823)
+                else if (value > -1073741825 && value < 1073741824)
                     result = BitConverter.GetBytes((int)value);
-                else if (value > -4611686018427387904 && value < 4611686018427387903)
+                else if (value > -4611686018427387905 && value < 4611686018427387904)
                     result = BitConverter.GetBytes(value);
                 else
                     throw new ArgumentOutOfRangeException(nameof(Exponent));
@@ -187,6 +188,13 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             for (int i = 0; i < _Data.Length; i++)
                 _Numbers[i] = a._Numbers[i];
         }
+        public ArNumber(int value)
+           : this()
+           => Parse(value.ToString(), this);
+
+        public ArNumber(double value)
+            : this()
+            => Parse(value.ToString(), this);
 
         public ArNumber()
         {
@@ -275,7 +283,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 buffer = BitConverter.GetBytes(value);
             else
                 buffer = Reverse(BitConverter.GetBytes(value));
-            int j = index * 15 + 18 / 4;
+            int j = index * 15 / 4;
             switch (index % 4)
             {
                 case 0:
@@ -321,7 +329,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 
         private int GetDigits(int index)
         {
-            int j = index * 15 + 18 / 4;
+            int j = index * 15 / 4;
             switch (index % 4)
             {
                 case 0:
@@ -330,22 +338,22 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                     (byte)(_Numbers[j + 3] >> 2 & 63) }, 0);
                 case 1:
                     return BitConverter.ToInt32(new byte[] {
-                    (byte)(_Numbers[j] << 6 | _Numbers[j + 1] >> 2 & 63),
-                    (byte)(_Numbers[j + 1] << 6 | _Numbers[j + 2] >> 2 & 63),
-                    (byte)(_Numbers[j + 2] << 6 | _Numbers[j + 3] >> 2 & 63),
-                    (byte)(_Numbers[j + 3] << 4 & 192 | _Numbers[j + 4] >> 4) }, 0);
+                    (byte)((byte)(_Numbers[j] << 6) | (_Numbers[j + 1] >> 2 & 63)),
+                    (byte)((byte)(_Numbers[j + 1] << 6) | (_Numbers[j + 2] >> 2 & 63)),
+                    (byte)((byte)(_Numbers[j + 2] << 6) | (_Numbers[j + 3] >> 2 & 63)),
+                    (byte)((byte)(_Numbers[j + 3] << 4 & 48) | (_Numbers[j + 4] >> 4 & 15)) }, 0);
                 case 2:
                     return BitConverter.ToInt32(new byte[] {
                     (byte)(_Numbers[j] << 4 | _Numbers[j + 1] >> 4 & 15),
                     (byte)(_Numbers[j + 1] << 4 | _Numbers[j + 2] >> 4 & 15),
                     (byte)(_Numbers[j + 2] << 4 | _Numbers[j + 3] >> 4 & 15),
-                    (byte)(_Numbers[j + 3] << 2 & 192 | _Numbers[j + 4] >> 6) }, 0);
+                    (byte)(_Numbers[j + 3] << 2 & 48 | _Numbers[j + 4] >> 6 & 3) }, 0);
                 case 3:
                     return BitConverter.ToInt32(new byte[] {
                     (byte)(_Numbers[j] << 2 | _Numbers[j + 1] >> 6 & 3),
                     (byte)(_Numbers[j + 1] << 2 | _Numbers[j + 2] >> 6 & 3),
                     (byte)(_Numbers[j + 2] << 2 | _Numbers[j + 3] >> 6 & 3),
-                    (byte)(_Numbers[j + 3] & 192) }, 0);
+                    (byte)(_Numbers[j + 3] & 48) }, 0);
                 default:
                     throw new NotImplementedException();
             }
@@ -541,5 +549,10 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 return false;
             }
         }
+
+        public static implicit operator ArNumber(int a)
+            => new ArNumber(a);
+        public static implicit operator ArNumber(double a)
+            => new ArNumber(a);
     }
 }
