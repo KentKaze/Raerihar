@@ -11,9 +11,21 @@ namespace RaeriharTest
         public TestContext TestContext { get; set; }
 
         [TestMethod]
-        public void Test()
+        public void CompareTest()
         {
-            ArNumber ar = new ArNumber();
+            ChaosBox cb = new ChaosBox();
+            ArNumber ar;
+
+            ArNumber br;
+            for(int i = 0; i < 10000; i++)
+            {
+                ar = cb.DrawOutDiversityDouble();
+                br = cb.DrawOutDecimal();
+                if (ar > br)
+                    TestContext.WriteLine($"{ar}>{br}");
+                else
+                    TestContext.WriteLine($"{ar}<{br}");
+            }
             
         }
 
@@ -98,36 +110,44 @@ namespace RaeriharTest
 
             Assert.IsTrue(ar.ToString("E") == "-5.89662145E-106");
             ar = ArNumber.Parse(testStrings[1]);
-            //-3.61189567800E+49
+           
             //TestContext.WriteLine(ar.ToString());
-            //-3.611895671873741824E-79
-            //-3.611895678E-79
+           
             Assert.IsTrue(ar.ToString("E") == "-3.611895678E+49");
+            //TestContext.WriteLine(ar.ToString("D"));
+            Assert.IsTrue(ar.ToString("D") == "-36118956780000000000000000000000000000000000000000");
             ar = ArNumber.Parse(testStrings[2]);
             //TestContext.WriteLine(ar.ToString());
             Assert.IsTrue(ar.ToString("E") == "-6.8718E-4");
-            //Assert.IsTrue(sn.ToString("C") == "-0.00068718");
+            Assert.IsTrue(ar.ToString("D") == "0");            
+            Assert.IsTrue(ar.ToString("C") == "-0.00068718");
             ar = ArNumber.Parse(testStrings[3]);
             Assert.IsTrue(ar.ToString("E") == "3.567894358E+40");
+            Assert.IsTrue(ar.ToString("D") == "35678943580000000000000000000000000000000");
+            
             ar = ArNumber.Parse(testStrings[4]);
             Assert.IsTrue(ar.ToString("E") == "5.68681E-6");
-            //Assert.IsTrue(sn.ToString("C") == "0.00000568681");
-            //TestContext.WriteLine(sn.ToString("C3"));
-            //Assert.IsTrue(sn.ToString("C3") == "0.00000569");
-            //Assert.IsTrue(sn.ToString("C3") == "0.00");
+            Assert.IsTrue(ar.ToString("C") == "0.00000568681");
+            TestContext.WriteLine(ar.ToString("C3"));
+            //Assert.IsTrue(ar.ToString("C3") == "0.00000568681"); // TO DO
+            //Assert.IsTrue(sn.ToString("C3") == "0.00");            
+            Assert.IsTrue(ar.ToString("D") == "0");
+            
+            
             ar = ArNumber.Parse(testStrings[5]);
-
             Assert.IsTrue(ar.ToString("E") == "-3.5E-24");
             ar = ArNumber.Parse(testStrings[6]);
             Assert.IsTrue(ar.ToString("E") == "0");
-            //Assert.IsTrue(sn.ToString("C") == "0");
+            Assert.IsTrue(ar.ToString("C") == "0");
             ar = ArNumber.Parse(testStrings[7]);
             Assert.IsTrue(ar.ToString("E") == "0");
-            //Assert.IsTrue(sn.ToString("C") == "0");
+            Assert.IsTrue(ar.ToString("C") == "0");
             ar = ArNumber.Parse(testStrings[8]);
             Assert.IsTrue(ar.ToString("E") == "3E+2");
+            Assert.IsTrue(ar.ToString() == "300");
             ar = ArNumber.Parse(testStrings[9]);
             Assert.IsTrue(ar.ToString("E") == "-8E-3");
+            Assert.IsTrue(ar.ToString() == "-0.008");
             ar = ArNumber.Parse(testStrings[10]);
             Assert.IsTrue(ar.ToString("E") == "6.81E+95");
             ar = ArNumber.Parse(testStrings[11]);
@@ -150,64 +170,62 @@ namespace RaeriharTest
             }
         }
 
-        //[TestMethod]
-        //public void NewArNumber()
-        //{
-        //    ArNumber a = 3;
-        //    TestContext.WriteLine(a.ToString());
-        //    a = 20;
-        //    TestContext.WriteLine(a.ToString());
-        //    a = 56;
-        //    TestContext.WriteLine(a.ToString());
-        //    a = 127;
-        //    TestContext.WriteLine(a.ToString());
-        //    a = -13;
-        //    TestContext.WriteLine(a.ToString());
+        [TestMethod]
+        public void NewArNumber()
+        {
+            ArNumber a = 3;
+            TestContext.WriteLine(a.ToString());
+            a = 20;
+            TestContext.WriteLine(a.ToString());
+            a = 56;
+            TestContext.WriteLine(a.ToString());
+            a = 127;
+            TestContext.WriteLine(a.ToString());
+            a = -13;
+            TestContext.WriteLine(a.ToString());
+            ArNumber b = new ArNumber(50.7);
+            b.Negative = true;
 
-        //    //3
-        //    //2E+1
-        //    //5.6E+1
-        //    //1.27E+2
-        //    //- 1.3E+1
-        //    ArNumber b = new ArNumber(50.7);
-        //    b.Negative = true;
+            ArNumber c = b;
+            TestContext.WriteLine(c.ToString());
+        }
 
-        //    ArNumber c = b;            
-        //    TestContext.WriteLine(c.ToString());
-        //}
+        [TestMethod]
+        public void CastTest()
+        {
+            byte b = 3;
+            ArNumber ar = new ArNumber(3);
+            ArNumber br = ar.Clone() as ArNumber;
+            br.Negative = true;
+            TestContext.WriteLine(ar.ToString());
+            TestContext.WriteLine(br.ToString());
+            sbyte c = (sbyte)ar;
+            TestContext.WriteLine(c.ToString());
+            br = 200;
+            Assert.ThrowsException<OverflowException>(() =>
+            {
+                sbyte d = (sbyte)br;
+            });
+            //TestContext.WriteLine(d.ToString());
 
-        //[TestMethod]
-        //public void CastTest()
-        //{
-        //    byte b = 3;
-        //    ArNumber ar = new ArNumber(3);
-        //    ArNumber br = ar.Clone() as ArNumber;
-        //    br.Negative = true;
-        //    TestContext.WriteLine(ar.ToString());
-        //    TestContext.WriteLine(br.ToString());
-        //    sbyte c = (sbyte)ar;            
-        //    TestContext.WriteLine(c.ToString());
-        //    br = 300;
-        //    sbyte d = (sbyte)br;
-        //    TestContext.WriteLine(d.ToString());
+            byte a1 = (byte)br;
+            short a2 = (short)br;
+            ushort a3 = (ushort)br;
+            int a4 = (int)br;
+            uint a5 = (uint)br;
+            long a6 = (long)br;
+            ulong a7 = (ulong)br;
+            decimal a8 = (decimal)br;            
+            float a9 = (float)br;            
+            double a11 = (double)br;
+            char a10 = (char)br;
 
-        //    byte a1 = (byte)br;
-        //    short a2 = (short)br;
-        //    ushort a3 = (ushort)br;
-        //    int a4 = (int)br;
-        //    uint a5 = (uint)br;
-        //    long a6 = (long)br;
-        //    ulong a7 = (ulong)br;
-        //    decimal a8 = (decimal)br;
-        //    float a9 = (float)br;
-        //    char a10 = (char)br;
-        //    double a11 = (double)br;            
-
-        //    Assert.ThrowsException<OverflowException>(() => {
-        //        br = -60;
-        //        byte aa1 = (byte)br;
-        //    });
-        //}
+            Assert.ThrowsException<OverflowException>(() =>
+            {
+                br = -60;
+                byte aa1 = (byte)br;
+            });
+        }
 
 
     }

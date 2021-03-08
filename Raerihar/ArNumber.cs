@@ -470,6 +470,13 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 {
                     if (e > digits - 1)
                         result.Append(new string('0', (int)e - digits + 1));
+                    else
+                    {
+                        if (e > 0)
+                            result.Remove((int)e + 1, result.Length - (int)e - 1);
+                        else
+                            return "0";
+                    }                        
                 }   
                 else if (format == 'C')
                 {
@@ -481,9 +488,6 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                         result.Insert(0, $"0.{new string('0', Math.Abs((int)e + 1))}");
                 }   
             }
-            //-744999665.2453299: -7449996652453299
-            //34594088007308696: 34594088007308696000000000000000
-            //2170.6907744747728: 2170690774474772800
             if (Negative)
                 result.Insert(0, '-');
             return result.ToString();
@@ -568,6 +572,10 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 
         public bool Equals(ArNumber other)
         {
+            if (_Data.Length != other._Data.Length)
+                return false;
+            if (_Numbers.Length != other._Numbers.Length)
+                return false;
             for (int i = 0; i < _Data.Length; i++)
                 if (_Data[i] != other._Data[i])
                     return false;
@@ -665,7 +673,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public static explicit operator ushort(ArNumber a)
             => ushort.Parse(a.ToString("D"));
         public static explicit operator char(ArNumber a)
-            => char.Parse(a.ToString("D"));
+            => (char)int.Parse(a.ToString("D"));
         public static explicit operator int(ArNumber a)
             => int.Parse(a.ToString("D"));
         public static explicit operator uint(ArNumber a)
