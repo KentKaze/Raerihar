@@ -50,7 +50,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 
     //128, 64, 32, 16, 8, 4, 2, 1
     //[CLSCompliant(false)]
-    public class ArNumber : IEquatable<ArNumber>, IComparable, IComparable<ArNumber>, IFormattable, ICloneable // IConvertible
+    public class ArNumber : IEquatable<ArNumber>, IComparable, IComparable<ArNumber>, IFormattable, ICloneable, IConvertible
     {
         private byte[] _Data;
         private byte[] _Digits;
@@ -516,45 +516,87 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public object Clone()
             => new ArNumber(this);
 
+        public TypeCode GetTypeCode()
+            => TypeCode.Object;
+        public bool ToBoolean(IFormatProvider provider)
+            => throw new InvalidCastException();
+        public byte ToByte(IFormatProvider provider)
+            => (byte)this;
+        public char ToChar(IFormatProvider provider)
+            => (char)this;
+        public DateTime ToDateTime(IFormatProvider provider)
+            => throw new InvalidCastException();
+        public decimal ToDecimal(IFormatProvider provider)
+            => (decimal)this;
+        public double ToDouble(IFormatProvider provider)
+            => (double)this;
+        public short ToInt16(IFormatProvider provider)
+            => (short)this;
+        public int ToInt32(IFormatProvider provider)
+            => (int)this;
+        public long ToInt64(IFormatProvider provider)
+            => (long)this;
+        public sbyte ToSByte(IFormatProvider provider)
+            => (sbyte)this;
+        public float ToSingle(IFormatProvider provider)
+            => (float)this;
+        public object ToType(Type conversionType, IFormatProvider provider)
+            => throw new InvalidCastException();
+        public ushort ToUInt16(IFormatProvider provider)
+            => (ushort)this;
+        public uint ToUInt32(IFormatProvider provider) 
+            => (uint)this;
+        public ulong ToUInt64(IFormatProvider provider)
+            => (ulong)this;
+
         public static implicit operator ArNumber(sbyte a)
             => new ArNumber(a);
-
         public static implicit operator ArNumber(byte a)
             => new ArNumber(a);
-
         public static implicit operator ArNumber(short a)
             => new ArNumber(a);
-
         public static implicit operator ArNumber(ushort a)
             => new ArNumber(a);
-
+        public static implicit operator ArNumber(char a)
+            => new ArNumber((uint)a);
         public static implicit operator ArNumber(int a)
             => new ArNumber(a);
-
         public static implicit operator ArNumber(uint a)
             => new ArNumber(a);
-
         public static implicit operator ArNumber(long a)
             => new ArNumber(a);
-
         public static implicit operator ArNumber(ulong a)
             => new ArNumber(a);
-
         public static implicit operator ArNumber(decimal a)
             => new ArNumber(a);
-
         public static implicit operator ArNumber(float a)
             => new ArNumber(a);
-
         public static implicit operator ArNumber(double a)
-            => new ArNumber(a);        
-
+            => new ArNumber(a);
         public static explicit operator sbyte(ArNumber a)
-        {   
-            if (a > sbyte.MaxValue || a < sbyte.MinValue || !IsInteger(a))
-                throw new InvalidCastException();            
-            return sbyte.Parse(a.ToString());
-        }
+            => sbyte.Parse(a.ToString("D"));
+        public static explicit operator byte(ArNumber a)
+            => byte.Parse(a.ToString("D"));
+        public static explicit operator short(ArNumber a)
+            => short.Parse(a.ToString("D"));
+        public static explicit operator ushort(ArNumber a)
+            => ushort.Parse(a.ToString("D"));
+        public static explicit operator char(ArNumber a)
+            => char.Parse(a.ToString("D"));
+        public static explicit operator int(ArNumber a)
+            => int.Parse(a.ToString("D"));
+        public static explicit operator uint(ArNumber a) 
+            => uint.Parse(a.ToString("D"));
+        public static explicit operator long(ArNumber a)
+            => long.Parse(a.ToString("D"));
+        public static explicit operator ulong(ArNumber a)
+            => ulong.Parse(a.ToString("D"));
+        public static explicit operator float(ArNumber a)
+            => float.Parse(a.ToString());
+        public static explicit operator double(ArNumber a)
+            => double.Parse(a.ToString());
+        public static explicit operator decimal(ArNumber a)
+            => decimal.Parse(a.ToString());
 
         public static bool operator >(ArNumber a, ArNumber b)
             => a.CompareTo(b) == 1;
