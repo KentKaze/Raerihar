@@ -61,9 +61,10 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         {
             get => _Data[_Data.Length - 1] >> 7 == 1;
             set
-            {   
-                //if (Digits == "0")
-                //    return;
+            {
+                if (_Numbers.Length == 4 && _Numbers[0] == 0 && 
+                    _Numbers[1] == 0 && _Numbers[2] == 0 && _Numbers[3] == 0)
+                    return;
                 _Data[_Data.Length - 1] = value ? (byte)(_Data[_Data.Length - 1] | 128) : (byte)(_Data[_Data.Length - 1] & 127);
             }
         }
@@ -571,10 +572,10 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         }
 
         public bool Equals(ArNumber other)
-        {
-            if (_Data.Length != other._Data.Length)
-                return false;
+        {   
             if (_Numbers.Length != other._Numbers.Length)
+                return false;
+            if (_Data.Length != other._Data.Length)
                 return false;
             for (int i = 0; i < _Data.Length; i++)
                 if (_Data[i] != other._Data[i])
@@ -598,10 +599,14 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 return result;
             else if (Exponent < other.Exponent)
                 return result * -1;
-            for (int i = 0; i < DigitSetLength; i++)
+            for (int i = 0; i < DigitSetLength && i < other.DigitSetLength; i++)
                 if (GetDigits(i) > other.GetDigits(i))
                     return result;
-            return other.DigitSetLength > DigitSetLength ? result * -1 : 0;
+            if (DigitSetLength > other.DigitSetLength)
+                return result;
+            else if(DigitSetLength < other.DigitSetLength)
+                return result *-1;
+            throw new NotImplementedException();
         }
         public int CompareTo(object obj)
             => CompareTo((ArNumber)obj);
@@ -665,23 +670,23 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public static implicit operator ArNumber(double a)
             => new ArNumber(a);
         public static explicit operator sbyte(ArNumber a)
-            => sbyte.Parse(a.ToString("D"));
+            => sbyte.Parse(a.ToString());
         public static explicit operator byte(ArNumber a)
-            => byte.Parse(a.ToString("D"));
+            => byte.Parse(a.ToString());
         public static explicit operator short(ArNumber a)
-            => short.Parse(a.ToString("D"));
+            => short.Parse(a.ToString());
         public static explicit operator ushort(ArNumber a)
-            => ushort.Parse(a.ToString("D"));
+            => ushort.Parse(a.ToString());
         public static explicit operator char(ArNumber a)
-            => (char)int.Parse(a.ToString("D"));
+            => (char)int.Parse(a.ToString());
         public static explicit operator int(ArNumber a)
-            => int.Parse(a.ToString("D"));
+            => int.Parse(a.ToString());
         public static explicit operator uint(ArNumber a)
-            => uint.Parse(a.ToString("D"));
+            => uint.Parse(a.ToString());
         public static explicit operator long(ArNumber a)
-            => long.Parse(a.ToString("D"));
+            => long.Parse(a.ToString());
         public static explicit operator ulong(ArNumber a)
-            => ulong.Parse(a.ToString("D"));
+            => ulong.Parse(a.ToString());
         public static explicit operator float(ArNumber a)
             => float.Parse(a.ToString());
         public static explicit operator double(ArNumber a)
