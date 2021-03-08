@@ -49,12 +49,17 @@ namespace Aritiafel.Organizations.RaeriharUniversity
     // 1002 Negative Infinity 
 
     //128, 64, 32, 16, 8, 4, 2, 1
-    public struct ArNumber : IEquatable<ArNumber>, IFormattable //: IComparable, IComparable<ArNumber>, IConvertible
+    //[CLSCompliant(false)]
+    public struct ArNumber : IEquatable<ArNumber>, /*IComparable, IComparable<ArNumber>,*/ IFormattable //: IComparable, IComparable<ArNumber>, IConvertible
     {
         private byte[] _Data;
         private byte[] _Digits;
+
+        public const long ExponentMaxValue = 1152921504606846976;
+        public const long ExponentMinValue = -1152921504606846977;
+        public static readonly ArNumber Empty = 0;
         public bool IsNegative
-        {
+        {            
             get
             {
                 if (_Data == null || _Data.Length == 0)
@@ -233,34 +238,6 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         }
 
         public int Length { get => _Digits.Length; }
-
-        //[CLSCompliant(false)]
-        //public ArNumber(ulong value);
-        //[CLSCompliant(false)]
-        //public ArNumber(uint value);
-        //public ArNumber(float value);
-        //public ArNumber(long value);
-        //public ArNumber(int[] bits);
-        //public ArNumber(int value)
-        //{
-        //    _Data = new byte[1];// To Do
-        //}
-        public ArNumber(double value)
-            : this()
-        {
-            ParseSelf(value.ToString());
-        }
-        private byte[] Reverse(byte[] array)
-        {
-            for (int i = 0; i < array.Length / 2; i++)
-            {
-                byte buffer = array[i];
-                array[i] = array[array.Length - i - 1];
-                array[array.Length - i - 1] = buffer;
-            }
-            return array;
-        }
-
         public ArNumber(sbyte value)
         {
             _Data = new byte[1];
@@ -273,6 +250,46 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 _Data[0] |= 1;
             SetDigits(0, (ushort)Math.Abs(value));
         }
+        public ArNumber(byte value)
+            : this()
+            => Parse(value.ToString(), this);
+        public ArNumber(ushort value)
+            : this()
+            => Parse(value.ToString(), this);
+        public ArNumber(short value)
+            : this()
+            => Parse(value.ToString(), this);        
+        public ArNumber(uint value)
+            : this()
+            => Parse(value.ToString(), this);
+        public ArNumber(int value)
+            : this()
+            => Parse(value.ToString(), this);
+        public ArNumber(ulong value)
+            : this()
+            => Parse(value.ToString(), this);
+        public ArNumber(long value)
+            : this()
+            => Parse(value.ToString(), this);
+        public ArNumber(decimal value)
+            : this()
+            => Parse(value.ToString(), this);
+        public ArNumber(float value)
+            : this()
+            => Parse(value.ToString(), this);
+        public ArNumber(double value)
+            : this()
+            => Parse(value.ToString(), this);
+        private byte[] Reverse(byte[] array)
+        {
+            for (int i = 0; i < array.Length / 2; i++)
+            {
+                byte buffer = array[i];
+                array[i] = array[array.Length - i - 1];
+                array[array.Length - i - 1] = buffer;
+            }
+            return array;
+        }
 
         private void Initialize()
         {
@@ -280,13 +297,12 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             _Digits = new byte[2];
         }
 
-        private void ParseSelf(string s, NumberStyles style = NumberStyles.None, IFormatProvider provider = null)
+        private static ArNumber Parse(string s, ArNumber a, NumberStyles style = NumberStyles.None, IFormatProvider provider = null)
         {
-            if (_Data == null || _Data.Length == 0)
-                Initialize();
+            a.Initialize();
             if (string.IsNullOrEmpty(s))
                 throw new ArgumentNullException(nameof(s));
-            IsNegative = false;
+            a.IsNegative = false;
             long e;
 
             string numberString = s;
@@ -299,7 +315,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 numberString = numberString.Remove(0, 1);
             else if (numberString[0] == '-')
             {
-                IsNegative = true;
+                a.IsNegative = true;
                 numberString = numberString.Remove(0, 1);
             }
             while (numberString.Length > 1 && numberString[0] == '0')
@@ -343,9 +359,9 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 numberString = numberString.Remove(pointIndex, 1);
                 if (numberString.Length == 0)
                 {
-                    IsNegative = false;
-                    Digits = "0";
-                    return;
+                    a.IsNegative = false;
+                    a.Digits = "0";
+                    return Empty;
                 }
                 e += pointIndex - 1;
                 while (numberString[0] == '0')
@@ -359,8 +375,9 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 
             while (numberString.Length > 1 && numberString[numberString.Length - 1] == '0')
                 numberString = numberString.Remove(numberString.Length - 1, 1);
-            Digits = numberString;
-            Exponent = e;
+            a.Digits = numberString;
+            a.Exponent = e;
+            return a;
         }
 
         public static ArNumber Parse(string s)
@@ -375,7 +392,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public static ArNumber Parse(string s, NumberStyles style, IFormatProvider provider)
         {
             ArNumber result = new ArNumber();
-            result.ParseSelf(s, style, provider);
+            Parse(s, result, style, provider);
             return result;
         }
 
@@ -388,7 +405,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             }
             catch
             {
-                result = new ArNumber();
+                result = Empty;
                 return false;
             }
         }
@@ -413,6 +430,13 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 
         public override string ToString()
             => ToString(null, null);
+
+        public string ToString(string format)
+            => ToString(format, null);
+
+        public string ToString(IFormatProvider provider)
+            => ToString(null, provider);
+
         public string ToString(string format, IFormatProvider provider)
         {
             int length = 0;
@@ -457,10 +481,36 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public static implicit operator ArNumber(sbyte a)
             => new ArNumber(a);
 
+        public static implicit operator ArNumber(byte a)
+            => new ArNumber(a);
+
+        public static implicit operator ArNumber(short a)
+            => new ArNumber(a);
+
+        public static implicit operator ArNumber(ushort a)
+            => new ArNumber(a);
+
+        public static implicit operator ArNumber(int a)
+            => new ArNumber(a);
+
+        public static implicit operator ArNumber(uint a)
+            => new ArNumber(a);
+
+        public static implicit operator ArNumber(long a)
+            => new ArNumber(a);
+
+        public static implicit operator ArNumber(ulong a)
+            => new ArNumber(a);
+
+        public static implicit operator ArNumber(decimal a)
+            => new ArNumber(a);
+
+        public static implicit operator ArNumber(float a)
+            => new ArNumber(a);
+
         public static implicit operator ArNumber(double a)
             => new ArNumber(a);
 
-        //public static implicit operator ArNumber(int a)
-        //    => new ArNumber(a);        
+        
     }
 }
