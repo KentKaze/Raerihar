@@ -18,8 +18,4 @@
     <None Remove="ArNumber.cs.old" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Include="ArNumber.cs.old" />
-  </ItemGroup>
-
 </Project>
