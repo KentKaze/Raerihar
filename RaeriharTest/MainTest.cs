@@ -135,15 +135,18 @@ namespace RaeriharTest
             ar = ArNumber.Parse(testStrings[12]);
             Assert.IsTrue(ar.ToString("E") == "0");
             ar = ArNumber.Parse(testStrings[13]);
-            TestContext.WriteLine(ar.ToString());
+            //TestContext.WriteLine(ar.ToString());
 
             ChaosBox cb = new ChaosBox();
             for (int i = 0; i < 10000; i++)
             {
                 double d = cb.DrawOutDiversityDouble();
+                string s = d.ToString().Replace("E+0", "E+").Replace("E-0", "E-");
                 ar = new ArNumber(d);
-                if(d.ToString() != ar.ToString())
-                    TestContext.WriteLine($"{d}: {ar}");
+                //TestContext.WriteLine(ar.ToString().Length.ToString());
+                //TestContext.WriteLine(ar.ToString());
+                if (s != ar.ToString())
+                    TestContext.WriteLine($"{s}: {ar}");
             }
         }
 

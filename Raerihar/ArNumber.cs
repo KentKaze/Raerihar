@@ -51,7 +51,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
     {
         public const long ExponentMaxValue = 1152921504606846976;
         public const long ExponentMinValue = -1152921504606846977;
-        public const byte MaximumDisplayedDigitsCount = 20;
+        public const byte MaximumDisplayedDigitsCount = 17;
         private const int MaximumBytesCount = 4166668;
 
         private byte[] _Data;
@@ -435,7 +435,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             long e = a.Exponent;
             int l = a.GetDigitsToString().Length; // Todo
             if ((e > 0 && e + 1 <= MaximumDisplayedDigitsCount) ||
-                (e < 0 && e - l + 1 >= MaximumDisplayedDigitsCount * -1))
+                (e < 0 && e - l + 3 >= MaximumDisplayedDigitsCount * -1))
                 return false;
             return true;
         }
