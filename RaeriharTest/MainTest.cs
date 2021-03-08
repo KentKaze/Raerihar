@@ -177,6 +177,10 @@ namespace RaeriharTest
             br = -60;
             sbyte d = (sbyte)br;
             TestContext.WriteLine(d.ToString());
+
+            ArNumber ar3;
+            ar3.
+
         }
 
 

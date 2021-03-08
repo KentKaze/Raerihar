@@ -57,7 +57,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 
         public const long ExponentMaxValue = 1152921504606846976;
         public const long ExponentMinValue = -1152921504606846977;
-        public static readonly ArNumber Empty = 0;        
+        public static readonly ArNumber Empty = 0;
+        public const byte MaximumDisplayedDigitsCount = 20;
 
         public bool Negative
         {            
@@ -505,7 +506,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         {
             long e = a.Exponent;
             int l = a.Digits.Length;
-            if ((e > 0 && e - l + 1 <= 20) || (e < 0 && e - l + 1 >= -20))
+            if ((e > 0 && e - l + 1 <= MaximumDisplayedDigitsCount) ||
+                (e < 0 && e - l + 1 >= MaximumDisplayedDigitsCount * -1))
                 return false;
             return true;
         }
@@ -515,7 +517,6 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             => CompareTo((ArNumber)obj);
         public object Clone()
             => new ArNumber(this);
-
         public TypeCode GetTypeCode()
             => TypeCode.Object;
         public bool ToBoolean(IFormatProvider provider)
@@ -541,7 +542,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public float ToSingle(IFormatProvider provider)
             => (float)this;
         public object ToType(Type conversionType, IFormatProvider provider)
-            => throw new InvalidCastException();
+            => Convert.ChangeType(this, conversionType, provider);
         public ushort ToUInt16(IFormatProvider provider)
             => (ushort)this;
         public uint ToUInt32(IFormatProvider provider) 
@@ -597,7 +598,22 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             => double.Parse(a.ToString());
         public static explicit operator decimal(ArNumber a)
             => decimal.Parse(a.ToString());
-
+        public override int GetHashCode()
+        {
+            int result = _Data[0].GetHashCode();
+            for (int i = 1; i < _Data.Length; i++)
+                result ^= _Data[i].GetHashCode();
+            for (int i = 0; i < _Digits.Length; i++)
+                result ^= _Digits[i].GetHashCode();
+            return result;
+        }
+        public override bool Equals(object obj)
+        {
+            ArNumber ar = obj as ArNumber;
+            if (ar == null)
+                return false;
+            return Equals(ar);
+        }
         public static bool operator >(ArNumber a, ArNumber b)
             => a.CompareTo(b) == 1;
         public static bool operator >=(ArNumber a, ArNumber b)
