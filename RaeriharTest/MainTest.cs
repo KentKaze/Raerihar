@@ -15,35 +15,35 @@ namespace RaeriharTest
         {
             ArNumber ar = new ArNumber(3);
             ar.Exponent = 0;
-            Assert.IsTrue(ar.ToString() == "3");
+            Assert.IsTrue(ar.ToString("E") == "3");
             ar.Exponent = 10;
-            Assert.IsTrue(ar.ToString() == "3E+10");
+            Assert.IsTrue(ar.ToString("E") == "3E+10");
             ar.Exponent = -11;
-            Assert.IsTrue(ar.ToString() == "3E-11");
+            Assert.IsTrue(ar.ToString("E") == "3E-11");
             ar.Exponent = 15;
-            Assert.IsTrue(ar.ToString() == "3E+15");
+            Assert.IsTrue(ar.ToString("E") == "3E+15");
             ar.Exponent = 16;
-            Assert.IsTrue(ar.ToString() == "3E+16");
+            Assert.IsTrue(ar.ToString("E") == "3E+16");
             ar.Exponent = -16;
-            Assert.IsTrue(ar.ToString() == "3E-16");
+            Assert.IsTrue(ar.ToString("E") == "3E-16");
             ar.Exponent = -17;
-            Assert.IsTrue(ar.ToString() == "3E-17");
+            Assert.IsTrue(ar.ToString("E") == "3E-17");
             ar.Exponent = 4095;
-            Assert.IsTrue(ar.ToString() == "3E+4095");
+            Assert.IsTrue(ar.ToString("E") == "3E+4095");
             ar.Exponent = 4096;
-            Assert.IsTrue(ar.ToString() == "3E+4096");
+            Assert.IsTrue(ar.ToString("E") == "3E+4096");
             ar.Exponent = -4096;
-            Assert.IsTrue(ar.ToString() == "3E-4096");
+            Assert.IsTrue(ar.ToString("E") == "3E-4096");
             ar.Exponent = -4097;
-            Assert.IsTrue(ar.ToString() == "3E-4097");
+            Assert.IsTrue(ar.ToString("E") == "3E-4097");
             ar.Exponent = 65883;
-            Assert.IsTrue(ar.ToString() == "3E+65883");
+            Assert.IsTrue(ar.ToString("E") == "3E+65883");
             ar.Exponent = 73813185;
-            Assert.IsTrue(ar.ToString() == "3E+73813185");
+            Assert.IsTrue(ar.ToString("E") == "3E+73813185");
             ar.Exponent = -3185;
-            Assert.IsTrue(ar.ToString() == "3E-3185");
+            Assert.IsTrue(ar.ToString("E") == "3E-3185");
             ar.Exponent = 268435456;
-            Assert.IsTrue(ar.ToString() == "3E+268435456");
+            Assert.IsTrue(ar.ToString("E") == "3E+268435456");
             ar.Exponent = 268435455;
             Assert.IsTrue(ar.ToString() == "3E+268435455");
             ar.Exponent = -268435456;
@@ -68,13 +68,7 @@ namespace RaeriharTest
             ArNumber ar = new ArNumber();
             //9.810030755230452E-231: 9.81375523452E-231
             //-4.970069320087064E-275: -4.97693287064E-275
-            ChaosBox cb = new ChaosBox();
-            for (int i = 0; i < 10000; i++)
-            {
-                double d = cb.DrawOutDiversityDouble();
-                ar = new ArNumber(d);
-                TestContext.WriteLine($"{d}: {ar}");
-            }
+           
 
             string[] testStrings = {
                 "-0.00589662145E-103", //0
@@ -93,48 +87,56 @@ namespace RaeriharTest
             };
 
             ar = ArNumber.Parse(testStrings[0]);
-            Assert.IsTrue(ar.ToString() == "-5.89662145E-106");
+            
+            Assert.IsTrue(ar.ToString("E") == "-5.89662145E-106");
             ar = ArNumber.Parse(testStrings[1]);            
             //-3.61189567800E+49
-            Assert.IsTrue(ar.ToString() == "-3.611895678E+49");
+            Assert.IsTrue(ar.ToString("E") == "-3.611895678E+49");
             ar = ArNumber.Parse(testStrings[2]);
-            Assert.IsTrue(ar.ToString() == "-6.8718E-4");
+            //TestContext.WriteLine(ar.ToString());
+            Assert.IsTrue(ar.ToString("E") == "-6.8718E-4");
             //Assert.IsTrue(sn.ToString("C") == "-0.00068718");
             ar = ArNumber.Parse(testStrings[3]);
-            Assert.IsTrue(ar.ToString() == "3.567894358E+40");
+            Assert.IsTrue(ar.ToString("E") == "3.567894358E+40");
             ar = ArNumber.Parse(testStrings[4]);
-            Assert.IsTrue(ar.ToString() == "5.68681E-6");
+            Assert.IsTrue(ar.ToString("E") == "5.68681E-6");
             //Assert.IsTrue(sn.ToString("C") == "0.00000568681");
             //TestContext.WriteLine(sn.ToString("C3"));
             //Assert.IsTrue(sn.ToString("C3") == "0.00000569");
             //Assert.IsTrue(sn.ToString("C3") == "0.00");
             ar = ArNumber.Parse(testStrings[5]);
             
-            Assert.IsTrue(ar.ToString() == "-3.5E-24");
+            Assert.IsTrue(ar.ToString("E") == "-3.5E-24");
             ar = ArNumber.Parse(testStrings[6]);
-            Assert.IsTrue(ar.ToString() == "0");
+            Assert.IsTrue(ar.ToString("E") == "0");
             //Assert.IsTrue(sn.ToString("C") == "0");
             ar = ArNumber.Parse(testStrings[7]);
-            Assert.IsTrue(ar.ToString() == "0");
+            Assert.IsTrue(ar.ToString("E") == "0");
             //Assert.IsTrue(sn.ToString("C") == "0");
             ar = ArNumber.Parse(testStrings[8]);
-            Assert.IsTrue(ar.ToString() == "3E+2");
+            Assert.IsTrue(ar.ToString("E") == "3E+2");
             ar = ArNumber.Parse(testStrings[9]);
-            Assert.IsTrue(ar.ToString() == "-8E-3");
+            Assert.IsTrue(ar.ToString("E") == "-8E-3");
             ar = ArNumber.Parse(testStrings[10]);
-            Assert.IsTrue(ar.ToString() == "6.81E+95");
+            Assert.IsTrue(ar.ToString("E") == "6.81E+95");
             ar = ArNumber.Parse(testStrings[11]);
-            Assert.IsTrue(ar.ToString() == "1E-2");
+            Assert.IsTrue(ar.ToString("E") == "1E-2");
             ar = ArNumber.Parse(testStrings[12]);
-            Assert.IsTrue(ar.ToString() == "0");
+            Assert.IsTrue(ar.ToString("E") == "0");
 
-            
+            ChaosBox cb = new ChaosBox();
+            for (int i = 0; i < 10000; i++)
+            {
+                double d = cb.DrawOutDiversityDouble();
+                ar = new ArNumber(d);
+                TestContext.WriteLine($"{d}: {ar}");
+            }
         }
 
         [TestMethod]
         public void NewArNumber()
         {
-            ArNumber a = new ArNumber(3);
+            ArNumber a = 3;
             TestContext.WriteLine(a.ToString());
             a = 20;
             TestContext.WriteLine(a.ToString());
@@ -151,16 +153,30 @@ namespace RaeriharTest
             //1.27E+2
             //- 1.3E+1
             ArNumber b = new ArNumber(50.7);
-            b.IsNegative = true;
+            b.Negative = true;
 
-            ArNumber c = b;
+            ArNumber c = b;            
             TestContext.WriteLine(c.ToString());
         }
 
         [TestMethod]
-        public void Test()
+        public void CastTest()
         {
-            
+            byte b = 3;
+            ArNumber ar = new ArNumber(3);
+            ArNumber br = ar.Clone() as ArNumber;
+            br.Negative = true;
+            TestContext.WriteLine(ar.ToString());
+            TestContext.WriteLine(br.ToString());
+            sbyte c = (sbyte)ar;            
+            TestContext.WriteLine(c.ToString());
+            br = 300;            
+            Assert.ThrowsException<InvalidCastException>(() => {
+                var d = (sbyte)br;
+            });
+            br = -60;
+            sbyte d = (sbyte)br;
+            TestContext.WriteLine(d.ToString());
         }
 
 
