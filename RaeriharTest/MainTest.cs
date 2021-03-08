@@ -90,7 +90,8 @@ namespace RaeriharTest
                 "-0.008", //9
                 "0.00681E+98", //10
                 "0.01", //11
-                "0" //12
+                "0", //12
+                "2170.6907744747728" //13
             };
 
             ar = ArNumber.Parse(testStrings[0]);
@@ -133,13 +134,16 @@ namespace RaeriharTest
             Assert.IsTrue(ar.ToString("E") == "1E-2");
             ar = ArNumber.Parse(testStrings[12]);
             Assert.IsTrue(ar.ToString("E") == "0");
+            ar = ArNumber.Parse(testStrings[13]);
+            TestContext.WriteLine(ar.ToString());
 
             ChaosBox cb = new ChaosBox();
             for (int i = 0; i < 10000; i++)
             {
                 double d = cb.DrawOutDiversityDouble();
                 ar = new ArNumber(d);
-                TestContext.WriteLine($"{d}: {ar}");
+                if(d.ToString() != ar.ToString())
+                    TestContext.WriteLine($"{d}: {ar}");
             }
         }
 
