@@ -35,18 +35,36 @@ namespace Aritiafel.Organizations.RaeriharUniversity
     //8     73~81     270      34
     //9     82~90     300      38
     //10    91~99     330      42
+    //11  100~102     360      45
+    //12  103~105     390      49
+    //13  106~108     420      53
+    //14  109~111     450      57
+    //15  112~114     480      60
+
+    //3 => 15, 7 => 30, 11 => 45, 14 => 60
+
+    //index = (digits - 1) / 9
+    //bytes = index * 15 + 18 / 4
+    //bytes = ((digits - 1) / 9) * 15 + 18 / 4
+    //index = bytes * 4 - 6 / 15
     public sealed class ArNumber
     {
+        public const long ExponentMaxValue = 1152921504606846976;
+        public const long ExponentMinValue = -1152921504606846977;
+        public const byte MaximumDisplayedDigitsCount = 20;
+        private const int MaximumBytesCount = 4166668;
+
         private byte[] _Data;
         private byte[] _Numbers;
 
+        private int DigitSetLength => (_Numbers.Length * 4 - 6) / 15;
         public bool Negative
         {
             get => _Data[_Data.Length - 1] >> 7 == 1;
             set
             {
-                if (Digits == "0")
-                    return;
+                //if (Digits == "0")
+                //    return;
                 _Data[_Data.Length - 1] = value ? (byte)(_Data[_Data.Length - 1] | 128) : (byte)(_Data[_Data.Length - 1] & 127);
             }
         }
@@ -90,13 +108,13 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             set
             {
                 byte[] result;
-                if (value < 63 && value > -64)
+                if (value > -64 && value < 63)
                     result = new byte[] { (byte)value };
-                else if (value < 16383 && value > -16384)
+                else if (value > -16384 && value < 16383)
                     result = BitConverter.GetBytes((short)value);
-                else if (value < 1073741823 && value > -1073741824)
+                else if (value > -1073741824 && value < 1073741823)
                     result = BitConverter.GetBytes((int)value);
-                else if (value < 4611686018427387903 && value > -4611686018427387904)
+                else if (value > -4611686018427387904 && value < 4611686018427387903)
                     result = BitConverter.GetBytes(value);
                 else
                     throw new ArgumentOutOfRangeException(nameof(Exponent));
@@ -108,34 +126,57 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             }
         }
 
-        public string Digits
-        {
-            get
-            {
-                StringBuilder result = new StringBuilder();
-                for (int i = 0; i < DigitSetLength; i++)
-                    result.AppendFormat("{0:D9}", GetDigits(i));
-                while (result.Length > 1 && result[0] == '0')
-                    result.Remove(0, 1);
-                while (result.Length > 1 && result[result.Length - 1] == '0')
-                    result.Remove(result.Length - 1, 1);
-                return result.ToString();
-            }
-            private set
-            {
-                //No Check
-                _Digits = new byte[(value.Length - 1) / 3 * 5 / 4 + 2];
-                ushort v;
-                for (int i = 0; i < (value.Length - 1) / 3 + 1; i++)
-                {
-                    if (i * 3 + 2 < value.Length)
-                        v = ushort.Parse(value.Substring(i * 3, 3));
-                    else
-                        v = ushort.Parse(value.Substring(i * 3).PadRight(3, '0'));
-                    SetDigits(i, v);
-                }
-            }
-        }
+        //public byte[] Digits
+        //{
+        //    get { return null; }
+        //    set 
+        //    {
+        //        if (value == null || value.Length == 0)
+        //            throw new ArgumentNullException(nameof(Digits));
+        //        _Numbers = new byte[((value.Length - 1) / 9 * 15 + 18) / 4];
+        //        int v;
+        //        for(int i = 0; i < (value.Length - 1) / 9 + 1; i++)
+        //        {
+        //            v= 
+        //            v = $"{value[i * 9 + 0]} +
+
+        //            if (i * 9 + 8 < value.Length)
+        //                v =  int.Parse(value.Substring(i * 9, 9));
+        //            else
+        //                v = int.Parse(value.Substring(i * 9).PadRight(9, '0'));
+        //            SetDigits(i, v);
+        //        }
+        //    }
+        //}
+
+        //public string Digits
+        //{
+        //    get
+        //    {
+        //        StringBuilder result = new StringBuilder();
+        //        for (int i = 0; i < DigitSetLength; i++)
+        //            result.AppendFormat("{0:D9}", GetDigits(i));
+        //        while (result.Length > 1 && result[0] == '0')
+        //            result.Remove(0, 1);
+        //        while (result.Length > 1 && result[result.Length - 1] == '0')
+        //            result.Remove(result.Length - 1, 1);
+        //        return result.ToString();
+        //    }
+        //    private set
+        //    {
+        //        //No Check
+        //        _Digits = new byte[(value.Length - 1) / 3 * 5 / 4 + 2];
+        //        ushort v;
+        //        for (int i = 0; i < (value.Length - 1) / 3 + 1; i++)
+        //        {
+        //            if (i * 3 + 2 < value.Length)
+        //                v = ushort.Parse(value.Substring(i * 3, 3));
+        //            else
+        //                v = ushort.Parse(value.Substring(i * 3).PadRight(3, '0'));
+        //            SetDigits(i, v);
+        //        }
+        //    }
+        //}
 
         public ArNumber(ArNumber a)
         {
@@ -201,64 +242,114 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         //    : this()
         //    => Parse(value.ToString(), this);
 
-        //private void SetDigits(int index, ushort value)
-        //{
-        //byte[] buffer;
-        //if (BitConverter.IsLittleEndian)
-        //    buffer = BitConverter.GetBytes(value);
-        //else
-        //    buffer = Reverse(BitConverter.GetBytes(value));
-        //int j = index * 5 / 4;
-        //switch (index % 4)
-        //{
-        //    case 0:
-        //        _Digits[j] = buffer[0]; // 8
-        //        _Digits[j + 1] = (byte)(buffer[1] << 6); //2
-        //        break;
-        //    case 1:
-        //        _Digits[j] |= (byte)(buffer[0] >> 2 & 63); //6
-        //        _Digits[j + 1] = (byte)(buffer[0] << 6); //2
-        //        _Digits[j + 1] |= (byte)(buffer[1] << 4); //2
-        //        break;
-        //    case 2:
-        //        _Digits[j] |= (byte)(buffer[0] >> 4 & 15); //4
-        //        _Digits[j + 1] = (byte)(buffer[0] << 4); //4
-        //        _Digits[j + 1] |= (byte)(buffer[1] << 2); //2
-        //        break;
-        //    case 3:
-        //        _Digits[j] |= (byte)(buffer[0] >> 6 & 3); //2
-        //        _Digits[j + 1] = (byte)(buffer[0] << 2); //6
-        //        _Digits[j + 1] |= buffer[1]; //2
-        //        break;
-        //    default:
-        //        throw new NotImplementedException();
-        //    //}
-        //}
-        //private ushort GetDigits(int index)
-        //{
-        //int j = index * 5 / 4;
-        //switch (index % 4)
-        //{
-        //    case 0:
-        //        return BitConverter.ToUInt16(new byte[] {
-        //            _Digits[j],
-        //            (byte)(_Digits[j + 1] >> 6 & 3) }, 0);
-        //    case 1:
-        //        return BitConverter.ToUInt16(new byte[] {
-        //            (byte)(_Digits[j] << 2 | _Digits[j + 1] >> 6 & 3),
-        //            (byte)(_Digits[j + 1] >> 4 & 3) }, 0);
-        //    case 2:
-        //        return BitConverter.ToUInt16(new byte[] {
-        //            (byte)(_Digits[j] << 4 | _Digits[j + 1] >> 4 & 15),
-        //            (byte)(_Digits[j + 1] >> 2 & 3) }, 0);
-        //    case 3:
-        //        return BitConverter.ToUInt16(new byte[] {
-        //            (byte)(_Digits[j] << 6 | _Digits[j + 1] >> 2 & 63),
-        //            (byte)(_Digits[j + 1] & 3) }, 0);
-        //    default:
-        //        throw new NotImplementedException();
-        //}
-        //}
+        private string GetDigitsToString()
+        {
+            StringBuilder result = new StringBuilder();
+            for (int i = 0; i < DigitSetLength; i++)
+                result.AppendFormat("{0:D9}", GetDigits(i));
+            while (result.Length > 1 && result[0] == '0')
+                result.Remove(0, 1);
+            while (result.Length > 1 && result[result.Length - 1] == '0')
+                result.Remove(result.Length - 1, 1);
+            return result.ToString();
+        }
+
+        private void SetDigitsByString(string s)
+        {   
+            _Numbers = new byte[((s.Length - 1) / 9 * 15 + 18) / 4];
+            int v;
+            for (int i = 0; i < (s.Length - 1) / 9 + 1; i++)
+            {
+                if (i * 9 + 8 < s.Length)
+                    v = int.Parse(s.Substring(i * 9, 9));
+                else
+                    v = int.Parse(s.Substring(i * 9).PadRight(9, '0'));
+                SetDigits(i, v);
+            }
+        }
+
+        private void SetDigits(int index, int value)
+        {
+            byte[] buffer;
+            if (BitConverter.IsLittleEndian)
+                buffer = BitConverter.GetBytes(value);
+            else
+                buffer = Reverse(BitConverter.GetBytes(value));
+            int j = index * 15 + 18 / 4;
+            switch (index % 4)
+            {
+                case 0:
+                    _Numbers[j] = buffer[0]; // 8
+                    _Numbers[j + 1] = buffer[1]; //8
+                    _Numbers[j + 2] = buffer[2]; //8
+                    _Numbers[j + 3] = (byte)(buffer[3] << 2); //6
+                    break;
+                case 1:
+                    _Numbers[j] |= (byte)(buffer[0] >> 6 & 3); //2
+                    _Numbers[j + 1] = (byte)(buffer[0] << 2); //6
+                    _Numbers[j + 1] |= (byte)(buffer[1] >> 6 & 3); //2
+                    _Numbers[j + 2] = (byte)(buffer[1] << 2); //6
+                    _Numbers[j + 2] |= (byte)(buffer[2] >> 6 & 3); //2
+                    _Numbers[j + 3] = (byte)(buffer[2] << 2); //6
+                    _Numbers[j + 3] |= (byte)(buffer[3] >> 4 & 3); //2
+                    _Numbers[j + 4] = (byte)(buffer[3] << 4); //4
+                    break;
+                case 2:
+                    _Numbers[j] |= (byte)(buffer[0] >> 4 & 15); //4
+                    _Numbers[j + 1] = (byte)(buffer[0] << 4); //4
+                    _Numbers[j + 1] |= (byte)(buffer[1] >> 4 & 15); //4
+                    _Numbers[j + 2] = (byte)(buffer[1] << 4); //4
+                    _Numbers[j + 2] |= (byte)(buffer[2] >> 4 & 15); //4
+                    _Numbers[j + 3] = (byte)(buffer[2] << 4); //4
+                    _Numbers[j + 3] |= (byte)(buffer[3] >> 2 & 15); //4
+                    _Numbers[j + 4] = (byte)(buffer[3] << 6); //2
+                    break;
+                case 3:
+                    _Numbers[j] |= (byte)(buffer[0] >> 2 & 63); //6
+                    _Numbers[j + 1] = (byte)(buffer[0] << 6); //2
+                    _Numbers[j + 1] |= (byte)(buffer[1] >> 2 & 63); //6
+                    _Numbers[j + 2] = (byte)(buffer[1] << 6); //2
+                    _Numbers[j + 2] |= (byte)(buffer[2] >> 2 & 63); //6
+                    _Numbers[j + 3] = (byte)(buffer[2] << 6); //2
+                    _Numbers[j + 3] |= (byte)(buffer[3]); //6
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+
+        private int GetDigits(int index)
+        {
+            int j = index * 15 + 18 / 4;
+            switch (index % 4)
+            {
+                case 0:
+                    return BitConverter.ToInt32(new byte[] {
+                    _Numbers[j], _Numbers[j + 1], _Numbers[j + 2],
+                    (byte)(_Numbers[j + 3] >> 2 & 63) }, 0);
+                case 1:
+                    return BitConverter.ToInt32(new byte[] {
+                    (byte)(_Numbers[j] << 6 | _Numbers[j + 1] >> 2 & 63),
+                    (byte)(_Numbers[j + 1] << 6 | _Numbers[j + 2] >> 2 & 63),
+                    (byte)(_Numbers[j + 2] << 6 | _Numbers[j + 3] >> 2 & 63),
+                    (byte)(_Numbers[j + 3] << 4 & 192 | _Numbers[j + 4] >> 4) }, 0);
+                case 2:
+                    return BitConverter.ToInt32(new byte[] {
+                    (byte)(_Numbers[j] << 4 | _Numbers[j + 1] >> 4 & 15),
+                    (byte)(_Numbers[j + 1] << 4 | _Numbers[j + 2] >> 4 & 15),
+                    (byte)(_Numbers[j + 2] << 4 | _Numbers[j + 3] >> 4 & 15),
+                    (byte)(_Numbers[j + 3] << 2 & 192 | _Numbers[j + 4] >> 6) }, 0);
+                case 3:
+                    return BitConverter.ToInt32(new byte[] {
+                    (byte)(_Numbers[j] << 2 | _Numbers[j + 1] >> 6 & 3),
+                    (byte)(_Numbers[j + 1] << 2 | _Numbers[j + 2] >> 6 & 3),
+                    (byte)(_Numbers[j + 2] << 2 | _Numbers[j + 3] >> 6 & 3),
+                    (byte)(_Numbers[j + 3] & 192) }, 0);
+                default:
+                    throw new NotImplementedException();
+            }
+        }
         private static void Parse(string s, ArNumber a, NumberStyles style = NumberStyles.None, IFormatProvider provider = null)
         {
             if (string.IsNullOrEmpty(s))
@@ -320,8 +411,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 numberString = numberString.Remove(pointIndex, 1);
                 if (numberString.Length == 0)
                 {
-                    a.Negative = false;
-                    a.Digits = "0";
+                    a = new ArNumber(); // Set To 0 To DO
                     return;
                 }
                 e += pointIndex - 1;
@@ -337,8 +427,78 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             while (numberString.Length > 1 && numberString[numberString.Length - 1] == '0')
                 numberString = numberString.Remove(numberString.Length - 1, 1);
             a.Exponent = e;
-            a.Digits = numberString;
+            a.SetDigitsByString(numberString);
             a.Negative = isNegative;
+        }
+
+        private static bool AdaptExponentForm(ArNumber a)
+        {
+            long e = a.Exponent;
+            int l = a.DigitSetLength;
+            if ((e > 0 && e - l + 1 <= MaximumDisplayedDigitsCount) ||
+                (e < 0 && e - l + 1 >= MaximumDisplayedDigitsCount * -1))
+                return false;
+            return true;
+        }
+        public static bool IsInteger(ArNumber a)
+            => a.Exponent - a.DigitSetLength + 1 >= 0;
+        private string ToString(int digits, char format, IFormatProvider provider)
+        {
+            // TO DO
+            long e = Exponent;
+            if (format == 'G')
+                if (AdaptExponentForm(this))
+                    format = 'E';
+                else if (IsInteger(this))
+                    format = 'D';
+                else
+                    format = 'C';
+
+            StringBuilder result = new StringBuilder();
+            result.Append(GetDigitsToString());
+            if (result.Length != 1 && format == 'E')
+                result.Insert(1, '.');
+            if (e != 0 && format == 'E')
+                result.AppendFormat("E{0}{1}", e > 0 ? "+" : "", e);
+            if (Negative)
+                result.Insert(0, '-');
+            return result.ToString();
+        }
+
+        public override string ToString()
+            => ToString(null, null);
+        public string ToString(string format)
+            => ToString(format, null);
+        public string ToString(IFormatProvider provider)
+            => ToString(null, provider);
+        public string ToString(string format, IFormatProvider provider)
+        {
+            int length = 0;
+            if (string.IsNullOrEmpty(format))
+                format = "G";
+            format = format.Trim().ToUpperInvariant();
+            if (provider == null)
+                provider = NumberFormatInfo.CurrentInfo;
+            if (format.Length > 1 && !int.TryParse(format.Substring(1), out length))
+                throw new FormatException($"{nameof(format)}:{format}");
+            switch (format[0])
+            {
+                // TO DO
+                case 'C':
+                    return ToString(length, format[0], provider);
+                case 'D':
+                    return ToString(length, format[0], provider);
+                //case 'F':
+                //case 'N':
+                //case 'P':
+                //case 'R':
+                //case 'X':
+                case 'E':
+                case 'G':
+                    return ToString(length, format[0], provider);
+                default:
+                    throw new FormatException(string.Format("The '{0}' format string is not supported.", format));
+            }
         }
 
         private byte[] Reverse(byte[] array)

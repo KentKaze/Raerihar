@@ -10,6 +10,13 @@ namespace RaeriharTest
     {
         public TestContext TestContext { get; set; }
 
+        [TestMethod]
+        public void Test()
+        {
+            ArNumber ar = new ArNumber();
+            
+        }
+
         //[TestMethod]
         //public void ExponentGetSetTest()
         //{
