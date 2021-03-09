@@ -3,9 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31019.35
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Raerihar", "Raerihar\Raerihar.csproj", "{F280C38B-10ED-49BE-806A-50AF37FA9E16}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Raerihar", "Raerihar\Raerihar.csproj", "{F280C38B-10ED-49BE-806A-50AF37FA9E16}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RaeriharTest", "RaeriharTest\RaeriharTest.csproj", "{6701BCA2-221F-43B7-A1E0-0FC923B2B099}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RaeriharTest", "RaeriharTest\RaeriharTest.csproj", "{6701BCA2-221F-43B7-A1E0-0FC923B2B099}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{548D46DF-C483-4A44-BD8C-0CAED849A8DF}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

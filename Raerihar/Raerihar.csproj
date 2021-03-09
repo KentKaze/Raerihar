@@ -16,6 +16,11 @@
 
   <ItemGroup>
     <None Remove="ArNumber.cs.old" />
+    <None Remove="ArNumber2.cs.old" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
 
 </Project>
