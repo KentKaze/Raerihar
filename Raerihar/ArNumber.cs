@@ -61,8 +61,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
     //e = -100 = (-100 + 1) % 9 = 0
 
     //Data =>
-    //3     EndDigitsCount
-    //5-61  Exponent
+    //4     EndDigitsCount
+    //4-60  Exponent
 
     //Number=>
     //NumberBytes
@@ -92,7 +92,10 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             {
                 long result;
                 byte lastByte = _Data[_Data.Length - 1];
-                _Data[_Data.Length - 1] = (byte)((byte)(_Data[_Data.Length - 1] << 3) >> 3);
+                if ((_Data[_Data.Length - 1] & 8) == 8)
+                    _Data[_Data.Length - 1] |= 240;
+                else
+                    _Data[_Data.Length - 1] &= 15;
                 switch (_Data.Length)
                 {
                     case 1:
@@ -150,20 +153,20 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public void SetExponent(long e)
         {
             byte[] result;
-            if (e > -17 && e < 16)
+            if (e > -9 && e < 8)
                 result = new byte[] { (byte)e };
-            else if (e > -4097 && e < 4096)
+            else if (e > -2049 && e < 2048)
                 result = BitConverter.GetBytes((short)e);
-            else if (e > -268435457 && e < 268435456)
+            else if (e > -134217729 && e < 134217728)
                 result = BitConverter.GetBytes((int)e);
-            else if (e > -2305843009213693952 && e < 2305843009213693952)
+            else if (e > -576460752303423489 && e < 576460752303423488)
                 result = BitConverter.GetBytes(e);
             else
                 throw new ArgumentOutOfRangeException(nameof(e));
             if (!BitConverter.IsLittleEndian && result.Length != 1)
                 result = Reverse(result);
-            result[result.Length - 1] &= 31;
-            result[result.Length - 1] |= (byte)(_Data[_Data.Length - 1] & 224);
+            result[result.Length - 1] &= 15;
+            result[result.Length - 1] |= (byte)(_Data[_Data.Length - 1] & 240);
             _Data = result;
         }     
 
@@ -171,26 +174,52 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         {
             //參考E
             //_Numbers = new byte[30];
-            if(index == 0)
+            long bytesLength = _Numbers.Length;
+            int valueLength = Math.Abs(value).ToString().Length;
+            //_Numbers
+            byte[] result;
+            if(index == 0)                
             {
-                switch(value.ToString().Length)
-                {
-                    case 0:
+                _Data[_Data.Length - 1] = (byte)(_Data[_Data.Length - 1] & 15 | (16 * valueLength));
+                switch (valueLength)
+                {   
                     case 1:
-                    case 2:
+                    case 2:                        
+                        _Numbers[0] = (byte)value;
+                        break;
                     case 3:
-                    case 4:
+                    case 4:                        
+                        result = BitConverter.GetBytes((short)value);
+                        if (!BitConverter.IsLittleEndian)
+                            result = Reverse(result);
+                        _Numbers[0] = result[0];
+                        _Numbers[1] = result[1];
+                        break;
                     case 5:
                     case 6:
                     case 7:
+                        result = BitConverter.GetBytes(value);
+                        if (!BitConverter.IsLittleEndian)
+                            result = Reverse(result);
+                        for (int i = 0; i < 3; i++)
+                            _Numbers[i] = result[i];
+                        break;
                     case 8:
+                    case 9:
+                        result = BitConverter.GetBytes(value);
+                        if (!BitConverter.IsLittleEndian)
+                            result = Reverse(result);
+                        for (int i = 0; i < 4; i++)
+                            _Numbers[i] = result[i];
+                        break;
+                    default:
+                        throw new NotImplementedException();
                 }
             }
-            //if(!last)
-            //{
+            else
+            {
                 
-            //}
-
+            }
             
             //_Numbers = new byte[((s.Length - 1) / 9 * 15 + 18) / 4];
         }
