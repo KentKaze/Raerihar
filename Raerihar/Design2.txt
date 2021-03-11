@@ -63,7 +63,7 @@ digits 	bits	 Byte
 
 //digits = (bits + 2) * 4 / 15
 bits = (digits * 10 + 2) / 3
-
+bytes = digits * 2 + 5 / 5(研究中)
  111
  111
  ---

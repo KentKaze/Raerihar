@@ -21,9 +21,17 @@ namespace RaeriharTest
         }
 
         [TestMethod]
+        public void GetSetTest()
+        {
+            ArNumber ar = new ArNumber();
+            //ar.SetNumberBlock()
+        }
+
+        [TestMethod]
         public void V3TestTest()
         {
             //0       0           0
+
             //1       4           1
             //2       7           1
             //3       10          2
@@ -34,24 +42,26 @@ namespace RaeriharTest
             //8       27          4
             //9       30          4
 
-            //10      34
-            //11      37
-            //12      40
-            //13      44
-            //14      47
-            //15      50
-            //16      54
-            //17      57
-            //18      60
+            //10      34          5
+            //11      37          5
+            //12      40          5
+            //13      44          6
+            //14      47          6
+            //15      50          7
+            //16      54          7
+            //17      57          8
+            //18      60          8
 
-            //19      64
+            //19      64          8
+            //20      67          9
 
             //digits = (bits + 2) * 4 / 15
-            //for (int i = 1; i < 100; i++)
-            //{
-            //    TestContext.WriteLine($"{i}\t{(i * 10 + 2) / 3}");
-            //}
-            
+            for (int i = 1; i < 100; i++)
+            {
+                int j = (i * 10 + 2) / 3;
+                TestContext.WriteLine($"{i}\t{j}\t{ j / 4}");
+            }
+
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace Aritiafel.Organizations.RaeriharUniversity
@@ -92,10 +93,10 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             {
                 long result;
                 byte lastByte = _Data[_Data.Length - 1];
-                if ((_Data[_Data.Length - 1] & 8) == 8)
-                    _Data[_Data.Length - 1] |= 240;
+                if ((_Data[_Data.Length - 1] & 128) == 128)
+                    _Data[_Data.Length - 1] = (byte)((byte)(_Data[_Data.Length - 1] >> 4) | 240);
                 else
-                    _Data[_Data.Length - 1] &= 15;
+                    _Data[_Data.Length - 1] = (byte)((byte)(_Data[_Data.Length - 1] >> 4) & 15);
                 switch (_Data.Length)
                 {
                     case 1:
@@ -165,8 +166,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 throw new ArgumentOutOfRangeException(nameof(e));
             if (!BitConverter.IsLittleEndian && result.Length != 1)
                 result = Reverse(result);
-            result[result.Length - 1] &= 15;
-            result[result.Length - 1] |= (byte)(_Data[_Data.Length - 1] & 240);
+            result[result.Length - 1] = (byte)(result[result.Length - 1] << 4);
+            result[result.Length - 1] |= (byte)(_Data[_Data.Length - 1] & 15);
             _Data = result;
         }     
 
@@ -174,60 +175,220 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         {
             //參考E
             //_Numbers = new byte[30];
-            long bytesLength = _Numbers.Length;
             int valueLength = Math.Abs(value).ToString().Length;
             //_Numbers
+            //int firstUsed = ((_Data[_Data.Length - 1] & 15) * 2 + 5) / 5;
+            int firstBitUsed = ((_Data[_Data.Length - 1] & 15) * 10 + 2) / 3;
+            int j = index == 0 ? 0 : ((index - 1) * 30 + firstBitUsed) / 4;
             byte[] result;
-            if(index == 0)                
+            if(index == 0 || j + 4 > _Numbers.Length)                
             {
-                _Data[_Data.Length - 1] = (byte)(_Data[_Data.Length - 1] & 15 | (16 * valueLength));
+                if(index == 0)
+                    _Data[_Data.Length - 1] = (byte)(_Data[_Data.Length - 1] & 15 | (16 * valueLength));
+                
                 switch (valueLength)
                 {   
-                    case 1:
-                    case 2:                        
-                        _Numbers[0] = (byte)value;
+                    case 1: //4
+                        _Numbers[j] = (byte)(_Numbers[j] & 240 | (value & 15));
                         break;
-                    case 3:
-                    case 4:                        
+                    case 2: //7
+                        _Numbers[j] = (byte)(_Numbers[j] & 128 | (value & 127));
+                        break;
+                    case 3: //10
                         result = BitConverter.GetBytes((short)value);
                         if (!BitConverter.IsLittleEndian)
                             result = Reverse(result);
-                        _Numbers[0] = result[0];
-                        _Numbers[1] = result[1];
+                        _Numbers[j] = result[0];
+                        _Numbers[j + 1] = (byte)(_Numbers[j + 1] & 252 | (result[1] & 3));
                         break;
-                    case 5:
-                    case 6:
-                    case 7:
+                    case 4: //14
+                        result = BitConverter.GetBytes((short)value);
+                        if (!BitConverter.IsLittleEndian)
+                            result = Reverse(result);
+                        _Numbers[j] = result[0];
+                        _Numbers[j + 1] = (byte)(_Numbers[j + 1] & 192 | (result[1] & 63));
+                        break;
+                    case 5: //17
                         result = BitConverter.GetBytes(value);
                         if (!BitConverter.IsLittleEndian)
                             result = Reverse(result);
-                        for (int i = 0; i < 3; i++)
+                        for (int i = j; i < j + 2; i++)
                             _Numbers[i] = result[i];
+                        _Numbers[j + 2] = (byte)(_Numbers[j + 2] & 254 | (result[2] & 1));
                         break;
-                    case 8:
-                    case 9:
+                    case 6: //20
                         result = BitConverter.GetBytes(value);
                         if (!BitConverter.IsLittleEndian)
                             result = Reverse(result);
-                        for (int i = 0; i < 4; i++)
+                        for (int i = j; i < j + 2; i++)
                             _Numbers[i] = result[i];
+                        _Numbers[j + 2] = (byte)(_Numbers[j + 2] & 240 | (result[2] & 15));
+                        break;
+                    case 7: //24
+                        result = BitConverter.GetBytes(value);
+                        if (!BitConverter.IsLittleEndian)
+                            result = Reverse(result);
+                        for (int i = j; i < j + 3; i++)
+                            _Numbers[i] = result[i];
+                        break;
+                    case 8: //27
+                        result = BitConverter.GetBytes(value);
+                        if (!BitConverter.IsLittleEndian)
+                            result = Reverse(result);
+                        for (int i = 0; i < j + 3; i++)
+                            _Numbers[i] = result[i];
+                        _Numbers[j + 3] = (byte)(_Numbers[j + 3] & 248 | (result[3] & 7));
+                        break;
+                    case 9: //30
+                        result = BitConverter.GetBytes(value);
+                        if (!BitConverter.IsLittleEndian)
+                            result = Reverse(result);
+                        for (int i = 0; i < j + 3; i++)
+                            _Numbers[i] = result[i];
+                        _Numbers[j + 3] = (byte)(_Numbers[j + 3] & 192 | (result[3] & 63));
                         break;
                     default:
                         throw new NotImplementedException();
                 }
             }
-            else
-            {
-                
+            else // 4
+            {   
+                result = BitConverter.GetBytes(value);
+                if (!BitConverter.IsLittleEndian)
+                    result = Reverse(result);
+                for (int i = j; i < j + 4; i++)
+                    _Numbers[i] = result[i];
             }
-            
-            //_Numbers = new byte[((s.Length - 1) / 9 * 15 + 18) / 4];
         }
 
         public int GetNumberBlock(int index)
         {
+            int firstUsed = ((_Data[_Data.Length - 1] & 15) * 2 + 5) / 5;
+            int j = index * 4;
+            //int valueLegth =             
+            if (index == 0)
+            {
+                //if (firstUsed == 1)
+                //    return _Numbers[j];
+                //else if (firstUsed == 2)
+                //    if (BitConverter.IsLittleEndian)
+                //        return (int)BitConverter.ToInt16(new byte[] { _Numbers[j], _Numbers[j + 1] }, 0);
+                //    else
+                //        return (int)BitConverter.ToInt16(new byte[] { _Numbers[j + 1], _Numbers[j] }, 0);
+                //else if(firstUsed == 3)
+                //    if (BitConverter.IsLittleEndian)
+                //        return (int)BitConverter.ToInt16(new byte[] { _Numbers[j], _Numbers[j + 1] }, 0);
+                //    else
+                //        return (int)BitConverter.ToInt16(new byte[] { _Numbers[j + 1], _Numbers[j] }, 0);
+                //else
+
+            }
+            else
+            {
+
+            }
             //參考E
             return 1;
+        }
+
+        //private static bool AdaptExponentForm(ArNumber a)
+        //{
+        //    long e = a.Exponent;
+        //    int l = a.GetDigitsToString().Length; // Todo
+        //    if ((e > 0 && e + 1 <= MaximumDisplayedDigitsCount) ||
+        //        (e < 0 && e - l + 3 >= MaximumDisplayedDigitsCount * -1))
+        //        return false;
+        //    return true;
+        //}
+        //public static bool IsInteger(ArNumber a)
+        //    => a.Exponent - a.GetDigitsToString().Length + 1 >= 0; // Todo
+        private string ToString(int digits, char format, IFormatProvider provider)
+        {
+            //string numbers = GetDigitsToString();
+            //if (digits < 0)
+            //    throw new ArgumentOutOfRangeException(nameof(digits));
+            //else if (digits == 0 || digits > numbers.Length)
+            //    digits = numbers.Length;
+            //// TO DO
+            //long e = Exponent; // if e > int overflow            
+            //if (format == 'G')
+            //    format = 'E';
+            //    //if (AdaptExponentForm(this))
+            //    //    format = 'E';
+            //    //else if (IsInteger(this))
+            //    //    format = 'D';
+            //    //else
+            //    //    format = 'C';
+
+            StringBuilder result = new StringBuilder();
+            //result.Append(numbers);
+            //if (result.Length != 1 && format == 'E')
+            //    result.Insert(1, '.');
+            //if (e != 0)
+            //{
+            //    if (format == 'E')
+            //        result.AppendFormat("E{0}{1}", e > 0 ? "+" : "", e);
+            //    else if (format == 'D')
+            //    {
+            //        if (e > digits - 1)
+            //            result.Append(new string('0', (int)e - digits + 1));
+            //        else
+            //        {
+            //            if (e > 0)
+            //                result.Remove((int)e + 1, result.Length - (int)e - 1);
+            //            else
+            //                return "0";
+            //        }
+            //    }
+            //    else if (format == 'C')
+            //    {
+            //        if (e > digits - 1)
+            //            result.Append(new string('0', (int)e - digits + 1));
+            //        else if (e > 0)
+            //            result.Insert((int)e + 1, '.');
+            //        else
+            //            result.Insert(0, $"0.{new string('0', Math.Abs((int)e + 1))}");
+            //    }
+            //}
+            //if (Negative)
+            //    result.Insert(0, '-');
+            return result.ToString();
+        }
+
+        public override string ToString()
+            => ToString(null, null);
+        public string ToString(string format)
+            => ToString(format, null);
+        public string ToString(IFormatProvider provider)
+            => ToString(null, provider);
+        public string ToString(string format, IFormatProvider provider)
+        {
+            int length = 0;
+            if (string.IsNullOrEmpty(format))
+                format = "G";
+            format = format.Trim().ToUpperInvariant();
+            if (provider == null)
+                provider = NumberFormatInfo.CurrentInfo;
+            if (format.Length > 1 && !int.TryParse(format.Substring(1), out length))
+                throw new FormatException($"{nameof(format)}:{format}");
+            switch (format[0])
+            {
+                // TO DO
+                case 'C':
+                    return ToString(length, format[0], provider);
+                case 'D':
+                    return ToString(length, format[0], provider);
+                //case 'F':
+                //case 'N':
+                //case 'P':
+                //case 'R':
+                //case 'X':
+                case 'E':
+                case 'G':
+                    return ToString(length, format[0], provider);
+                default:
+                    throw new FormatException(string.Format("The '{0}' format string is not supported.", format));
+            }
         }
     }
 }
