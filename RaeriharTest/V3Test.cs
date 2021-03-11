@@ -24,7 +24,67 @@ namespace RaeriharTest
         public void GetSetTest()
         {
             ArNumber ar = new ArNumber();
-            //ar.SetNumberBlock()
+            ar.SetNumberBlock(0, 1);            
+            TestContext.WriteLine(ar.GetNumber().ToString());
+            ar.SetNumberBlock(0, 2);
+            TestContext.WriteLine(ar.GetNumber().ToString());
+            ar.SetNumberBlock(0, 3);
+            TestContext.WriteLine(ar.GetNumber().ToString());
+            ar.SetNumberBlock(0, 9);
+            TestContext.WriteLine(ar.GetNumber().ToString());
+            ar.SetNumberBlock(0, 10);
+            TestContext.WriteLine(ar.GetNumber().ToString());
+            ar.SetNumberBlock(0, 11);
+            TestContext.WriteLine(ar.GetNumber().ToString());
+            ar.SetNumberBlock(0, 12);
+            TestContext.WriteLine(ar.GetNumber().ToString());
+            ar.SetNumberBlock(0, 60);
+            TestContext.WriteLine(ar.GetNumber().ToString());
+            ar.SetNumberBlock(0, 98);
+            TestContext.WriteLine(ar.GetNumber().ToString());
+            ar.SetNumberBlock(0, 99);
+            TestContext.WriteLine(ar.GetNumber().ToString());            
+            ar.SetNumberBlock(0, 100);
+            TestContext.WriteLine(ar.GetNumber().ToString());
+            ar.SetNumberBlock(0, 101);
+            TestContext.WriteLine(ar.GetNumber().ToString());
+            ar.SetNumberBlock(0, 102);
+            TestContext.WriteLine(ar.GetNumber().ToString());
+            ar.SetNumberBlock(0, 103);
+            TestContext.WriteLine(ar.GetNumber().ToString());
+            ar.SetNumberBlock(0, 199);
+            TestContext.WriteLine(ar.GetNumber().ToString());
+            ar.SetNumberBlock(0, 200);
+            TestContext.WriteLine(ar.GetNumber().ToString());
+            ar.SetNumberBlock(0, 999);
+            TestContext.WriteLine(ar.GetNumber().ToString());
+            ar.SetNumberBlock(0, 1000);
+            TestContext.WriteLine(ar.GetNumber().ToString());
+            ar.SetNumberBlock(0, 1999);
+            TestContext.WriteLine(ar.GetNumber().ToString());
+            ar.SetNumberBlock(0, 2999);
+            TestContext.WriteLine(ar.GetNumber().ToString());
+            ar.SetNumberBlock(0, 9999);
+            TestContext.WriteLine(ar.GetNumber().ToString());
+            ar.SetNumberBlock(0, 10000);
+            TestContext.WriteLine(ar.GetNumber().ToString());
+            ar.SetNumberBlock(0, 20000);
+            TestContext.WriteLine(ar.GetNumber().ToString());
+            ar.SetNumberBlock(0, 99999);
+            TestContext.WriteLine(ar.GetNumber().ToString());
+            //ar.SetNumberBlock(0, -1);
+            //TestContext.WriteLine(ar.GetNumber().ToString());
+            //ar.SetNumberBlock(0, -9);
+            //TestContext.WriteLine(ar.GetNumber().ToString());
+            //ar.SetNumberBlock(0, -100);
+            //TestContext.WriteLine(ar.GetNumber().ToString());
+            //ar.SetNumberBlock(0, -999);
+            //TestContext.WriteLine(ar.GetNumber().ToString());
+            return;
+            ar.SetNumberBlock(1, 4299);
+            TestContext.WriteLine(ar.GetNumberBlock(1).ToString());
+
+            //TestContext.WriteLine(ar.GetNumberBlock(0));
         }
 
         [TestMethod]

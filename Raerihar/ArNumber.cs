@@ -169,106 +169,93 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             result[result.Length - 1] = (byte)(result[result.Length - 1] << 4);
             result[result.Length - 1] |= (byte)(_Data[_Data.Length - 1] & 15);
             _Data = result;
-        }     
+        }
 
         public void SetNumberBlock(int index, int value)
         {
-            //參考E
-            //_Numbers = new byte[30];
-            int valueLength = Math.Abs(value).ToString().Length;
-            //_Numbers
-            //int firstUsed = ((_Data[_Data.Length - 1] & 15) * 2 + 5) / 5;
-            int firstBitUsed = ((_Data[_Data.Length - 1] & 15) * 10 + 2) / 3;
-            int j = index == 0 ? 0 : ((index - 1) * 30 + firstBitUsed) / 4;
-            byte[] result;
-            if(index == 0 || j + 4 > _Numbers.Length)                
+            value = Math.Abs(value); // To Do
+            //寫幾位
+            int writeBits;
+            //已使用多少Bit
+            long bitUsed = index == 0 ? 0 : (index - 1) * 30 +
+                (((_Data[_Data.Length - 1] & 240) >> 4) * 10 + 2) / 3;
+            //從哪個Byte開始
+            int j = (int)(bitUsed / 8);
+            //該Byte已使用多少Bit
+            int move = (int)(bitUsed % 8);
+            //記一下首位
+            if (index == 0)
             {
-                if(index == 0)
-                    _Data[_Data.Length - 1] = (byte)(_Data[_Data.Length - 1] & 15 | (16 * valueLength));
-                
-                switch (valueLength)
-                {   
-                    case 1: //4
-                        _Numbers[j] = (byte)(_Numbers[j] & 240 | (value & 15));
-                        break;
-                    case 2: //7
-                        _Numbers[j] = (byte)(_Numbers[j] & 128 | (value & 127));
-                        break;
-                    case 3: //10
-                        result = BitConverter.GetBytes((short)value);
-                        if (!BitConverter.IsLittleEndian)
-                            result = Reverse(result);
-                        _Numbers[j] = result[0];
-                        _Numbers[j + 1] = (byte)(_Numbers[j + 1] & 252 | (result[1] & 3));
-                        break;
-                    case 4: //14
-                        result = BitConverter.GetBytes((short)value);
-                        if (!BitConverter.IsLittleEndian)
-                            result = Reverse(result);
-                        _Numbers[j] = result[0];
-                        _Numbers[j + 1] = (byte)(_Numbers[j + 1] & 192 | (result[1] & 63));
-                        break;
-                    case 5: //17
-                        result = BitConverter.GetBytes(value);
-                        if (!BitConverter.IsLittleEndian)
-                            result = Reverse(result);
-                        for (int i = j; i < j + 2; i++)
-                            _Numbers[i] = result[i];
-                        _Numbers[j + 2] = (byte)(_Numbers[j + 2] & 254 | (result[2] & 1));
-                        break;
-                    case 6: //20
-                        result = BitConverter.GetBytes(value);
-                        if (!BitConverter.IsLittleEndian)
-                            result = Reverse(result);
-                        for (int i = j; i < j + 2; i++)
-                            _Numbers[i] = result[i];
-                        _Numbers[j + 2] = (byte)(_Numbers[j + 2] & 240 | (result[2] & 15));
-                        break;
-                    case 7: //24
-                        result = BitConverter.GetBytes(value);
-                        if (!BitConverter.IsLittleEndian)
-                            result = Reverse(result);
-                        for (int i = j; i < j + 3; i++)
-                            _Numbers[i] = result[i];
-                        break;
-                    case 8: //27
-                        result = BitConverter.GetBytes(value);
-                        if (!BitConverter.IsLittleEndian)
-                            result = Reverse(result);
-                        for (int i = 0; i < j + 3; i++)
-                            _Numbers[i] = result[i];
-                        _Numbers[j + 3] = (byte)(_Numbers[j + 3] & 248 | (result[3] & 7));
-                        break;
-                    case 9: //30
-                        result = BitConverter.GetBytes(value);
-                        if (!BitConverter.IsLittleEndian)
-                            result = Reverse(result);
-                        for (int i = 0; i < j + 3; i++)
-                            _Numbers[i] = result[i];
-                        _Numbers[j + 3] = (byte)(_Numbers[j + 3] & 192 | (result[3] & 63));
-                        break;
-                    default:
-                        throw new NotImplementedException();
+                _Data[_Data.Length - 1] = (byte)(_Data[_Data.Length - 1] & 15 | (16 * Math.Abs(value).ToString().Length));
+                writeBits = (((_Data[_Data.Length - 1] & 240) >> 4) * 10 + 2) / 3;
+            }
+            else if (j + 4 > _Data.Length) //最後一位
+                writeBits = (Math.Abs(value).ToString().Length * 10 + 2) / 3;
+            else
+                writeBits = 30;
+
+            //2情況 + 1情況
+            while(writeBits > 0)
+            {
+                if (writeBits <= 8 - move)
+                {
+                    _Numbers[j] = (byte)(_Numbers[j] & (((1 << (8 - writeBits - move) - 1)
+                        << (writeBits + move)) & (1 << move - 1)) | value << move);
+                    break;
                 }
+                else if (move == 0)
+                {
+                    _Numbers[j] = (byte)(value << move);
+                    value = value >> 8;
+                    writeBits -= 8;
+                }
+                else
+                {
+                    _Numbers[j] = (byte)(_Numbers[j] & (1 << move - 1) | (byte)(value << move));
+                    _Numbers[j + 1] = (byte)(_Numbers[j + 1] & ((1 << (8 - writeBits - move) - 1)
+                        << (writeBits + move)) | (byte)value >> (8 - move));
+                    value = value >> 8;
+                    writeBits -= 8;
+                }
+                j++;
             }
-            else // 4
-            {   
-                result = BitConverter.GetBytes(value);
-                if (!BitConverter.IsLittleEndian)
-                    result = Reverse(result);
-                for (int i = j; i < j + 4; i++)
-                    _Numbers[i] = result[i];
-            }
+        }
+
+        public int GetNumber()
+        {
+            return BitConverter.ToInt32(_Numbers, 0);
         }
 
         public int GetNumberBlock(int index)
         {
-            int firstUsed = ((_Data[_Data.Length - 1] & 15) * 2 + 5) / 5;
-            int j = index * 4;
-            //int valueLegth =             
+            //int firstUsed = ((_Data[_Data.Length - 1] & 15) * 2 + 5) / 5;
+            int firstBitUsed = ((_Data[_Data.Length - 1] & 15) * 10 + 2) / 3;
+            int j = index == 0 ? 0 : index * 4 + (firstBitUsed / 4);
+            int move = 0;
+            //int valueLegth =
+            //To Do - Little Endian Check
             if (index == 0)
             {
-                //if (firstUsed == 1)
+                switch(_Data[_Data.Length - 1] & 15)
+                {
+                    case 1: //4
+                        return _Numbers[j] << move & 15;
+                    case 2: //7
+                        return _Numbers[j] << move & 127;                        
+                    case 3: //10                        
+                        return BitConverter.ToInt16(new byte[] { _Numbers[j], (byte)(_Numbers[j + 1] & 3) }, 0);
+                    case 4: //14
+                        return BitConverter.ToInt16(new byte[] { _Numbers[j], (byte)(_Numbers[j + 1] & 63) }, 0);
+                    case 5: //17
+                        return BitConverter.ToInt32(new byte[] { _Numbers[j], (byte)(_Numbers[j + 1] & 3) }, 0);
+                    case 6: //20
+                    case 7: //24
+                    case 8: //27
+                    case 9: //30
+                    default:
+                        throw new NotImplementedException();
+                }
+                //if (firstUsed == 1 )
                 //    return _Numbers[j];
                 //else if (firstUsed == 2)
                 //    if (BitConverter.IsLittleEndian)
