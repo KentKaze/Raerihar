@@ -43,7 +43,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
     //bit	4		30		    30		30			30	 10
     //bits = 134
     //bytes = 17
-    //e = 0 = 1 % 0 = 1
+    //e = 0 = (0 + 1) % 9 = 1 0v0?
 
     //		132 197489464 894319548 941594894 319548915 6
     //		--- --------- --------- --------- --------- -
@@ -60,6 +60,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
     //bits = 134
     //bytes = 17
     //e = -100 = (-100 + 1) % 9 = 0
+    //(e + 1) % 9 = 0
 
     //Data =>
     //4     EndDigitsCount
@@ -75,8 +76,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 
         //public bool Negative
         //{
-        //    get;
-        //    set;
+            
+        
         //    get => _Data[_Data.Length - 1] >> 7 == 1;
         //    set
         //    {
@@ -174,22 +175,24 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public void SetNumberBlock(int index, int value)
         {
             value = Math.Abs(value); // To Do
-            //寫幾位
-            int writeBits;
+            
             //已使用多少Bit
             long bitUsed = index == 0 ? 0 : (index - 1) * 30 +
                 (((_Data[_Data.Length - 1] & 240) >> 4) * 10 + 2) / 3;
             //從哪個Byte開始
             int j = (int)(bitUsed / 8);
             //該Byte已使用多少Bit
-            int move = (int)(bitUsed % 8);
-            //記一下首位
+            int move = (int)(bitUsed % 8);            
+
+            //寫幾位
+            int writeBits;
             if (index == 0)
             {
+                //記一下首位
                 _Data[_Data.Length - 1] = (byte)(_Data[_Data.Length - 1] & 15 | (16 * Math.Abs(value).ToString().Length));
                 writeBits = (((_Data[_Data.Length - 1] & 240) >> 4) * 10 + 2) / 3;
             }
-            else if (j + 4 > _Data.Length) //最後一位
+            else if ((bitUsed + 1) / 8 + 4 > _Data.Length) //最後一位
                 writeBits = (Math.Abs(value).ToString().Length * 10 + 2) / 3;
             else
                 writeBits = 30;
@@ -204,19 +207,16 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                     break;
                 }
                 else if (move == 0)
-                {
                     _Numbers[j] = (byte)(value << move);
-                    value = value >> 8;
-                    writeBits -= 8;
-                }
                 else
                 {
+                    //test
                     _Numbers[j] = (byte)(_Numbers[j] & (1 << move - 1) | (byte)(value << move));
                     _Numbers[j + 1] = (byte)(_Numbers[j + 1] & ((1 << (8 - writeBits - move) - 1)
                         << (writeBits + move)) | (byte)value >> (8 - move));
-                    value = value >> 8;
-                    writeBits -= 8;
                 }
+                value = value >> 8;
+                writeBits -= 8;
                 j++;
             }
         }
@@ -228,54 +228,47 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 
         public int GetNumberBlock(int index)
         {
-            //int firstUsed = ((_Data[_Data.Length - 1] & 15) * 2 + 5) / 5;
-            int firstBitUsed = ((_Data[_Data.Length - 1] & 15) * 10 + 2) / 3;
-            int j = index == 0 ? 0 : index * 4 + (firstBitUsed / 4);
-            int move = 0;
-            //int valueLegth =
-            //To Do - Little Endian Check
+            //已使用多少Bit            
+            long bitUsed = index == 0 ? 0 : (index - 1) * 30 +
+                (((_Data[_Data.Length - 1] & 240) >> 4) * 10 + 2) / 3;
+            //從哪個Byte開始
+            int j = (int)(bitUsed / 8);
+            //該Byte已使用多少Bit
+            int move = (int)(bitUsed % 8);
+
+            //讀幾位
+            int readBits;
             if (index == 0)
-            {
-                switch(_Data[_Data.Length - 1] & 15)
-                {
-                    case 1: //4
-                        return _Numbers[j] << move & 15;
-                    case 2: //7
-                        return _Numbers[j] << move & 127;                        
-                    case 3: //10                        
-                        return BitConverter.ToInt16(new byte[] { _Numbers[j], (byte)(_Numbers[j + 1] & 3) }, 0);
-                    case 4: //14
-                        return BitConverter.ToInt16(new byte[] { _Numbers[j], (byte)(_Numbers[j + 1] & 63) }, 0);
-                    case 5: //17
-                        return BitConverter.ToInt32(new byte[] { _Numbers[j], (byte)(_Numbers[j + 1] & 3) }, 0);
-                    case 6: //20
-                    case 7: //24
-                    case 8: //27
-                    case 9: //30
-                    default:
-                        throw new NotImplementedException();
-                }
-                //if (firstUsed == 1 )
-                //    return _Numbers[j];
-                //else if (firstUsed == 2)
-                //    if (BitConverter.IsLittleEndian)
-                //        return (int)BitConverter.ToInt16(new byte[] { _Numbers[j], _Numbers[j + 1] }, 0);
-                //    else
-                //        return (int)BitConverter.ToInt16(new byte[] { _Numbers[j + 1], _Numbers[j] }, 0);
-                //else if(firstUsed == 3)
-                //    if (BitConverter.IsLittleEndian)
-                //        return (int)BitConverter.ToInt16(new byte[] { _Numbers[j], _Numbers[j + 1] }, 0);
-                //    else
-                //        return (int)BitConverter.ToInt16(new byte[] { _Numbers[j + 1], _Numbers[j] }, 0);
-                //else
-
-            }
+                readBits = ((_Data[_Data.Length - 1] & 240) * 10 + 2) / 3;
+            else if ((bitUsed + 1) / 8 + 4 > _Data.Length) //最後一位
+                readBits = (int)((Exponent + 1) % 9 * 10 + 2) / 3;
             else
+                readBits = 30;
+          
+            byte[] result = readBits >= 17 ? new byte[4] : new byte[readBits / 4];
+            for(int i = 0; readBits > 0; i++)
             {
-
+                if (readBits <= 8 - move)
+                    result[i] = (byte)((byte)(_Numbers[j + i] << (8 - move - readBits)) >> (8 - readBits));
+                else if (move == 0)
+                    result[i] = _Numbers[j + i];
+                else
+                    result[i] = (byte)((_Numbers[j + i] >> move) | (byte)(_Numbers[j + i + 1] << (8 - move)));
+                readBits -= 8;
             }
-            //參考E
-            return 1;
+
+            if (result.Length == 1)
+                return (sbyte)result[0];
+            else if (result.Length == 2)
+                if(BitConverter.IsLittleEndian)
+                    return BitConverter.ToInt16(result, 0);
+                else
+                    return BitConverter.ToInt16(Reverse(result), 0);
+            else
+                if (BitConverter.IsLittleEndian)
+                    return BitConverter.ToInt32(result, 0);
+                else
+                    return BitConverter.ToInt32(Reverse(result), 0);         
         }
 
         //private static bool AdaptExponentForm(ArNumber a)

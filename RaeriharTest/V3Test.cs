@@ -72,6 +72,8 @@ namespace RaeriharTest
             TestContext.WriteLine(ar.GetNumber().ToString());
             ar.SetNumberBlock(0, 99999);
             TestContext.WriteLine(ar.GetNumber().ToString());
+            ar.SetNumberBlock(1, 199);
+            TestContext.WriteLine(ar.GetNumber().ToString());
             //ar.SetNumberBlock(0, -1);
             //TestContext.WriteLine(ar.GetNumber().ToString());
             //ar.SetNumberBlock(0, -9);
