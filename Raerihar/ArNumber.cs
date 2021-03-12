@@ -166,7 +166,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         private int GetIndexCount()
         {
             int tail = PostiveRemainder(Exponent + 1, 9);
-            return (int)(1 + (DigitsCount - tail) / 9 + (DigitsCount - tail) % 9);
+            return (int)(1 + (DigitsCount - tail) / 9 + ((DigitsCount - tail) % 9 == 0 ? 0 : 1) );
         }
 
         private long GetBits(long digitsLength)
@@ -279,6 +279,9 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 readBits = (PostiveRemainder(Exponent + 1, 9) * 10 + 2) / 3;
             else
                 readBits = 30;
+
+            //if (readBits > 30)
+            //    Console.WriteLine("?!");
 
             byte[] result = readBits >= 17 ? new byte[4] : new byte[readBits / 8 + 1];
             for (int i = 0; readBits > 0; i++)
@@ -414,12 +417,14 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             while (numberString.Length > 1 && numberString[numberString.Length - 1] == '0')
                 numberString = numberString.Remove(numberString.Length - 1, 1);
 
+            a._Numbers = new byte[(a.GetBits(numberString.Length) + 7) / 8];
+            int maxIndex = a.GetIndexCount(); // 跟上一行改進空間
             a.Negative = isNegative;
             a.SetExponent(e);
-            a._Numbers = new byte[(a.GetBits(numberString.Length) + 7) / 8];
+            
             int v;
             int digitIndex = 0;
-            for (int i = 0; digitIndex < numberString.Length; i++)
+            for (int i = maxIndex - 1; digitIndex < numberString.Length; i--)
             {
                 if (digitIndex == 0)
                 {
