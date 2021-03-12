@@ -24,6 +24,7 @@ namespace RaeriharTest
         public void GetSetTest()
         {
             ArNumber ar = new ArNumber();
+            
             ar.SetNumberBlock(0, 1);
             TestContext.WriteLine(ar.GetNumberBlock(0).ToString());            
             ar.SetNumberBlock(0, 2);
@@ -86,6 +87,8 @@ namespace RaeriharTest
             TestContext.WriteLine(ar.GetNumberBlock(1).ToString());
             ar.SetNumberBlock(1, 1000000);
             TestContext.WriteLine(ar.GetNumberBlock(1).ToString());
+
+            
             //ar.SetNumberBlock(0, -1);
             //TestContext.WriteLine(ar.GetNumber().ToString());
             //ar.SetNumberBlock(0, -9);
@@ -99,6 +102,15 @@ namespace RaeriharTest
 
             //TestContext.WriteLine(ar.GetNumberBlock(0));
         }
+
+        [TestMethod]
+        public void ParseTest()
+        {
+            ArNumber a = ArNumber.Parse("7");
+
+            ArNumber c = ArNumber.Parse("7.7");
+        }
+
 
         [TestMethod]
         public void V3TestTest()

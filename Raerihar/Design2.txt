@@ -43,6 +43,8 @@ bits = 134
 bytes = 17
 e = 3
 
+
+
 前面用1 ~ 4Byte 來存
 後面用1 ~ 4Byte 來存
 全部存正數
@@ -63,6 +65,7 @@ digits 	bits	 Byte
 
 //digits = (bits + 2) * 4 / 15
 bits = (digits * 10 + 2) / 3
+bits = 頭 + 尾 + 身x4
 bytes = digits * 2 + 5 / 5(研究中)
  111
  111

@@ -68,26 +68,51 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 
     //Number=>
     //NumberBytes
-    //Last 1 Sign
+    //First 1 Sign
+
+    //Head and Tail
+    //30.52 =>30 52
+    //        -- --
+    //        e = 1 tail = 2
+
+    //3    => 3
+    //        -
+    //        e = 0 tail = 1 (repeat)
+    //0.5  => 0.5
+    //        e = -1 tail = 1
+    //0.0576 => 0.0576
+    //        e = -2 tail = 7 (repeat)
+    // e > 0
     public class ArNumber
     {
         private byte[] _Data;
         private byte[] _Numbers;
 
-        //public bool Negative
+        //public long DigitsCount
         //{
-            
-        
-        //    get => _Data[_Data.Length - 1] >> 7 == 1;
-        //    set
+        //    //get => _Data[0] & 1;
+        //    //set => _Data[0] = _Data[0] & 254 | value
         //    {
-        //        if (_Numbers.Length == 4 && _Numbers[0] == 0 &&
-        //            _Numbers[1] == 0 && _Numbers[2] == 0 && _Numbers[3] == 0)
-        //            return;
-        //        _Data[_Data.Length - 1] = value ? (byte)(_Data[_Data.Length - 1] | 128) : (byte)(_Data[_Data.Length - 1] & 127);
-        //    }
-        //}
 
+        //        ((_Data[_Data.Length - 1] & 240) >> 4)
+        //        if (_Data.Length <= 4)
+        //            return;
+        //        //(Exponent + 1) % 9 + ((_Data[_Data.Length - 1] & 240) >> 4)
+        //    } 
+        //}
+        public bool Negative
+        {
+            get => (_Numbers[0] & 1) == 1;
+            set => _Numbers[0] = (byte)(_Numbers[0] & 254 | (value ? 1 : 0));
+        }
+
+            //public long DigitsCount
+            //{
+            //    get
+            //    {
+            //        +_Data[_Data.Length - 1] & 240) >> 4;
+            //    }
+            //}
         public long Exponent
         { 
             get
@@ -141,6 +166,20 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             _Numbers = a._Numbers;
         }
 
+        private int GetIndexCount(long digitsLength)
+        {
+            int tail = (int)((Exponent + 1) % 9);
+            return (int)(1 + (digitsLength - tail) / 9 + (digitsLength - tail) % 9);
+        }
+
+        private long GetBits(long digitsLength)
+        {   
+            int tail = (int)((Exponent + 1) % 9);
+            return (tail * 10 + 2) / 3 + 
+                (digitsLength - tail) / 9 * 30 + 
+                ((digitsLength - tail) % 9 * 10 + 2) / 3 + 1;
+        }
+
         private byte[] Reverse(byte[] array)
         {
             for (int i = 0; i < array.Length / 2; i++)
@@ -172,28 +211,27 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             _Data = result;
         }
 
+        //value 不接受負值
         public void SetNumberBlock(int index, int value)
-        {
-            value = Math.Abs(value); // To Do
-            
+        {   
             //已使用多少Bit
-            long bitUsed = index == 0 ? 0 : (index - 1) * 30 +
-                (((_Data[_Data.Length - 1] & 240) >> 4) * 10 + 2) / 3;
+            long bitUsed = index == 0 ? 1 : (index - 1) * 30 +
+                (((_Data[_Data.Length - 1] & 240) >> 4) * 10 + 2) / 3 + 1;
             //從哪個Byte開始
             int j = (int)(bitUsed / 8);
             //該Byte已使用多少Bit
-            int move = (int)(bitUsed % 8);            
+            int move = (int)(bitUsed % 8);
 
             //寫幾位
             int writeBits;
             if (index == 0)
             {
                 //記一下首位
-                _Data[_Data.Length - 1] = (byte)(_Data[_Data.Length - 1] & 15 | (16 * Math.Abs(value).ToString().Length));
+                _Data[_Data.Length - 1] = (byte)(_Data[_Data.Length - 1] & 15 | (16 * value.ToString().Length));
                 writeBits = (((_Data[_Data.Length - 1] & 240) >> 4) * 10 + 2) / 3;
             }
             else if ((bitUsed + 1) / 8 + 4 > _Data.Length) //最後一位
-                writeBits = (Math.Abs(value).ToString().Length * 10 + 2) / 3;
+                writeBits = (value.ToString().Length * 10 + 2) / 3;
             else
                 writeBits = 30;
 
@@ -221,16 +259,40 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             }
         }
 
-        public int GetNumber()
-        {
-            return BitConverter.ToInt32(_Numbers, 0);
-        }
+        //private string GetNumbersToString()
+        //{
+        //    StringBuilder result = new StringBuilder();
+        //    for (int i = 0; i < DigitSetLength; i++)
+        //        result.AppendFormat("{0:D9}", GetDigits(i));
+        //    while (result.Length > 1 && result[0] == '0')
+        //        result.Remove(0, 1);
+        //    while (result.Length > 1 && result[result.Length - 1] == '0')
+        //        result.Remove(result.Length - 1, 1);
+        //    return result.ToString();
+        //}
+
+        //需先設定Negative和Exponenet
+        //private void SetNumbersByString(string s)
+        //{
+        //    long e = Exponent;
+
+        //    _Numbers = new byte[((s.Length - 1) / 9 * 15 + 18) / 4];
+        //    int v;
+        //    for (int i = 0; i < (s.Length - 1) / 9 + 1; i++)
+        //    {
+        //        if (i * 9 + 8 < s.Length)
+        //            v = int.Parse(s.Substring(i * 9, 9));
+        //        else
+        //            v = int.Parse(s.Substring(i * 9).PadRight(9, '0'));
+        //        SetDigits(i, v);
+        //    }
+        //}
 
         public int GetNumberBlock(int index)
         {
             //已使用多少Bit            
-            long bitUsed = index == 0 ? 0 : (index - 1) * 30 +
-                (((_Data[_Data.Length - 1] & 240) >> 4) * 10 + 2) / 3;
+            long bitUsed = index == 0 ? 1 : (index - 1) * 30 +
+                (((_Data[_Data.Length - 1] & 240) >> 4) * 10 + 2) / 3 + 1;
             //從哪個Byte開始
             int j = (int)(bitUsed / 8);
             //該Byte已使用多少Bit
@@ -271,6 +333,141 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                     return BitConverter.ToInt32(Reverse(result), 0);         
         }
 
+        public static bool TryParse(string s, out ArNumber result)
+            => TryParse(s, NumberStyles.None, null, out result);
+        public static bool TryParse(string s, NumberStyles style, out ArNumber result)
+            => TryParse(s, style, null, out result);
+        public static bool TryParse(string s, IFormatProvider provider, out ArNumber result)
+            => TryParse(s, NumberStyles.None, provider, out result);
+        public static bool TryParse(string s, NumberStyles style, IFormatProvider provider, out ArNumber result)
+        {
+            try
+            {
+                result = Parse(s, style, provider);
+                return true;
+            }
+            catch
+            {
+                result = null;
+                return false;
+            }
+        }
+        public static ArNumber Parse(string s)
+           => Parse(s, NumberStyles.None, null);
+        public static ArNumber Parse(string s, NumberStyles style)
+            => Parse(s, style, null);
+        public static ArNumber Parse(string s, IFormatProvider provider)
+            => Parse(s, NumberStyles.None, provider);
+        public static ArNumber Parse(string s, NumberStyles style, IFormatProvider provider)
+        {
+            ArNumber result = new ArNumber();
+            Parse(s, result, style, provider);
+            return result;
+        }
+        private static void Parse(string s, ArNumber a, NumberStyles style = NumberStyles.None, IFormatProvider provider = null)
+        {
+            if (string.IsNullOrEmpty(s))
+                throw new ArgumentNullException(nameof(s));
+            bool isNegative = false;
+            long e;
+
+            string numberString = s;
+            if (style.HasFlag(NumberStyles.AllowThousands))
+                numberString = numberString.Replace(",", "");
+            numberString = numberString.Trim();
+
+            int eIndex = -2, pointIndex = -1;
+            if (numberString[0] == '+')
+                numberString = numberString.Remove(0, 1);
+            else if (numberString[0] == '-')
+            {
+                isNegative = true;
+                numberString = numberString.Remove(0, 1);
+            }
+            while (numberString.Length > 1 && numberString[0] == '0')
+                numberString = numberString.Remove(0, 1);
+
+            for (int i = 0; i < numberString.Length; i++)
+            {
+                if (i == eIndex + 1)
+                {
+                    if (numberString[i] != '+' && numberString[i] != '-')
+                        throw new ArgumentException($"{nameof(s)}:{s}");
+                }
+                else if (numberString[i] == '.')
+                    if (pointIndex == -1)
+                        pointIndex = i;
+                    else
+                        throw new ArgumentException($"{nameof(s)}:{s}");
+                else if (numberString[i] == 'E' || numberString[i] == 'e')
+                    if (i == 0)
+                        throw new ArgumentException($"{nameof(s)}:{s}");
+                    else if (eIndex == -2)
+                        eIndex = i;
+                    else
+                        throw new ArgumentException($"{nameof(s)}:{s}");
+                else if (!char.IsDigit(numberString[i]))
+                    throw new ArgumentException($"{nameof(s)}:{s}");
+            }
+
+            if (eIndex != -2)
+            {
+                e = int.Parse(numberString.Substring(eIndex + 1));
+                numberString = numberString.Remove(eIndex);
+            }
+            else
+                e = 0;
+
+            if (pointIndex != -1)
+            {
+                while (numberString[numberString.Length - 1] == '0')
+                    numberString = numberString.Remove(numberString.Length - 1, 1);
+                numberString = numberString.Remove(pointIndex, 1);
+                if (numberString.Length == 0)
+                {
+                    a = new ArNumber(); // Set To 0 To DO
+                    return;
+                }
+                e += pointIndex - 1;
+                while (numberString[0] == '0')
+                {
+                    numberString = numberString.Remove(0, 1);
+                    e--;
+                }
+            }
+            else
+                e += numberString.Length - 1;
+
+            while (numberString.Length > 1 && numberString[numberString.Length - 1] == '0')
+                numberString = numberString.Remove(numberString.Length - 1, 1);
+
+            a.Negative = isNegative;
+            a.SetExponent(e);
+            a._Numbers = new byte[a.GetBits(numberString.Length)];
+            //int indexCount = a.GetIndexCount(numberString.Length);
+            int v;
+            int digitIndex = 0;
+            for (int i = 0; digitIndex < numberString.Length; i++)
+            {
+                if(digitIndex == 0)
+                {
+                    v = int.Parse(numberString.Substring(digitIndex, (int)((e + 1) % 9)));
+                    digitIndex += (int)((e + 1) % 9);
+                }
+                else if(numberString.Length - digitIndex < 9)
+                {
+                    v = int.Parse(numberString.Substring(digitIndex));
+                    digitIndex = numberString.Length;
+                }
+                else
+                {
+                    v = int.Parse(numberString.Substring(digitIndex, 9));
+                    digitIndex += 9;
+                }
+                a.SetNumberBlock(i, v);
+            }            
+        }
+
         //private static bool AdaptExponentForm(ArNumber a)
         //{
         //    long e = a.Exponent;
@@ -280,6 +477,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         //        return false;
         //    return true;
         //}
+
         //public static bool IsInteger(ArNumber a)
         //    => a.Exponent - a.GetDigitsToString().Length + 1 >= 0; // Todo
         private string ToString(int digits, char format, IFormatProvider provider)
