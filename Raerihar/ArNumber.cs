@@ -202,8 +202,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             {
                 if (writeBits <= 8 - move)
                 {
-                    _Numbers[j] = (byte)(_Numbers[j] & (((1 << (8 - writeBits - move) - 1)
-                        << (writeBits + move)) & (1 << move - 1)) | value << move);
+                    _Numbers[j] = (byte)(_Numbers[j] & ((((1 << 8 - writeBits - move) - 1) 
+                        << writeBits + move) | (1 << move) - 1) | (value << move));
                     break;
                 }
                 else if (move == 0)
@@ -211,8 +211,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 else
                 {
                     //test
-                    _Numbers[j] = (byte)(_Numbers[j] & (1 << move - 1) | (byte)(value << move));
-                    _Numbers[j + 1] = (byte)(_Numbers[j + 1] & ((1 << (8 - writeBits - move) - 1)
+                    _Numbers[j] = (byte)(_Numbers[j] & ((1 << move) - 1) | (byte)(value << move));
+                    _Numbers[j + 1] = (byte)(_Numbers[j + 1] & (((1 << (8 - writeBits - move)) - 1)
                         << (writeBits + move)) | (byte)value >> (8 - move));
                 }
                 value = value >> 8;
@@ -239,13 +239,13 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             //讀幾位
             int readBits;
             if (index == 0)
-                readBits = ((_Data[_Data.Length - 1] & 240) * 10 + 2) / 3;
+                readBits = (((_Data[_Data.Length - 1] & 240) >> 4) * 10 + 2) / 3;
             else if ((bitUsed + 1) / 8 + 4 > _Data.Length) //最後一位
                 readBits = (int)((Exponent + 1) % 9 * 10 + 2) / 3;
             else
                 readBits = 30;
           
-            byte[] result = readBits >= 17 ? new byte[4] : new byte[readBits / 4];
+            byte[] result = readBits >= 17 ? new byte[4] : new byte[readBits / 8 + 1];
             for(int i = 0; readBits > 0; i++)
             {
                 if (readBits <= 8 - move)
