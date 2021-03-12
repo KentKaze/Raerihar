@@ -85,36 +85,33 @@ namespace Aritiafel.Organizations.RaeriharUniversity
     // e > 0
     public class ArNumber
     {
+        public const long ExponentMaxValue = 576460752303423487;
+        public const long ExponentMinValue = -576460752303423488;
+        public const byte MaximumDisplayedDigitsCount = 17;
+        private const int MaximumBytesCount = 4166668;
+
         private byte[] _Data;
         private byte[] _Numbers;
 
-        //public long DigitsCount
-        //{
-        //    //get => _Data[0] & 1;
-        //    //set => _Data[0] = _Data[0] & 254 | value
-        //    {
-
-        //        ((_Data[_Data.Length - 1] & 240) >> 4)
-        //        if (_Data.Length <= 4)
-        //            return;
-        //        //(Exponent + 1) % 9 + ((_Data[_Data.Length - 1] & 240) >> 4)
-        //    } 
-        //}
+        public long DigitsCount
+        {
+            get
+            {
+                int lastDigits = (_Data[_Data.Length - 1] & 15);
+                int bitUsed = (lastDigits * 10 + 2) / 3 + 1;
+                if (_Numbers.Length == bitUsed / 8 + 1 && (_Numbers[_Numbers.Length - 1] >> (bitUsed % 8) == 0))
+                    return lastDigits;
+                else
+                    return lastDigits + PostiveRemainder(Exponent + 1, 9) + (_Numbers.Length * 8 - bitUsed - (PostiveRemainder(Exponent + 1, 9) * 10 + 2) / 3) / 10 * 3;
+            }
+        }
         public bool Negative
         {
             get => (_Numbers[0] & 1) == 1;
             set => _Numbers[0] = (byte)(_Numbers[0] & 254 | (value ? 1 : 0));
         }
-
-            //public long DigitsCount
-            //{
-            //    get
-            //    {
-            //        +_Data[_Data.Length - 1] & 240) >> 4;
-            //    }
-            //}
         public long Exponent
-        { 
+        {
             get
             {
                 long result;
@@ -157,7 +154,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public ArNumber()
         {
             _Data = new byte[1];
-            _Numbers = new byte[100];
+            _Numbers = new byte[1];
         }
 
         public ArNumber(ArNumber a)
@@ -166,18 +163,24 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             _Numbers = a._Numbers;
         }
 
-        private int GetIndexCount(long digitsLength)
+        private int GetIndexCount()
         {
-            int tail = (int)((Exponent + 1) % 9);
-            return (int)(1 + (digitsLength - tail) / 9 + (digitsLength - tail) % 9);
+            int tail = PostiveRemainder(Exponent + 1, 9);
+            return (int)(1 + (DigitsCount - tail) / 9 + (DigitsCount - tail) % 9);
         }
 
         private long GetBits(long digitsLength)
-        {   
-            int tail = (int)((Exponent + 1) % 9);
-            return (tail * 10 + 2) / 3 + 
-                (digitsLength - tail) / 9 * 30 + 
+        {
+            int tail = PostiveRemainder(Exponent + 1, 9);
+            return (tail * 10 + 2) / 3 +
+                (digitsLength - tail) / 9 * 30 +
                 ((digitsLength - tail) % 9 * 10 + 2) / 3 + 1;
+        }
+
+        private static int PostiveRemainder(long a, int b)
+        {
+            int result = (int)(a % b);
+            return result >= 0 ? result : result + b;
         }
 
         private byte[] Reverse(byte[] array)
@@ -213,10 +216,10 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 
         //value 不接受負值
         public void SetNumberBlock(int index, int value)
-        {   
+        {
             //已使用多少Bit
             long bitUsed = index == 0 ? 1 : (index - 1) * 30 +
-                (((_Data[_Data.Length - 1] & 240) >> 4) * 10 + 2) / 3 + 1;
+                ((_Data[_Data.Length - 1] & 15) * 10 + 2) / 3 + 1;
             //從哪個Byte開始
             int j = (int)(bitUsed / 8);
             //該Byte已使用多少Bit
@@ -227,8 +230,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             if (index == 0)
             {
                 //記一下首位
-                _Data[_Data.Length - 1] = (byte)(_Data[_Data.Length - 1] & 15 | (16 * value.ToString().Length));
-                writeBits = (((_Data[_Data.Length - 1] & 240) >> 4) * 10 + 2) / 3;
+                _Data[_Data.Length - 1] = (byte)(_Data[_Data.Length - 1] & 240 | value.ToString().Length);
+                writeBits = ((_Data[_Data.Length - 1] & 15) * 10 + 2) / 3;
             }
             else if ((bitUsed + 1) / 8 + 4 > _Data.Length) //最後一位
                 writeBits = (value.ToString().Length * 10 + 2) / 3;
@@ -236,11 +239,11 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 writeBits = 30;
 
             //2情況 + 1情況
-            while(writeBits > 0)
+            while (writeBits > 0)
             {
                 if (writeBits <= 8 - move)
                 {
-                    _Numbers[j] = (byte)(_Numbers[j] & ((((1 << 8 - writeBits - move) - 1) 
+                    _Numbers[j] = (byte)(_Numbers[j] & ((((1 << 8 - writeBits - move) - 1)
                         << writeBits + move) | (1 << move) - 1) | (value << move));
                     break;
                 }
@@ -258,41 +261,11 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 j++;
             }
         }
-
-        //private string GetNumbersToString()
-        //{
-        //    StringBuilder result = new StringBuilder();
-        //    for (int i = 0; i < DigitSetLength; i++)
-        //        result.AppendFormat("{0:D9}", GetDigits(i));
-        //    while (result.Length > 1 && result[0] == '0')
-        //        result.Remove(0, 1);
-        //    while (result.Length > 1 && result[result.Length - 1] == '0')
-        //        result.Remove(result.Length - 1, 1);
-        //    return result.ToString();
-        //}
-
-        //需先設定Negative和Exponenet
-        //private void SetNumbersByString(string s)
-        //{
-        //    long e = Exponent;
-
-        //    _Numbers = new byte[((s.Length - 1) / 9 * 15 + 18) / 4];
-        //    int v;
-        //    for (int i = 0; i < (s.Length - 1) / 9 + 1; i++)
-        //    {
-        //        if (i * 9 + 8 < s.Length)
-        //            v = int.Parse(s.Substring(i * 9, 9));
-        //        else
-        //            v = int.Parse(s.Substring(i * 9).PadRight(9, '0'));
-        //        SetDigits(i, v);
-        //    }
-        //}
-
         public int GetNumberBlock(int index)
         {
             //已使用多少Bit            
             long bitUsed = index == 0 ? 1 : (index - 1) * 30 +
-                (((_Data[_Data.Length - 1] & 240) >> 4) * 10 + 2) / 3 + 1;
+                ((_Data[_Data.Length - 1] & 15) * 10 + 2) / 3 + 1;
             //從哪個Byte開始
             int j = (int)(bitUsed / 8);
             //該Byte已使用多少Bit
@@ -301,14 +274,14 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             //讀幾位
             int readBits;
             if (index == 0)
-                readBits = (((_Data[_Data.Length - 1] & 240) >> 4) * 10 + 2) / 3;
+                readBits = ((_Data[_Data.Length - 1] & 15) * 10 + 2) / 3;
             else if ((bitUsed + 1) / 8 + 4 > _Data.Length) //最後一位
-                readBits = (int)((Exponent + 1) % 9 * 10 + 2) / 3;
+                readBits = (PostiveRemainder(Exponent + 1, 9) * 10 + 2) / 3;
             else
                 readBits = 30;
-          
+
             byte[] result = readBits >= 17 ? new byte[4] : new byte[readBits / 8 + 1];
-            for(int i = 0; readBits > 0; i++)
+            for (int i = 0; readBits > 0; i++)
             {
                 if (readBits <= 8 - move)
                     result[i] = (byte)((byte)(_Numbers[j + i] << (8 - move - readBits)) >> (8 - readBits));
@@ -322,15 +295,15 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             if (result.Length == 1)
                 return (sbyte)result[0];
             else if (result.Length == 2)
-                if(BitConverter.IsLittleEndian)
+                if (BitConverter.IsLittleEndian)
                     return BitConverter.ToInt16(result, 0);
                 else
                     return BitConverter.ToInt16(Reverse(result), 0);
             else
                 if (BitConverter.IsLittleEndian)
-                    return BitConverter.ToInt32(result, 0);
-                else
-                    return BitConverter.ToInt32(Reverse(result), 0);         
+                return BitConverter.ToInt32(result, 0);
+            else
+                return BitConverter.ToInt32(Reverse(result), 0);
         }
 
         public static bool TryParse(string s, out ArNumber result)
@@ -443,18 +416,17 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 
             a.Negative = isNegative;
             a.SetExponent(e);
-            a._Numbers = new byte[a.GetBits(numberString.Length)];
-            //int indexCount = a.GetIndexCount(numberString.Length);
+            a._Numbers = new byte[(a.GetBits(numberString.Length) + 7) / 8];
             int v;
             int digitIndex = 0;
             for (int i = 0; digitIndex < numberString.Length; i++)
             {
-                if(digitIndex == 0)
+                if (digitIndex == 0)
                 {
-                    v = int.Parse(numberString.Substring(digitIndex, (int)((e + 1) % 9)));
-                    digitIndex += (int)((e + 1) % 9);
+                    v = int.Parse(numberString.Substring(digitIndex, PostiveRemainder(e + 1, 9)));
+                    digitIndex += PostiveRemainder(e + 1, 9);
                 }
-                else if(numberString.Length - digitIndex < 9)
+                else if (numberString.Length - digitIndex < 9)
                 {
                     v = int.Parse(numberString.Substring(digitIndex));
                     digitIndex = numberString.Length;
@@ -465,71 +437,79 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                     digitIndex += 9;
                 }
                 a.SetNumberBlock(i, v);
-            }            
+            }
         }
 
-        //private static bool AdaptExponentForm(ArNumber a)
-        //{
-        //    long e = a.Exponent;
-        //    int l = a.GetDigitsToString().Length; // Todo
-        //    if ((e > 0 && e + 1 <= MaximumDisplayedDigitsCount) ||
-        //        (e < 0 && e - l + 3 >= MaximumDisplayedDigitsCount * -1))
-        //        return false;
-        //    return true;
-        //}
+        private static bool AdaptExponentForm(ArNumber a)
+        {
+            long e = a.Exponent;
+            long l = a.DigitsCount; // Todo
+            if ((e > 0 && e + 1 <= MaximumDisplayedDigitsCount) ||
+                (e < 0 && e - l + 3 >= MaximumDisplayedDigitsCount * -1))
+                return false;
+            return true;
+        }
+        public static bool IsInteger(ArNumber a)
+            => a.Exponent - a.DigitsCount + 1 >= 0;
 
-        //public static bool IsInteger(ArNumber a)
-        //    => a.Exponent - a.GetDigitsToString().Length + 1 >= 0; // Todo
+        private string GetNumbersToString()
+        {
+            //Scan 改良空間
+            StringBuilder numbers = new StringBuilder();
+            int indexCount = GetIndexCount();
+            for (int i = 0; i < indexCount; i++)
+                numbers.Append(GetNumberBlock(i));
+            return numbers.ToString();
+        }
         private string ToString(int digits, char format, IFormatProvider provider)
         {
-            //string numbers = GetDigitsToString();
-            //if (digits < 0)
-            //    throw new ArgumentOutOfRangeException(nameof(digits));
-            //else if (digits == 0 || digits > numbers.Length)
-            //    digits = numbers.Length;
-            //// TO DO
-            //long e = Exponent; // if e > int overflow            
-            //if (format == 'G')
-            //    format = 'E';
-            //    //if (AdaptExponentForm(this))
-            //    //    format = 'E';
-            //    //else if (IsInteger(this))
-            //    //    format = 'D';
-            //    //else
-            //    //    format = 'C';
+            string numbers = GetNumbersToString();
+            if (digits < 0)
+                throw new ArgumentOutOfRangeException(nameof(digits));
+            else if (digits == 0 || digits > numbers.Length)
+                digits = numbers.Length;
+            // TO DO if e > int overflow   
+            long e = Exponent;       
+            if (format == 'G')
+                if (AdaptExponentForm(this))
+                    format = 'E';
+                else if (IsInteger(this))
+                    format = 'D';
+                else
+                    format = 'C';
 
             StringBuilder result = new StringBuilder();
-            //result.Append(numbers);
-            //if (result.Length != 1 && format == 'E')
-            //    result.Insert(1, '.');
-            //if (e != 0)
-            //{
-            //    if (format == 'E')
-            //        result.AppendFormat("E{0}{1}", e > 0 ? "+" : "", e);
-            //    else if (format == 'D')
-            //    {
-            //        if (e > digits - 1)
-            //            result.Append(new string('0', (int)e - digits + 1));
-            //        else
-            //        {
-            //            if (e > 0)
-            //                result.Remove((int)e + 1, result.Length - (int)e - 1);
-            //            else
-            //                return "0";
-            //        }
-            //    }
-            //    else if (format == 'C')
-            //    {
-            //        if (e > digits - 1)
-            //            result.Append(new string('0', (int)e - digits + 1));
-            //        else if (e > 0)
-            //            result.Insert((int)e + 1, '.');
-            //        else
-            //            result.Insert(0, $"0.{new string('0', Math.Abs((int)e + 1))}");
-            //    }
-            //}
-            //if (Negative)
-            //    result.Insert(0, '-');
+            result.Append(numbers);
+            if (result.Length != 1 && format == 'E')
+                result.Insert(1, '.');
+            if (e != 0)
+            {
+                if (format == 'E')
+                    result.AppendFormat("E{0}{1}", e > 0 ? "+" : "", e);
+                else if (format == 'D')
+                {
+                    if (e > digits - 1)
+                        result.Append(new string('0', (int)e - digits + 1));
+                    else
+                    {
+                        if (e > 0)
+                            result.Remove((int)e + 1, result.Length - (int)e - 1);
+                        else
+                            return "0";
+                    }
+                }
+                else if (format == 'C')
+                {
+                    if (e > digits - 1)
+                        result.Append(new string('0', (int)e - digits + 1));
+                    else if (e > 0)
+                        result.Insert((int)e + 1, '.');
+                    else
+                        result.Insert(0, $"0.{new string('0', Math.Abs((int)e + 1))}");
+                }
+            }
+            if (Negative)
+                result.Insert(0, '-');
             return result.ToString();
         }
 
@@ -570,50 +550,3 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         }
     }
 }
-
-// byte[] buffer;
-//if (BitConverter.IsLittleEndian)
-//    buffer = BitConverter.GetBytes(value);
-//else
-//    buffer = Reverse(BitConverter.GetBytes(value));
-//int j = index * 15 / 4;
-//switch (index % 4)
-//{
-//    case 0:
-//        _Numbers[j] = buffer[0]; // 8
-//        _Numbers[j + 1] = buffer[1]; //8
-//        _Numbers[j + 2] = buffer[2]; //8
-//        _Numbers[j + 3] = (byte)(buffer[3] << 2); //6
-//        break;
-//    case 1:
-//        _Numbers[j] |= (byte)(buffer[0] >> 6 & 3); //2
-//        _Numbers[j + 1] = (byte)(buffer[0] << 2); //6
-//        _Numbers[j + 1] |= (byte)(buffer[1] >> 6 & 3); //2
-//        _Numbers[j + 2] = (byte)(buffer[1] << 2); //6
-//        _Numbers[j + 2] |= (byte)(buffer[2] >> 6 & 3); //2
-//        _Numbers[j + 3] = (byte)(buffer[2] << 2); //6
-//        _Numbers[j + 3] |= (byte)(buffer[3] >> 4 & 3); //2
-//        _Numbers[j + 4] = (byte)(buffer[3] << 4); //4
-//        break;
-//    case 2:
-//        _Numbers[j] |= (byte)(buffer[0] >> 4 & 15); //4
-//        _Numbers[j + 1] = (byte)(buffer[0] << 4); //4
-//        _Numbers[j + 1] |= (byte)(buffer[1] >> 4 & 15); //4
-//        _Numbers[j + 2] = (byte)(buffer[1] << 4); //4
-//        _Numbers[j + 2] |= (byte)(buffer[2] >> 4 & 15); //4
-//        _Numbers[j + 3] = (byte)(buffer[2] << 4); //4
-//        _Numbers[j + 3] |= (byte)(buffer[3] >> 2 & 15); //4
-//        _Numbers[j + 4] = (byte)(buffer[3] << 6); //2
-//        break;
-//    case 3:
-//        _Numbers[j] |= (byte)(buffer[0] >> 2 & 63); //6
-//        _Numbers[j + 1] = (byte)(buffer[0] << 6); //2
-//        _Numbers[j + 1] |= (byte)(buffer[1] >> 2 & 63); //6
-//        _Numbers[j + 2] = (byte)(buffer[1] << 6); //2
-//        _Numbers[j + 2] |= (byte)(buffer[2] >> 2 & 63); //6
-//        _Numbers[j + 3] = (byte)(buffer[2] << 6); //2
-//        _Numbers[j + 3] |= buffer[3]; //6
-//        break;
-//    default:
-//        throw new NotImplementedException();
-//}
