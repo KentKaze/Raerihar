@@ -14,6 +14,37 @@ namespace RaeriharTest
         public void Start()
         {
             ArNumber ar = new ArNumber();
+
+            int b = 3000;
+            TestContext.WriteLine(b.ToString("D2"));
+            TestContext.WriteLine(b.ToString("C2"));
+            TestContext.WriteLine(b.ToString("F2"));
+            TestContext.WriteLine(b.ToString("N2"));
+            TestContext.WriteLine(b.ToString("P2"));
+            //TestContext.WriteLine(b.ToString("R2"));
+            TestContext.WriteLine(b.ToString("X2"));
+
+
+            b = 3;
+
+            TestContext.WriteLine(b.ToString("D2"));
+            TestContext.WriteLine(b.ToString("C2"));
+            TestContext.WriteLine(b.ToString("F2"));
+            TestContext.WriteLine(b.ToString("N2"));
+            TestContext.WriteLine(b.ToString("P2"));
+            //TestContext.WriteLine(b.ToString("R2"));
+            TestContext.WriteLine(b.ToString("X2"));
+            //case 'C':
+            //       return ToString(length, format[0], provider);
+            //   case 'D':
+            //       return ToString(length, format[0], provider);
+            //   //case 'F':
+            //   //case 'N':
+            //   //case 'P':
+            //   //case 'R':
+            //   //case 'X':
+            //   case 'E':
+            //   case 'G':
             //ar.SetExponent(60);
             //TestContext.WriteLine(ar.Exponent.ToString());
             //ar.SetExponent(-300);

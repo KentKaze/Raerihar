@@ -85,8 +85,6 @@ namespace Aritiafel.Organizations.RaeriharUniversity
     // e > 0
     public sealed class ArNumber : IEquatable<ArNumber>, IComparable, IComparable<ArNumber>, IFormattable, ICloneable, IConvertible
     {
-
-
         public const long ExponentMaxValue = 576460752303423487;
         public const long ExponentMinValue = -576460752303423488;
         public const byte MaximumDisplayedDigitsCount = 17;
@@ -168,28 +166,28 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 
         public ArNumber(sbyte value)
             : this()
-            => Parse(value.ToString(), this);
+            => LoadInteger(value.ToString(), this);
         public ArNumber(byte value)
             : this()
-            => Parse(value.ToString(), this);
+            => LoadInteger(value.ToString(), this);
         public ArNumber(short value)
             : this()
-            => Parse(value.ToString(), this);
+            => LoadInteger(value.ToString(), this);
         public ArNumber(ushort value)
             : this()
-            => Parse(value.ToString(), this);
+            => LoadInteger(value.ToString(), this);
         public ArNumber(uint value)
             : this()
-            => Parse(value.ToString(), this);
+            => LoadInteger(value.ToString(), this);
         public ArNumber(int value)
             : this()
-            => Parse(value.ToString(), this);
+            => LoadInteger(value.ToString(), this);
         public ArNumber(ulong value)
             : this()
-            => Parse(value.ToString(), this);
+            => LoadInteger(value.ToString(), this);
         public ArNumber(long value)
             : this()
-            => Parse(value.ToString(), this);
+            => LoadInteger(value.ToString(), this);
         public ArNumber(decimal value)
             : this()
             => Parse(value.ToString(), this);
@@ -205,15 +203,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         //    int tail = PostiveRemainder(Exponent + 1, 9);
         //    return (int)(1 + (DigitsCount - tail) / 9 + ((DigitsCount - tail) % 9 <= 0 ? 0 : 1));
         //}
-
-        //private ArNumberInfo GetNumberInfo()
-        //{
-
-        //    ArNumberInfo ani = new ArNumberInfo()
-        //    int tail = PostiveRemainder(Exponent + 1, 9);
-
-        //}
-
+   
         private long GetBits(long digitsLength)
         {
             int tail = PostiveRemainder(Exponent + 1, 9);
@@ -268,14 +258,11 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             int j = (int)(bitUsed / 8);
             //該Byte已使用多少Bit
             int move = (int)(bitUsed % 8);
-
             //寫幾位
             int writeBits = (digitsCount * 10 + 2) / 3;
             //記一下首位
             if (index == 0)
-                _Data[_Data.Length - 1] = (byte)(_Data[_Data.Length - 1] & 240 | digitsCount);
-
-            //3情況 + 1情況
+                _Data[_Data.Length - 1] = (byte)(_Data[_Data.Length - 1] & 240 | digitsCount);            
             while (writeBits > 0)
             {
                 if (writeBits <= 8 - move)
@@ -373,7 +360,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             ArNumber result = new ArNumber();
             Parse(s, result, style, provider);
             return result;
-        }
+        }     
         private static void Parse(string s, ArNumber a, NumberStyles style = NumberStyles.None, IFormatProvider provider = null)
         {
             if (string.IsNullOrEmpty(s))
@@ -451,6 +438,31 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             while (numberString.Length > 1 && numberString[numberString.Length - 1] == '0')
                 numberString = numberString.Remove(numberString.Length - 1, 1);
 
+            LoadStandardData(numberString, a, isNegative, e);
+        }
+        private static void LoadInteger(string numberStringWithSign, ArNumber a)
+        {
+            bool isNegative = false;
+            long e = 0;
+            if (numberStringWithSign[0] == '-')
+            {
+                isNegative = true;
+                numberStringWithSign = numberStringWithSign.Remove(0, 1);
+            }
+            while (numberStringWithSign.Length > 1 && numberStringWithSign[numberStringWithSign.Length - 1] == '0')
+            {
+                numberStringWithSign = numberStringWithSign.Remove(numberStringWithSign.Length - 1, 1);
+                e++;
+            }
+            if (numberStringWithSign == "0")
+            {
+                a = new ArNumber();
+                return;
+            }
+            LoadStandardData(numberStringWithSign, a, isNegative, e);
+        }
+        private static void LoadStandardData(string numberString, ArNumber a, bool isNegative = false, long e = 0)
+        {
             a._Numbers = new byte[(a.GetBits(numberString.Length) + 7) / 8];
             a.Negative = isNegative;
             a.SetExponent(e);
@@ -481,6 +493,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 a.SetNumberBlock(i, v, substractedDigits);
             }
         }
+
         private static bool AdaptExponentForm(ArNumber a)
         {
             long e = a.Exponent;
@@ -514,13 +527,13 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 numbers.Append(GetNumberBlock(0, 9).ToString().PadLeft(9, '0'));
             return numbers.ToString();
         }
-        private string ToString(int digits, char format, IFormatProvider provider)
+        private string ToString(int digitsDisplay, char format, IFormatProvider provider)
         {
             string numbers = GetNumbersToString();
-            if (digits < 0)
-                throw new ArgumentOutOfRangeException(nameof(digits));
-            else if (digits == 0 || digits > numbers.Length)
-                digits = numbers.Length;
+            if (digitsDisplay < 0)
+                throw new ArgumentOutOfRangeException(nameof(digitsDisplay));
+            else if (digitsDisplay == 0 || digitsDisplay > numbers.Length)
+                digitsDisplay = numbers.Length;
             // TO DO if e > int overflow   
             long e = Exponent;
             if (format == 'G')
@@ -541,8 +554,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                     result.AppendFormat("E{0}{1}", e > 0 ? "+" : "", e);
                 else if (format == 'D')
                 {
-                    if (e > digits - 1)
-                        result.Append(new string('0', (int)e - digits + 1));
+                    if (e > digitsDisplay - 1)
+                        result.Append(new string('0', (int)e - digitsDisplay + 1));
                     else
                     {
                         if (e > 0)
@@ -553,8 +566,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 }
                 else if (format == 'C')
                 {
-                    if (e > digits - 1)
-                        result.Append(new string('0', (int)e - digits + 1));
+                    if (e > digitsDisplay - 1)
+                        result.Append(new string('0', (int)e - digitsDisplay + 1));
                     else if (e > 0)
                         result.Insert((int)e + 1, '.');
                     else
