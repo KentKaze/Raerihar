@@ -85,6 +85,28 @@ namespace Aritiafel.Organizations.RaeriharUniversity
     // e > 0
     public sealed class ArNumber : IEquatable<ArNumber>, IComparable, IComparable<ArNumber>, IFormattable, ICloneable, IConvertible
     {
+        //private struct ArNumberInfo
+        //{
+        //    public int HeadDigits { get; set; }
+        //    public int MidCount { get; set; }
+        //    public int TailDigits { get; set; }
+        //    public long TotalDigits => HeadDigits + TailDigits + MidCount * 9;
+
+        //    public ArNumberInfo(int tailDigits)
+        //        : this(tailDigits, 0, 0)
+        //    { }
+        //    public ArNumberInfo(int tailDigits, int headDigits)
+        //        : this(tailDigits, headDigits, 0)
+        //    { }
+
+        //    public ArNumberInfo(int tailDigits, int headDigits, int midCount)
+        //    {
+        //        TailDigits = tailDigits;
+        //        HeadDigits = headDigits;
+        //        MidCount = midCount;
+        //    }
+        //}
+
         public const long ExponentMaxValue = 576460752303423487;
         public const long ExponentMinValue = -576460752303423488;
         public const byte MaximumDisplayedDigitsCount = 17;
@@ -201,8 +223,16 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         private int GetIndexCount()
         {
             int tail = PostiveRemainder(Exponent + 1, 9);
-            return (int)(1 + (DigitsCount - tail) / 9 + ((DigitsCount - tail) % 9 <= 0 ? 0 : 1) );
+            return (int)(1 + (DigitsCount - tail) / 9 + ((DigitsCount - tail) % 9 <= 0 ? 0 : 1));
         }
+
+        //private ArNumberInfo GetNumberInfo()
+        //{
+
+        //    ArNumberInfo ani = new ArNumberInfo()
+        //    int tail = PostiveRemainder(Exponent + 1, 9);
+
+        //}
 
         private long GetBits(long digitsLength)
         {
@@ -249,7 +279,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         }
 
         //value 不接受負值
-        private void SetNumberBlock(int index, int value)
+        public void SetNumberBlock(int index, int value, int digitsCount)
         {
             //已使用多少Bit
             long bitUsed = index == 0 ? 1 : (index - 1) * 30 +
@@ -260,17 +290,10 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             int move = (int)(bitUsed % 8);
 
             //寫幾位
-            int writeBits;
+            int writeBits = (digitsCount * 10 + 2) / 3;
+            //記一下首位
             if (index == 0)
-            {
-                //記一下首位
-                _Data[_Data.Length - 1] = (byte)(_Data[_Data.Length - 1] & 240 | value.ToString().Length);
-                writeBits = ((_Data[_Data.Length - 1] & 15) * 10 + 2) / 3;
-            }
-            else if ((bitUsed + 1) / 8 + 4 > _Data.Length) //最後一位
-                writeBits = (value.ToString().Length * 10 + 2) / 3;
-            else
-                writeBits = 30;
+                _Data[_Data.Length - 1] = (byte)(_Data[_Data.Length - 1] & 240 | digitsCount);
 
             //2情況 + 1情況
             while (writeBits > 0)
@@ -284,7 +307,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 else if (move == 0)
                     _Numbers[j] = (byte)(value << move);
                 else
-                {   
+                {
                     _Numbers[j] = (byte)(_Numbers[j] & ((1 << move) - 1) | (byte)(value << move));
                     _Numbers[j + 1] = (byte)(_Numbers[j + 1] & (((1 << (8 - writeBits - move)) - 1)
                         << (writeBits + move)) | (byte)value >> (8 - move));
@@ -294,7 +317,12 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 j++;
             }
         }
-        private int GetNumberBlock(int index)
+
+        //public string GetNumberBlockString(int index)
+        //{
+        //    //bool last
+        //}
+        public int GetNumberBlock(int index, int digitsCount)
         {
             //已使用多少Bit            
             long bitUsed = index == 0 ? 1 : (index - 1) * 30 +
@@ -305,13 +333,13 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             int move = (int)(bitUsed % 8);
 
             //讀幾位
-            int readBits;
-            if (index == 0)
-                readBits = ((_Data[_Data.Length - 1] & 15) * 10 + 2) / 3;
-            else if ((bitUsed + 1) / 8 + 4 > _Data.Length) //最後一位
-                readBits = (PostiveRemainder(Exponent + 1, 9) * 10 + 2) / 3;
-            else
-                readBits = 30;
+            int readBits = (digitsCount * 10 + 2) / 3;
+            //if (index == 0)
+            //    readBits = ((_Data[_Data.Length - 1] & 15) * 10 + 2) / 3;
+            //else if (last) //最後一位
+            //    readBits = (PostiveRemainder(Exponent + 1, 9) * 10 + 2) / 3;
+            //else
+            //    readBits = 30;
 
             byte[] result = readBits >= 17 ? new byte[4] : new byte[readBits / 8 + 1];
             for (int i = 0; readBits > 0; i++)
@@ -448,41 +476,36 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 numberString = numberString.Remove(numberString.Length - 1, 1);
 
             a._Numbers = new byte[(a.GetBits(numberString.Length) + 7) / 8];
-            int maxIndex = a.GetIndexCount(); // 跟上一行改進空間
             a.Negative = isNegative;
             a.SetExponent(e);
             
             int v;
             int digitIndex = numberString.Length;
+            int substractedDigits;
             for (int i = 0; digitIndex > 0; i++)
             {
                 if (i == 0)
                 {
                     int pr = PostiveRemainder(e + 1, 9);
                     if (pr > numberString.Length)
-                        digitIndex -= numberString.Length;
+                        substractedDigits = numberString.Length;                        
                     else if ((numberString.Length - pr) % 9 != 0)
-                        digitIndex -= (numberString.Length - pr) % 9;
+                        substractedDigits = (numberString.Length - pr) % 9;
                     else if (numberString.Length < 9)
-                        digitIndex -= numberString.Length;
+                        substractedDigits = numberString.Length;
                     else
-                        digitIndex -= 9;
-                    v = int.Parse(numberString.Substring(digitIndex));                   
+                        substractedDigits = 9;                    
                 }
                 else if (digitIndex < 9)
-                {
-                    digitIndex = 0;
-                    v = int.Parse(numberString.Substring(digitIndex, PostiveRemainder(e + 1, 9)));
-                }
+                    substractedDigits = PostiveRemainder(e + 1, 9);
                 else
-                {
-                    digitIndex -= 9;
-                    v = int.Parse(numberString.Substring(digitIndex, 9));
-                }                
-                a.SetNumberBlock(i, v);
+                    substractedDigits = 9;
+                digitIndex -= substractedDigits;
+                v = int.Parse(numberString.Substring(digitIndex, substractedDigits));
+                a.SetNumberBlock(i, v, substractedDigits);
+                
             }
         }
-
         private static bool AdaptExponentForm(ArNumber a)
         {
             long e = a.Exponent;
@@ -494,13 +517,25 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         }
         public static bool IsInteger(ArNumber a)
             => a.Exponent - a.DigitsCount + 1 >= 0;
-        private string GetNumbersToString()
+        public string GetNumbersToString()
         {
             //Scan 改良空間
             StringBuilder numbers = new StringBuilder();
-            int indexCount = GetIndexCount();
-            for (int i = indexCount - 1; i >= 0; i--)
-                numbers.Append(GetNumberBlock(i));
+            int tail = PostiveRemainder(Exponent + 1, 9);
+            long digitsCount = DigitsCount;
+            if (tail > digitsCount)
+                tail = (int)digitsCount;
+            int mid = (int)((digitsCount - tail) / 9);
+            int head = (int)((digitsCount - tail) % 9);            
+            int indexCount = 1 + mid + (head > 0 ? 1 : 0);
+            
+            numbers.Append(GetNumberBlock(indexCount - 1, tail).ToString().PadLeft(tail, '0'));
+            for (int i = indexCount - 2; i >= 1; i--)
+                numbers.Append(GetNumberBlock(i, 9).ToString().PadLeft(9, '0'));
+            if (head > 0)
+                numbers.Append(GetNumberBlock(0, head).ToString().PadLeft(head, '0'));
+            else if(indexCount - 1 != 0)
+                numbers.Append(GetNumberBlock(0, 9).ToString().PadLeft(9, '0'));
             return numbers.ToString();
         }
         private string ToString(int digits, char format, IFormatProvider provider)
@@ -618,16 +653,18 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 return result;
             else if (Exponent < other.Exponent)
                 return result * -1;
-            int indexCount = GetIndexCount();
-            int otherIndexCount = other.GetIndexCount();
-            for (int i = 0; i < indexCount && i < otherIndexCount; i++)
-                if (GetNumberBlock(indexCount - i) > other.GetNumberBlock(otherIndexCount - i))
-                    return result;
-            if (indexCount > otherIndexCount)
-                return result;
-            else if (indexCount < otherIndexCount)
-                return result * -1;
-            throw new NotImplementedException();
+            //(To Do)
+            return GetNumbersToString().CompareTo(other.GetNumbersToString());
+            //int indexCount = GetIndexCount();
+            //int otherIndexCount = other.GetIndexCount();
+            //for (int i = 0; i < indexCount && i < otherIndexCount; i++)
+            //    if (GetNumberBlock(indexCount - i, i == 0) > other.GetNumberBlock(otherIndexCount - i, i == 0))
+            //        return result;
+            //if (indexCount > otherIndexCount)
+            //    return result;
+            //else if (indexCount < otherIndexCount)
+            //    return result * -1;
+            //throw new NotImplementedException();
         }
 
         public override int GetHashCode()
@@ -646,7 +683,6 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 return false;
             return Equals(ar);
         }
-
         public int CompareTo(object obj)
            => CompareTo((ArNumber)obj);
         public object Clone()
