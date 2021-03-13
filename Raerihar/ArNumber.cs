@@ -527,11 +527,13 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             long digitsCount = DigitsCount;
             if (tail > digitsCount)
                 tail = (int)digitsCount;
+            else if (tail == 0)
+                tail = 9;
             int mid = (int)((digitsCount - tail) / 9);
             int head = (int)((digitsCount - tail) % 9);            
             int indexCount = 1 + mid + (head > 0 ? 1 : 0);
             
-            numbers.Append(GetNumberBlock(indexCount - 1, tail).ToString().PadLeft(tail, '0'));
+            numbers.Append(GetNumberBlock(indexCount - 1, tail));
             for (int i = indexCount - 2; i >= 1; i--)
                 numbers.Append(GetNumberBlock(i, 9).ToString().PadLeft(9, '0'));
             if (head > 0)

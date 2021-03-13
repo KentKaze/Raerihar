@@ -86,14 +86,13 @@ namespace RaeriharTest
         {
             ArNumber ar = new ArNumber();
 
-            ar = new ArNumber(9.12861697881727E-284);
-            TestContext.WriteLine($"9.12861697881727E-284:{ar}");
+            //ar = new ArNumber(-3.625879747835531E-307);
+            //TestContext.WriteLine($"-3.625879747835531E-307:{ar}");
 
             //9.12861697881727E+130: 9.12860355704447E+130
             //9.810030755230452E-231: 9.81375523452E-231
             //-4.970069320087064E-275: -4.97693287064E-275
-            ChaosBox cb = new ChaosBox();
-            
+           
 
             string[] testStrings = {
                 "-0.00589662145E-103", //0
@@ -162,6 +161,8 @@ namespace RaeriharTest
             ar = ArNumber.Parse(testStrings[13]);
             //TestContext.WriteLine(ar.ToString());
 
+            ChaosBox cb = new ChaosBox();
+
             for (int i = 0; i < 10000; i++)
             {
                 double d = cb.DrawOutDiversityDouble();
@@ -169,13 +170,9 @@ namespace RaeriharTest
                 ar = new ArNumber(d);
                 //TestContext.WriteLine(ar.ToString().Length.ToString());
                 //TestContext.WriteLine(ar.ToString());
-                if (s != ar.ToString())
-                {
-                    TestContext.WriteLine("");
+                if (s != ar.ToString() && s != ar.ToString("E") && s != ar.ToString("C"))
                     TestContext.WriteLine($"{s}: {ar}");
-                }
-                else
-                    TestContext.Write("O");
+                
             }
         }
 
