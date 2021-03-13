@@ -83,7 +83,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
     //0.0576 => 0.0576
     //        e = -2 tail = 7 (repeat)
     // e > 0
-    public class ArNumber
+    public sealed class ArNumber : IEquatable<ArNumber>, IComparable, IComparable<ArNumber>, IFormattable, ICloneable, IConvertible
     {
         public const long ExponentMaxValue = 576460752303423487;
         public const long ExponentMinValue = -576460752303423488;
@@ -154,6 +154,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public ArNumber()
         {
             _Data = new byte[1];
+            _Data[0] = 1;
             _Numbers = new byte[1];
         }
 
@@ -163,10 +164,44 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             _Numbers = a._Numbers;
         }
 
+        public ArNumber(sbyte value)
+            : this()
+            => Parse(value.ToString(), this);
+        public ArNumber(byte value)
+            : this()
+            => Parse(value.ToString(), this);
+        public ArNumber(short value)
+            : this()
+            => Parse(value.ToString(), this);
+        public ArNumber(ushort value)
+            : this()
+            => Parse(value.ToString(), this);
+        public ArNumber(uint value)
+            : this()
+            => Parse(value.ToString(), this);
+        public ArNumber(int value)
+            : this()
+            => Parse(value.ToString(), this);
+        public ArNumber(ulong value)
+            : this()
+            => Parse(value.ToString(), this);
+        public ArNumber(long value)
+            : this()
+            => Parse(value.ToString(), this);
+        public ArNumber(decimal value)
+            : this()
+            => Parse(value.ToString(), this);
+        public ArNumber(float value)
+            : this()
+            => Parse(value.ToString(), this);
+        public ArNumber(double value)
+            : this()
+            => Parse(value.ToString(), this);
+
         private int GetIndexCount()
         {
             int tail = PostiveRemainder(Exponent + 1, 9);
-            return (int)(1 + (DigitsCount - tail) / 9 + ((DigitsCount - tail) % 9 == 0 ? 0 : 1) );
+            return (int)(1 + (DigitsCount - tail) / 9 + ((DigitsCount - tail) % 9 <= 0 ? 0 : 1) );
         }
 
         private long GetBits(long digitsLength)
@@ -193,8 +228,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             }
             return array;
         }
-
-        public void SetExponent(long e)
+        private void SetExponent(long e)
         {
             byte[] result;
             if (e > -9 && e < 8)
@@ -215,7 +249,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         }
 
         //value 不接受負值
-        public void SetNumberBlock(int index, int value)
+        private void SetNumberBlock(int index, int value)
         {
             //已使用多少Bit
             long bitUsed = index == 0 ? 1 : (index - 1) * 30 +
@@ -250,8 +284,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 else if (move == 0)
                     _Numbers[j] = (byte)(value << move);
                 else
-                {
-                    //test
+                {   
                     _Numbers[j] = (byte)(_Numbers[j] & ((1 << move) - 1) | (byte)(value << move));
                     _Numbers[j + 1] = (byte)(_Numbers[j + 1] & (((1 << (8 - writeBits - move)) - 1)
                         << (writeBits + move)) | (byte)value >> (8 - move));
@@ -261,7 +294,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 j++;
             }
         }
-        public int GetNumberBlock(int index)
+        private int GetNumberBlock(int index)
         {
             //已使用多少Bit            
             long bitUsed = index == 0 ? 1 : (index - 1) * 30 +
@@ -279,9 +312,6 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 readBits = (PostiveRemainder(Exponent + 1, 9) * 10 + 2) / 3;
             else
                 readBits = 30;
-
-            //if (readBits > 30)
-            //    Console.WriteLine("?!");
 
             byte[] result = readBits >= 17 ? new byte[4] : new byte[readBits / 8 + 1];
             for (int i = 0; readBits > 0; i++)
@@ -401,7 +431,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 numberString = numberString.Remove(pointIndex, 1);
                 if (numberString.Length == 0)
                 {
-                    a = new ArNumber(); // Set To 0 To DO
+                    a = new ArNumber(); // Set To 0
                     return;
                 }
                 e += pointIndex - 1;
@@ -429,11 +459,15 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 if (i == 0)
                 {
                     int pr = PostiveRemainder(e + 1, 9);
-                    if(numberString.Length > pr)
-                        digitIndex -= (numberString.Length - pr) % 9;
-                    else
+                    if (pr > numberString.Length)
                         digitIndex -= numberString.Length;
-                    v = int.Parse(numberString.Substring(digitIndex));
+                    else if ((numberString.Length - pr) % 9 != 0)
+                        digitIndex -= (numberString.Length - pr) % 9;
+                    else if (numberString.Length < 9)
+                        digitIndex -= numberString.Length;
+                    else
+                        digitIndex -= 9;
+                    v = int.Parse(numberString.Substring(digitIndex));                   
                 }
                 else if (digitIndex < 9)
                 {
@@ -556,5 +590,160 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                     throw new FormatException(string.Format("The '{0}' format string is not supported.", format));
             }
         }
+        public bool Equals(ArNumber other)
+        {
+            if (_Numbers.Length != other._Numbers.Length)
+                return false;
+            if (_Data.Length != other._Data.Length)
+                return false;
+            for (int i = 0; i < _Data.Length; i++)
+                if (_Data[i] != other._Data[i])
+                    return false;
+            for (int i = 0; i < _Numbers.Length; i++)
+                if (_Numbers[i] != other._Numbers[i])
+                    return false;
+            return true;
+        }
+
+        public int CompareTo(ArNumber other)
+        {
+            if (Equals(other))
+                return 0;
+            else if (!Negative && other.Negative)
+                return 1;
+            else if (Negative && !other.Negative)
+                return -1;
+            int result = Negative && Negative ? -1 : 1;
+            if (Exponent > other.Exponent)
+                return result;
+            else if (Exponent < other.Exponent)
+                return result * -1;
+            int indexCount = GetIndexCount();
+            int otherIndexCount = other.GetIndexCount();
+            for (int i = 0; i < indexCount && i < otherIndexCount; i++)
+                if (GetNumberBlock(indexCount - i) > other.GetNumberBlock(otherIndexCount - i))
+                    return result;
+            if (indexCount > otherIndexCount)
+                return result;
+            else if (indexCount < otherIndexCount)
+                return result * -1;
+            throw new NotImplementedException();
+        }
+
+        public override int GetHashCode()
+        {
+            int result = _Data[0].GetHashCode();
+            for (int i = 1; i < _Data.Length; i++)
+                result ^= _Data[i].GetHashCode();
+            for (int i = 0; i < _Numbers.Length; i++)
+                result ^= _Numbers[i].GetHashCode();
+            return result;
+        }
+        public override bool Equals(object obj)
+        {
+            ArNumber ar = obj as ArNumber;
+            if (ar == null)
+                return false;
+            return Equals(ar);
+        }
+
+        public int CompareTo(object obj)
+           => CompareTo((ArNumber)obj);
+        public object Clone()
+            => new ArNumber(this);
+        public TypeCode GetTypeCode()
+            => TypeCode.Object;
+        public bool ToBoolean(IFormatProvider provider)
+            => throw new InvalidCastException();
+        public byte ToByte(IFormatProvider provider)
+            => (byte)this;
+        public char ToChar(IFormatProvider provider)
+            => (char)this;
+        public DateTime ToDateTime(IFormatProvider provider)
+            => throw new InvalidCastException();
+        public decimal ToDecimal(IFormatProvider provider)
+            => (decimal)this;
+        public double ToDouble(IFormatProvider provider)
+            => (double)this;
+        public short ToInt16(IFormatProvider provider)
+            => (short)this;
+        public int ToInt32(IFormatProvider provider)
+            => (int)this;
+        public long ToInt64(IFormatProvider provider)
+            => (long)this;
+        public sbyte ToSByte(IFormatProvider provider)
+            => (sbyte)this;
+        public float ToSingle(IFormatProvider provider)
+            => (float)this;
+        public object ToType(Type conversionType, IFormatProvider provider)
+            => Convert.ChangeType(this, conversionType, provider);
+        public ushort ToUInt16(IFormatProvider provider)
+            => (ushort)this;
+        public uint ToUInt32(IFormatProvider provider)
+            => (uint)this;
+        public ulong ToUInt64(IFormatProvider provider)
+            => (ulong)this;
+
+        public static implicit operator ArNumber(sbyte a)
+           => new ArNumber(a);
+        public static implicit operator ArNumber(byte a)
+            => new ArNumber(a);
+        public static implicit operator ArNumber(short a)
+            => new ArNumber(a);
+        public static implicit operator ArNumber(ushort a)
+            => new ArNumber(a);
+        public static implicit operator ArNumber(char a)
+            => new ArNumber(a);
+        public static implicit operator ArNumber(int a)
+            => new ArNumber(a);
+        public static implicit operator ArNumber(uint a)
+            => new ArNumber(a);
+        public static implicit operator ArNumber(long a)
+            => new ArNumber(a);
+        public static implicit operator ArNumber(ulong a)
+            => new ArNumber(a);
+        public static implicit operator ArNumber(decimal a)
+            => new ArNumber(a);
+        public static implicit operator ArNumber(float a)
+            => new ArNumber(a);
+        public static implicit operator ArNumber(double a)
+            => new ArNumber(a);
+        public static explicit operator sbyte(ArNumber a)
+            => sbyte.Parse(a.ToString());
+        public static explicit operator byte(ArNumber a)
+            => byte.Parse(a.ToString());
+        public static explicit operator short(ArNumber a)
+            => short.Parse(a.ToString());
+        public static explicit operator ushort(ArNumber a)
+            => ushort.Parse(a.ToString());
+        public static explicit operator char(ArNumber a)
+            => (char)int.Parse(a.ToString());
+        public static explicit operator int(ArNumber a)
+            => int.Parse(a.ToString());
+        public static explicit operator uint(ArNumber a)
+            => uint.Parse(a.ToString());
+        public static explicit operator long(ArNumber a)
+            => long.Parse(a.ToString());
+        public static explicit operator ulong(ArNumber a)
+            => ulong.Parse(a.ToString());
+        public static explicit operator float(ArNumber a)
+            => float.Parse(a.ToString());
+        public static explicit operator double(ArNumber a)
+            => double.Parse(a.ToString());
+        public static explicit operator decimal(ArNumber a)
+            => decimal.Parse(a.ToString());
+
+        public static bool operator >(ArNumber a, ArNumber b)
+            => a.CompareTo(b) == 1;
+        public static bool operator >=(ArNumber a, ArNumber b)
+            => a.CompareTo(b) != -1;
+        public static bool operator <(ArNumber a, ArNumber b)
+            => a.CompareTo(b) == -1;
+        public static bool operator <=(ArNumber a, ArNumber b)
+            => a.CompareTo(b) != 1;
+        public static bool operator ==(ArNumber a, ArNumber b)
+            => a.Equals(b);
+        public static bool operator !=(ArNumber a, ArNumber b)
+            => !a.Equals(b);
     }
 }

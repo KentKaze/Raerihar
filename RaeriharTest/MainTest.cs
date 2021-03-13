@@ -107,7 +107,7 @@ namespace RaeriharTest
             };
 
             ar = ArNumber.Parse(testStrings[0]);
-            TestContext.WriteLine(ar.ToString("E"));
+            //TestContext.WriteLine(ar.ToString("E"));
             Assert.IsTrue(ar.ToString("E") == "-5.89662145E-106");
             ar = ArNumber.Parse(testStrings[1]);
             //TestContext.WriteLine(ar.ToString());
@@ -115,7 +115,7 @@ namespace RaeriharTest
             //TestContext.WriteLine(ar.ToString("D"));
             Assert.IsTrue(ar.ToString("D") == "-36118956780000000000000000000000000000000000000000");            
             ar = ArNumber.Parse(testStrings[2]);
-            TestContext.WriteLine(ar.ToString("E"));
+            //TestContext.WriteLine(ar.ToString("E"));
             //TestContext.WriteLine(ar.ToString());
             Assert.IsTrue(ar.ToString("E") == "-6.8718E-4");
             Assert.IsTrue(ar.ToString("D") == "0");
@@ -127,8 +127,8 @@ namespace RaeriharTest
             ar = ArNumber.Parse(testStrings[4]);
             Assert.IsTrue(ar.ToString("E") == "5.68681E-6");
             Assert.IsTrue(ar.ToString("C") == "0.00000568681");
-            TestContext.WriteLine(ar.ToString("C3"));
-            //Assert.IsTrue(ar.ToString("C3") == "0.00000568681"); // TO DO
+            //TestContext.WriteLine(ar.ToString("C3"));
+            Assert.IsTrue(ar.ToString("C3") == "0.00000568681"); // TO DO
             //Assert.IsTrue(sn.ToString("C3") == "0.00");            
             Assert.IsTrue(ar.ToString("D") == "0");
 
@@ -156,38 +156,46 @@ namespace RaeriharTest
             ar = ArNumber.Parse(testStrings[13]);
             //TestContext.WriteLine(ar.ToString());
 
-            //ChaosBox cb = new ChaosBox();
-            //for (int i = 0; i < 10000; i++)
-            //{
-            //    double d = cb.DrawOutDiversityDouble();
-            //    string s = d.ToString().Replace("E+0", "E+").Replace("E-0", "E-");
-            //    ar = new ArNumber(d);
-            //    TestContext.WriteLine(ar.ToString().Length.ToString());
-            //    TestContext.WriteLine(ar.ToString());
-            //    if (s != ar.ToString())
-            //        TestContext.WriteLine($"{s}: {ar}");
-            //}
+            ChaosBox cb = new ChaosBox();
+            for (int i = 0; i < 10000; i++)
+            {
+                double d = cb.DrawOutDiversityDouble();
+                string s = d.ToString().Replace("E+0", "E+").Replace("E-0", "E-");
+                ar = new ArNumber(d);
+                TestContext.WriteLine(ar.ToString().Length.ToString());
+                TestContext.WriteLine(ar.ToString());
+                if (s != ar.ToString())
+                    TestContext.WriteLine($"{s}: {ar}");
+            }
         }
 
-        //[TestMethod]
-        //public void NewArNumber()
-        //{
-        //    ArNumber a = 3;
-        //    TestContext.WriteLine(a.ToString());
-        //    a = 20;
-        //    TestContext.WriteLine(a.ToString());
-        //    a = 56;
-        //    TestContext.WriteLine(a.ToString());
-        //    a = 127;
-        //    TestContext.WriteLine(a.ToString());
-        //    a = -13;
-        //    TestContext.WriteLine(a.ToString());
-        //    ArNumber b = new ArNumber(50.7);
-        //    b.Negative = true;
+        [TestMethod]
+        public void NewArNumber()
+        {
+            ArNumber a = new ArNumber((sbyte)-3);
+            TestContext.WriteLine(a.ToString());
+            a = new ArNumber((sbyte)20);
+            TestContext.WriteLine(a.ToString());
+            a = new ArNumber((sbyte)100);
+            TestContext.WriteLine(a.ToString());
+            a = new ArNumber((sbyte)-100);
+            TestContext.WriteLine(a.ToString());
+            a = new ArNumber((sbyte)-87);
+            TestContext.WriteLine(a.ToString());
+            a = 20;
+            TestContext.WriteLine(a.ToString());
+            a = 56;
+            TestContext.WriteLine(a.ToString());
+            a = 127;
+            TestContext.WriteLine(a.ToString());
+            a = -13;
+            TestContext.WriteLine(a.ToString());
+            ArNumber b = new ArNumber(50.7);
+            b.Negative = true;
 
-        //    ArNumber c = b;
-        //    TestContext.WriteLine(c.ToString());
-        //}
+            ArNumber c = b;
+            TestContext.WriteLine(c.ToString());
+        }
 
         //[TestMethod]
         //public void CastTest()
