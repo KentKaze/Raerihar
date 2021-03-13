@@ -85,27 +85,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
     // e > 0
     public sealed class ArNumber : IEquatable<ArNumber>, IComparable, IComparable<ArNumber>, IFormattable, ICloneable, IConvertible
     {
-        //private struct ArNumberInfo
-        //{
-        //    public int HeadDigits { get; set; }
-        //    public int MidCount { get; set; }
-        //    public int TailDigits { get; set; }
-        //    public long TotalDigits => HeadDigits + TailDigits + MidCount * 9;
 
-        //    public ArNumberInfo(int tailDigits)
-        //        : this(tailDigits, 0, 0)
-        //    { }
-        //    public ArNumberInfo(int tailDigits, int headDigits)
-        //        : this(tailDigits, headDigits, 0)
-        //    { }
-
-        //    public ArNumberInfo(int tailDigits, int headDigits, int midCount)
-        //    {
-        //        TailDigits = tailDigits;
-        //        HeadDigits = headDigits;
-        //        MidCount = midCount;
-        //    }
-        //}
 
         public const long ExponentMaxValue = 576460752303423487;
         public const long ExponentMinValue = -576460752303423488;
@@ -279,7 +259,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         }
 
         //value 不接受負值
-        public void SetNumberBlock(int index, int value, int digitsCount)
+        public void SetNumberBlock(int index, uint value, int digitsCount)
         {
             //已使用多少Bit
             long bitUsed = index == 0 ? 1 : (index - 1) * 30 +
@@ -301,12 +281,12 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 if (writeBits <= 8 - move)
                 {
                     _Numbers[j] = (byte)(_Numbers[j] & ((((1 << 8 - writeBits - move) - 1)
-                        << writeBits + move) | (1 << move) - 1) | (value << move));
+                        << writeBits + move) | (1 << move) - 1) | (byte)(value << move));
                     break;
                 }
                 else if (move == 0)
                     _Numbers[j] = (byte)(value << move);
-                else if(writeBits >= 8)
+                else if (writeBits >= 8)
                 {
                     _Numbers[j] = (byte)(_Numbers[j] & ((1 << move) - 1) | (byte)(value << move));
                     _Numbers[j + 1] = (byte)(_Numbers[j + 1] & ((1 << (8 - move)) - 1 << move)
@@ -315,7 +295,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 else
                 {
                     _Numbers[j] = (byte)(_Numbers[j] & ((1 << move) - 1) | (byte)(value << move));
-                    _Numbers[j + 1] = (byte)((_Numbers[j + 1] & ((1 << (8 - move)) - 1 << move) 
+                    _Numbers[j + 1] = (byte)((_Numbers[j + 1] & ((1 << (8 - move)) - 1 << move)
                         & (byte)((1 << 16 - writeBits - move) - 1) << (writeBits - 8 + move))
                         | (byte)value >> (8 - move));
                 }
@@ -328,21 +308,13 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         {
             //已使用多少Bit            
             long bitUsed = index == 0 ? 1 : (index - 1) * 30 +
-                ((_Data[_Data.Length - 1]& 15) * 10 + 2) / 3 + 1;
+                ((_Data[_Data.Length - 1] & 15) * 10 + 2) / 3 + 1;
             //從哪個Byte開始
             int j = (int)(bitUsed / 8);
             //該Byte已使用多少Bit
             int move = (int)(bitUsed % 8);
-
             //讀幾位
             int readBits = (digitsCount * 10 + 2) / 3;
-            //if (index == 0)
-            //    readBits = ((_Data[_Data.Length - 1] & 15) * 10 + 2) / 3;
-            //else if (last) //最後一位
-            //    readBits = (PostiveRemainder(Exponent + 1, 9) * 10 + 2) / 3;
-            //else
-            //    readBits = 30;
-
             byte[] result = readBits >= 17 ? new byte[4] : new byte[readBits / 8 + 1];
             for (int i = 0; readBits > 0; i++)
             {
@@ -482,8 +454,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             a._Numbers = new byte[(a.GetBits(numberString.Length) + 7) / 8];
             a.Negative = isNegative;
             a.SetExponent(e);
-            
-            int v;
+
+            uint v;
             int digitIndex = numberString.Length;
             int substractedDigits;
             for (int i = 0; digitIndex > 0; i++)
@@ -492,7 +464,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 {
                     int pr = PostiveRemainder(e + 1, 9);
                     if (pr > numberString.Length)
-                        substractedDigits = numberString.Length;                        
+                        substractedDigits = numberString.Length;
                     else if ((numberString.Length - pr) % 9 != 0)
                         substractedDigits = (numberString.Length - pr) % 9;
                     else if (numberString.Length < 9)
@@ -505,8 +477,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 else
                     substractedDigits = 9;
                 digitIndex -= substractedDigits;
-                v = int.Parse(numberString.Substring(digitIndex, substractedDigits));
-                a.SetNumberBlock(i, v, substractedDigits);                
+                v = uint.Parse(numberString.Substring(digitIndex, substractedDigits));
+                a.SetNumberBlock(i, v, substractedDigits);
             }
         }
         private static bool AdaptExponentForm(ArNumber a)
@@ -530,15 +502,15 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             else if (tail == 0)
                 tail = 9;
             int mid = (int)((digitsCount - tail) / 9);
-            int head = (int)((digitsCount - tail) % 9);            
+            int head = (int)((digitsCount - tail) % 9);
             int indexCount = 1 + mid + (head > 0 ? 1 : 0);
-            
+
             numbers.Append(GetNumberBlock(indexCount - 1, tail));
             for (int i = indexCount - 2; i >= 1; i--)
                 numbers.Append(GetNumberBlock(i, 9).ToString().PadLeft(9, '0'));
             if (head > 0)
                 numbers.Append(GetNumberBlock(0, head).ToString().PadLeft(head, '0'));
-            else if(indexCount - 1 != 0)
+            else if (indexCount - 1 != 0)
                 numbers.Append(GetNumberBlock(0, 9).ToString().PadLeft(9, '0'));
             return numbers.ToString();
         }
@@ -550,7 +522,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             else if (digits == 0 || digits > numbers.Length)
                 digits = numbers.Length;
             // TO DO if e > int overflow   
-            long e = Exponent;       
+            long e = Exponent;
             if (format == 'G')
                 if (AdaptExponentForm(this))
                     format = 'E';
@@ -657,7 +629,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 return result;
             else if (Exponent < other.Exponent)
                 return result * -1;
-            //(To Do)
+            //(To Do - Temp)
             return GetNumbersToString().CompareTo(other.GetNumbersToString());
             //int indexCount = GetIndexCount();
             //int otherIndexCount = other.GetIndexCount();
@@ -725,7 +697,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             => (ulong)this;
 
         public static implicit operator ArNumber(sbyte a)
-           => new ArNumber(a);
+            => new ArNumber(a);
         public static implicit operator ArNumber(byte a)
             => new ArNumber(a);
         public static implicit operator ArNumber(short a)
@@ -787,3 +759,26 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             => !a.Equals(b);
     }
 }
+
+
+//private struct ArNumberInfo
+//{
+//    public int HeadDigits { get; set; }
+//    public int MidCount { get; set; }
+//    public int TailDigits { get; set; }
+//    public long TotalDigits => HeadDigits + TailDigits + MidCount * 9;
+
+//    public ArNumberInfo(int tailDigits)
+//        : this(tailDigits, 0, 0)
+//    { }
+//    public ArNumberInfo(int tailDigits, int headDigits)
+//        : this(tailDigits, headDigits, 0)
+//    { }
+
+//    public ArNumberInfo(int tailDigits, int headDigits, int midCount)
+//    {
+//        TailDigits = tailDigits;
+//        HeadDigits = headDigits;
+//        MidCount = midCount;
+//    }
+//}

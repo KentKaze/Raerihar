@@ -2,6 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Aritiafel.Organizations.RaeriharUniversity;
 using System;
 using Aritiafel.Artifacts;
+using System.Text;
 
 namespace RaeriharTest
 {
@@ -10,24 +11,24 @@ namespace RaeriharTest
     {
         public TestContext TestContext { get; set; }
 
-        //[TestMethod]
-        //public void CompareTest()
-        //{
-        //    ChaosBox cb = new ChaosBox();
-        //    ArNumber ar;
+        [TestMethod]
+        public void CompareTest()
+        {
+            ChaosBox cb = new ChaosBox();
+            ArNumber ar;
 
-        //    ArNumber br;
-        //    for(int i = 0; i < 10000; i++)
-        //    {
-        //        ar = cb.DrawOutDiversityDouble();
-        //        br = cb.DrawOutDecimal();
-        //        if (ar > br)
-        //            TestContext.WriteLine($"{ar}>{br}");
-        //        else
-        //            TestContext.WriteLine($"{ar}<{br}");
-        //    }
+            ArNumber br;
+            for (int i = 0; i < 10000; i++)
+            {
+                ar = cb.DrawOutDecimal();
+                br = cb.DrawOutDecimal();
+                if (ar > br)
+                    TestContext.WriteLine($"{ar}>{br}");
+                else
+                    TestContext.WriteLine($"{ar}<{br}");
+            }
 
-        //}
+        }
 
         //[TestMethod]
         //public void ExponentGetSetTest()
@@ -85,14 +86,14 @@ namespace RaeriharTest
         public void ParseTest()
         {
             ArNumber ar = new ArNumber();
-
+            //ar.
             //ar = new ArNumber(-3.625879747835531E-307);
             //TestContext.WriteLine($"-3.625879747835531E-307:{ar}");
 
             //9.12861697881727E+130: 9.12860355704447E+130
             //9.810030755230452E-231: 9.81375523452E-231
             //-4.970069320087064E-275: -4.97693287064E-275
-           
+
 
             string[] testStrings = {
                 "-0.00589662145E-103", //0
@@ -118,7 +119,7 @@ namespace RaeriharTest
             //TestContext.WriteLine(ar.ToString());
             Assert.IsTrue(ar.ToString("E") == "-3.611895678E+49");
             //TestContext.WriteLine(ar.ToString("D"));
-            Assert.IsTrue(ar.ToString("D") == "-36118956780000000000000000000000000000000000000000");            
+            Assert.IsTrue(ar.ToString("D") == "-36118956780000000000000000000000000000000000000000");
             ar = ArNumber.Parse(testStrings[2]);
             //TestContext.WriteLine(ar.ToString("E"));
             //TestContext.WriteLine(ar.ToString());
@@ -172,7 +173,6 @@ namespace RaeriharTest
                 //TestContext.WriteLine(ar.ToString());
                 if (s != ar.ToString() && s != ar.ToString("E") && s != ar.ToString("C"))
                     TestContext.WriteLine($"{s}: {ar}");
-                
             }
         }
 
@@ -204,43 +204,63 @@ namespace RaeriharTest
             TestContext.WriteLine(c.ToString());
         }
 
-        //[TestMethod]
-        //public void CastTest()
-        //{
-        //    byte b = 3;
-        //    ArNumber ar = new ArNumber(3);
-        //    ArNumber br = ar.Clone() as ArNumber;
-        //    br.Negative = true;
-        //    TestContext.WriteLine(ar.ToString());
-        //    TestContext.WriteLine(br.ToString());
-        //    sbyte c = (sbyte)ar;
-        //    TestContext.WriteLine(c.ToString());
-        //    br = 200;
-        //    Assert.ThrowsException<OverflowException>(() =>
-        //    {
-        //        sbyte d = (sbyte)br;
-        //    });
-        //    //TestContext.WriteLine(d.ToString());
+        [TestMethod]
+        public void CastTest()
+        {
+            byte b = 3;
+            ArNumber ar = new ArNumber(3);
+            ArNumber br = ar.Clone() as ArNumber;
+            br.Negative = true;
+            TestContext.WriteLine(ar.ToString());
+            TestContext.WriteLine(br.ToString());
+            sbyte c = (sbyte)ar;
+            TestContext.WriteLine(c.ToString());
+            br = 200;
+            Assert.ThrowsException<OverflowException>(() =>
+            {
+                sbyte d = (sbyte)br;
+            });
+            //TestContext.WriteLine(d.ToString());
 
-        //    byte a1 = (byte)br;
-        //    short a2 = (short)br;
-        //    ushort a3 = (ushort)br;
-        //    int a4 = (int)br;
-        //    uint a5 = (uint)br;
-        //    long a6 = (long)br;
-        //    ulong a7 = (ulong)br;
-        //    decimal a8 = (decimal)br;            
-        //    float a9 = (float)br;            
-        //    double a11 = (double)br;
-        //    char a10 = (char)br;
+            byte a1 = (byte)br;
+            short a2 = (short)br;
+            ushort a3 = (ushort)br;
+            int a4 = (int)br;
+            uint a5 = (uint)br;
+            long a6 = (long)br;
+            ulong a7 = (ulong)br;
+            decimal a8 = (decimal)br;
+            float a9 = (float)br;
+            double a11 = (double)br;
+            char a10 = (char)br;
 
-        //    Assert.ThrowsException<OverflowException>(() =>
-        //    {
-        //        br = -60;
-        //        byte aa1 = (byte)br;
-        //    });
-        //}
+            Assert.ThrowsException<OverflowException>(() =>
+            {
+                br = -60;
+                byte aa1 = (byte)br;
+            });
+        }
 
+        [TestMethod]
+        public void BigRandomNumberTest()
+        {
+            ChaosBox cb = new ChaosBox();
+            int digits;
 
+            for(int j = 0; j < 10; j++)
+            {
+                digits = cb.DrawOutShort();
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < digits; i++)
+                    sb.Append(cb.DrawOutLong());
+                sb.Append("E-");
+                sb.Append(cb.DrawOutShort());
+
+                ArNumber ar = ArNumber.Parse(sb.ToString());
+                TestContext.WriteLine(ar.DigitsCount.ToString());
+                //TestContext.WriteLine(ar.ToString());
+            }
+            
+        }
     }
 }
