@@ -220,11 +220,11 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             : this()
             => Parse(value.ToString(), this);
 
-        private int GetIndexCount()
-        {
-            int tail = PostiveRemainder(Exponent + 1, 9);
-            return (int)(1 + (DigitsCount - tail) / 9 + ((DigitsCount - tail) % 9 <= 0 ? 0 : 1));
-        }
+        //private int GetIndexCount()
+        //{
+        //    int tail = PostiveRemainder(Exponent + 1, 9);
+        //    return (int)(1 + (DigitsCount - tail) / 9 + ((DigitsCount - tail) % 9 <= 0 ? 0 : 1));
+        //}
 
         //private ArNumberInfo GetNumberInfo()
         //{
@@ -317,16 +317,11 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 j++;
             }
         }
-
-        //public string GetNumberBlockString(int index)
-        //{
-        //    //bool last
-        //}
-        public int GetNumberBlock(int index, int digitsCount)
+        public uint GetNumberBlock(int index, int digitsCount)
         {
             //已使用多少Bit            
             long bitUsed = index == 0 ? 1 : (index - 1) * 30 +
-                ((_Data[_Data.Length - 1] & 15) * 10 + 2) / 3 + 1;
+                ((_Data[_Data.Length - 1]& 15) * 10 + 2) / 3 + 1;
             //從哪個Byte開始
             int j = (int)(bitUsed / 8);
             //該Byte已使用多少Bit
@@ -354,17 +349,17 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             }
 
             if (result.Length == 1)
-                return (sbyte)result[0];
+                return result[0];
             else if (result.Length == 2)
                 if (BitConverter.IsLittleEndian)
-                    return BitConverter.ToInt16(result, 0);
+                    return BitConverter.ToUInt16(result, 0);
                 else
-                    return BitConverter.ToInt16(Reverse(result), 0);
+                    return BitConverter.ToUInt16(Reverse(result), 0);
             else
                 if (BitConverter.IsLittleEndian)
-                return BitConverter.ToInt32(result, 0);
+                return BitConverter.ToUInt32(result, 0);
             else
-                return BitConverter.ToInt32(Reverse(result), 0);
+                return BitConverter.ToUInt32(Reverse(result), 0);
         }
 
         public static bool TryParse(string s, out ArNumber result)
@@ -494,7 +489,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                     else if (numberString.Length < 9)
                         substractedDigits = numberString.Length;
                     else
-                        substractedDigits = 9;                    
+                        substractedDigits = 9;
                 }
                 else if (digitIndex < 9)
                     substractedDigits = PostiveRemainder(e + 1, 9);
@@ -502,8 +497,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                     substractedDigits = 9;
                 digitIndex -= substractedDigits;
                 v = int.Parse(numberString.Substring(digitIndex, substractedDigits));
-                a.SetNumberBlock(i, v, substractedDigits);
-                
+                a.SetNumberBlock(i, v, substractedDigits);                
             }
         }
         private static bool AdaptExponentForm(ArNumber a)
@@ -519,7 +513,6 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             => a.Exponent - a.DigitsCount + 1 >= 0;
         public string GetNumbersToString()
         {
-            //Scan 改良空間
             StringBuilder numbers = new StringBuilder();
             int tail = PostiveRemainder(Exponent + 1, 9);
             long digitsCount = DigitsCount;
