@@ -329,7 +329,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             }
         }
         public static ArNumber Parse(string s)
-           => Parse(s, NumberStyles.None, null);
+            => Parse(s, NumberStyles.None, null);
         public static ArNumber Parse(string s, NumberStyles style)
             => Parse(s, style, null);
         public static ArNumber Parse(string s, IFormatProvider provider)
@@ -428,7 +428,11 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             {
                 if (i == 0)
                 {
-                    digitIndex -= (numberString.Length - PostiveRemainder(e + 1, 9)) % 9;
+                    int pr = PostiveRemainder(e + 1, 9);
+                    if(numberString.Length > pr)
+                        digitIndex -= (numberString.Length - pr) % 9;
+                    else
+                        digitIndex -= numberString.Length;
                     v = int.Parse(numberString.Substring(digitIndex));
                 }
                 else if (digitIndex < 9)
