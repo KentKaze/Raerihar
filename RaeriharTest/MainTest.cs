@@ -110,13 +110,12 @@ namespace RaeriharTest
             TestContext.WriteLine(ar.ToString("E"));
             Assert.IsTrue(ar.ToString("E") == "-5.89662145E-106");
             ar = ArNumber.Parse(testStrings[1]);
-
             //TestContext.WriteLine(ar.ToString());
-
             Assert.IsTrue(ar.ToString("E") == "-3.611895678E+49");
             //TestContext.WriteLine(ar.ToString("D"));
-            Assert.IsTrue(ar.ToString("D") == "-36118956780000000000000000000000000000000000000000");
+            Assert.IsTrue(ar.ToString("D") == "-36118956780000000000000000000000000000000000000000");            
             ar = ArNumber.Parse(testStrings[2]);
+            TestContext.WriteLine(ar.ToString("E"));
             //TestContext.WriteLine(ar.ToString());
             Assert.IsTrue(ar.ToString("E") == "-6.8718E-4");
             Assert.IsTrue(ar.ToString("D") == "0");

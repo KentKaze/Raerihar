@@ -423,24 +423,24 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             a.SetExponent(e);
             
             int v;
-            int digitIndex = 0;
-            for (int i = maxIndex - 1; digitIndex < numberString.Length; i--)
+            int digitIndex = numberString.Length;
+            for (int i = 0; digitIndex > 0; i++)
             {
-                if (digitIndex == 0)
+                if (i == 0)
                 {
-                    v = int.Parse(numberString.Substring(digitIndex, PostiveRemainder(e + 1, 9)));
-                    digitIndex += PostiveRemainder(e + 1, 9);
-                }
-                else if (numberString.Length - digitIndex < 9)
-                {
+                    digitIndex -= (numberString.Length - PostiveRemainder(e + 1, 9)) % 9;
                     v = int.Parse(numberString.Substring(digitIndex));
-                    digitIndex = numberString.Length;
+                }
+                else if (digitIndex < 9)
+                {
+                    digitIndex = 0;
+                    v = int.Parse(numberString.Substring(digitIndex, PostiveRemainder(e + 1, 9)));
                 }
                 else
                 {
+                    digitIndex -= 9;
                     v = int.Parse(numberString.Substring(digitIndex, 9));
-                    digitIndex += 9;
-                }
+                }                
                 a.SetNumberBlock(i, v);
             }
         }
@@ -456,13 +456,12 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         }
         public static bool IsInteger(ArNumber a)
             => a.Exponent - a.DigitsCount + 1 >= 0;
-
         private string GetNumbersToString()
         {
             //Scan 改良空間
             StringBuilder numbers = new StringBuilder();
             int indexCount = GetIndexCount();
-            for (int i = 0; i < indexCount; i++)
+            for (int i = indexCount - 1; i >= 0; i--)
                 numbers.Append(GetNumberBlock(i));
             return numbers.ToString();
         }
