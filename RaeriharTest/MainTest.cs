@@ -86,9 +86,10 @@ namespace RaeriharTest
         {
             ArNumber ar = new ArNumber();
 
-            ar = new ArNumber(2.1339381317389773E-284);
-            TestContext.WriteLine(ar.ToString());
-            
+            ar = new ArNumber(9.12861697881727E-284);
+            TestContext.WriteLine($"9.12861697881727E-284:{ar}");
+
+            //9.12861697881727E+130: 9.12860355704447E+130
             //9.810030755230452E-231: 9.81375523452E-231
             //-4.970069320087064E-275: -4.97693287064E-275
             ChaosBox cb = new ChaosBox();

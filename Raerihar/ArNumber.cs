@@ -295,7 +295,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             if (index == 0)
                 _Data[_Data.Length - 1] = (byte)(_Data[_Data.Length - 1] & 240 | digitsCount);
 
-            //2情況 + 1情況
+            //3情況 + 1情況
             while (writeBits > 0)
             {
                 if (writeBits <= 8 - move)
@@ -306,11 +306,18 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 }
                 else if (move == 0)
                     _Numbers[j] = (byte)(value << move);
+                else if(writeBits >= 8)
+                {
+                    _Numbers[j] = (byte)(_Numbers[j] & ((1 << move) - 1) | (byte)(value << move));
+                    _Numbers[j + 1] = (byte)(_Numbers[j + 1] & ((1 << (8 - move)) - 1 << move)
+                        | (byte)value >> (8 - move));
+                }
                 else
                 {
                     _Numbers[j] = (byte)(_Numbers[j] & ((1 << move) - 1) | (byte)(value << move));
-                    _Numbers[j + 1] = (byte)(_Numbers[j + 1] & (((1 << (8 - writeBits - move)) - 1)
-                        << (writeBits + move)) | (byte)value >> (8 - move));
+                    _Numbers[j + 1] = (byte)((_Numbers[j + 1] & ((1 << (8 - move)) - 1 << move) 
+                        & (byte)((1 << 16 - writeBits - move) - 1) << (writeBits - 8 + move))
+                        | (byte)value >> (8 - move));
                 }
                 value = value >> 8;
                 writeBits -= 8;
@@ -343,8 +350,10 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                     result[i] = (byte)((byte)(_Numbers[j + i] << (8 - move - readBits)) >> (8 - readBits));
                 else if (move == 0)
                     result[i] = _Numbers[j + i];
-                else
+                else if (readBits >= 8)
                     result[i] = (byte)((_Numbers[j + i] >> move) | (byte)(_Numbers[j + i + 1] << (8 - move)));
+                else
+                    result[i] = (byte)((_Numbers[j + i] >> move) | (byte)((_Numbers[j + i + 1] & (1 << (readBits - 8 + move)) - 1) << (8 - move)));
                 readBits -= 8;
             }
 
