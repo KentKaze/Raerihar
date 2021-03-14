@@ -97,7 +97,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         {
             get
             {
-                int lastDigits = (_Data[_Data.Length - 1] & 15);
+                int lastDigits = _Data[_Data.Length - 1] & 15;
                 int bitUsed = (lastDigits * 10 + 2) / 3 + 1;
                 if (_Numbers.Length == bitUsed / 8 + 1 && (_Numbers[_Numbers.Length - 1] >> (bitUsed % 8) == 0))
                     return lastDigits;
@@ -158,6 +158,13 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             _Numbers = new byte[1];
         }
 
+        private ArNumber(int digitsLength, long e, bool isNegative)
+        {   
+            SetExponent(e);
+            _Numbers = new byte[(GetBits(digitsLength) + 7) / 8];
+            Negative = isNegative;
+        }
+
         public ArNumber(ArNumber a)
         {
             _Data = a._Data;
@@ -190,13 +197,13 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             => LoadInteger(value.ToString(), this);
         public ArNumber(decimal value)
             : this()
-            => Parse(value.ToString(), this);
+            => Parse(value.ToString("F4"), this);
         public ArNumber(float value)
             : this()
-            => Parse(value.ToString(), this);
+            => Parse(value.ToString("G9"), this);
         public ArNumber(double value)
             : this()
-            => Parse(value.ToString(), this);
+            => Parse(value.ToString("G17"), this);
 
         //private int GetIndexCount()
         //{
@@ -244,11 +251,11 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             if (!BitConverter.IsLittleEndian && result.Length != 1)
                 result = Reverse(result);
             result[result.Length - 1] = (byte)(result[result.Length - 1] << 4);
-            result[result.Length - 1] |= (byte)(_Data[_Data.Length - 1] & 15);
+            if(_Data != null && _Data.Length != 0)
+                result[result.Length - 1] |= (byte)(_Data[_Data.Length - 1] & 15);
             _Data = result;
         }
 
-        //value 不接受負值
         public void SetNumberBlock(int index, uint value, int digitsCount)
         {
             //已使用多少Bit
@@ -504,7 +511,118 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             return true;
         }
         public static bool IsInteger(ArNumber a)
-            => a.Exponent - a.DigitsCount + 1 >= 0;
+            => a.Exponent - a.DigitsCount + 1 >= 0;     
+        public static ArNumber Add(ArNumber a, ArNumber b)
+        {
+            long a_e = a.Exponent;
+            int a_tail = PostiveRemainder(a_e + 1, 9);
+            long a_digitsCount = a.DigitsCount;
+            if (a_tail > a_digitsCount)
+                a_tail = (int)a_digitsCount;
+            else if (a_tail == 0)
+                a_tail = 9;
+            int a_mid = (int)((a_digitsCount - a_tail) / 9);
+            int a_head = (int)((a_digitsCount - a_tail) % 9);
+            int a_indexCount = 1 + a_mid + (a_head > 0 ? 1 : 0);
+
+            long b_e = b.Exponent;
+            int b_tail = PostiveRemainder(b_e + 1, 9);
+            long b_digitsCount = b.DigitsCount;
+            if (b_tail > b_digitsCount)
+                b_tail = (int)b_digitsCount;
+            else if (b_tail == 0)
+                b_tail = 9;
+            int b_mid = (int)((b_digitsCount - b_tail) / 9);
+            int b_head = (int)((a_digitsCount - a_tail) % 9);
+            int b_indexCount = 1 + b_mid + (b_head > 0 ? 1 : 0);
+
+            //1.12
+            //- -- e = 2 digits = 3 e+ 1 - digits > 0
+            //3 + 5 = 
+            long AlastE = a_e - a_digitsCount + 1 - a_head == 0 ? 0 : 9 - a_head;
+            long BlastE = b_e - b_digitsCount + 1 - b_head == 0 ? 0 : 9 - b_head;
+            long lastE = AlastE > BlastE ? BlastE : AlastE;
+            long e = lastE;
+            long sum = 0;
+            int i = 0, j = 0;
+            uint plusA, plusB;
+            int carry = 0;
+            int digitsA;
+            int digitsB;
+            List<uint> sumList = new List<uint>();
+            while (e < a_e + 1 || e < b_e + 1)
+            {
+                if (e <= a_e + 1)
+                {
+                    if (i == 0)
+                    {
+                        digitsA = a._Data[a._Data.Length - 1];
+                        plusA = a.GetNumberBlock(i, digitsA);
+                        if (a_e + 1 - a_digitsCount < 0)
+                            plusA *= (uint)Math.Pow(10, 9 - digitsA);
+                    }
+                    else if (i == a_indexCount - 1)
+                    {
+                        digitsA = a_tail;
+                        plusA = a.GetNumberBlock(i, digitsA);
+                    }
+                    else
+                    {
+                        digitsA = 9;
+                        plusA = a.GetNumberBlock(i, digitsA);
+                    }
+                    i++;
+                }
+                else
+                    plusA = 0;
+                if (e <= b_e + 1)
+                {
+                    if (j == 0)
+                    {
+                        digitsB = b._Data[b._Data.Length - 1];
+                        plusB = b.GetNumberBlock(j, digitsB);
+                        if (b_e + 1 - b_digitsCount < 0)
+                            plusB *= (uint)Math.Pow(10, 9 - digitsB);
+                    }
+                    else if (j == b_indexCount - 1)
+                    {
+                        digitsB = b_tail;
+                        plusB = b.GetNumberBlock(j, digitsB);
+                    }
+                    else
+                    {
+                        digitsB = 9;
+                        plusB = b.GetNumberBlock(j, digitsB);
+                    }
+                    j++;
+                }
+                else
+                    plusB = 0;
+
+                sum = plusA + plusB + carry;
+                if (sum > 999999999)
+                {
+                    sum -= 1000000000;
+                    carry = 1;
+                }
+                sumList.Add((uint)sum);
+                e += 9;
+            }
+            if (carry == 1)
+            {
+                sumList.Add(1);
+                e -= 8;
+            }   
+            else
+                e -= 9 - sum.ToString().Length;            
+            ArNumber result = new ArNumber((int)(e - lastE), lastE, a.Negative);
+            result.SetNumberBlock(0, sumList[0], sumList[0].ToString().Length);
+            for (i = 1; i < sumList.Count - 1; i++)
+                result.SetNumberBlock(i, sumList[i], 9);
+            if (sumList.Count != 1)
+                result.SetNumberBlock(sumList.Count - 1, sumList[sumList.Count - 1], sumList[sumList.Count - 1].ToString().Length);
+            return result;
+        }
         public string GetNumbersToString()
         {
             StringBuilder numbers = new StringBuilder();
@@ -542,8 +660,10 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 else if (IsInteger(this))
                     format = 'D';
                 else
-                    format = 'C';
+                    format = 'F';
 
+            //if(format == 'C' && format == 'N' && format == 'P')
+            //CDFNPXEG
             StringBuilder result = new StringBuilder();
             result.Append(numbers);
             if (result.Length != 1 && format == 'E')
@@ -564,7 +684,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                             return "0";
                     }
                 }
-                else if (format == 'C')
+                else if (format == 'F')
                 {
                     if (e > digitsDisplay - 1)
                         result.Append(new string('0', (int)e - digitsDisplay + 1));
@@ -595,18 +715,16 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 provider = NumberFormatInfo.CurrentInfo;
             if (format.Length > 1 && !int.TryParse(format.Substring(1), out length))
                 throw new FormatException($"{nameof(format)}:{format}");
+
             switch (format[0])
             {
                 // TO DO
-                case 'C':
-                    return ToString(length, format[0], provider);
-                case 'D':
-                    return ToString(length, format[0], provider);
-                //case 'F':
-                //case 'N':
-                //case 'P':
-                //case 'R':
-                //case 'X':
+                case 'C':                   
+                case 'D':                   
+                case 'F':                   
+                case 'N':
+                case 'P':                
+                case 'X':
                 case 'E':
                 case 'G':
                     return ToString(length, format[0], provider);

@@ -30,6 +30,52 @@ namespace RaeriharTest
 
         }
 
+        [TestMethod]
+        public void Add()
+        {
+            ArNumber ar1 = 3;
+            ArNumber ar2 = 5;
+            ArNumber ar3 = ArNumber.Add(ar1, ar2);
+            TestContext.WriteLine(ar3.ToString());
+
+            ChaosBox cb = new ChaosBox();
+            
+            for (int i = 0; i < 30; i++)
+            {
+                ar1 = cb.DrawOutLong();
+                ar2 = cb.DrawOutLong();
+                ar3 = ArNumber.Add(ar1, ar2);
+                TestContext.WriteLine($"{ar1}+{ar2}={ar3}");
+            }
+        }
+
+        [TestMethod]
+        public void GetSetNumberBlockTest()
+        {
+            //ArNumber ar = new ArNumber();
+            //ar = 23988.8799708890817;
+            //TestContext.WriteLine(ar.ToString());
+            //ar.SetNumberBlock(2, 23988, 5);
+            //TestContext.WriteLine(ar.ToString());            
+            //ar.SetNumberBlock(0, 8, 2);
+            //TestContext.WriteLine(ar.ToString());
+            //ar.SetNumberBlock(1, 879970889, 9);
+            //TestContext.WriteLine(ar.ToString());
+            //ar.SetNumberBlock(2, 23988, 5);
+            //TestContext.WriteLine(ar.ToString());
+            //ar.SetNumberBlock(0, 8, 2);
+            //TestContext.WriteLine(ar.ToString());
+            //ar.SetNumberBlock(1, 879970889, 9);
+            //TestContext.WriteLine(ar.ToString());
+            //23988.87997088982
+            //            23988.87997088982
+            //26953.967124785
+            //84553.220800817
+            //ar.GetNumberBlock(1, 9);
+            //ar.GetNumberBlock(2, 5);
+            //ar.GetNumberBlock(0, 3);
+        }
+
         //[TestMethod]
         //public void ExponentGetSetTest()
         //{
@@ -125,16 +171,16 @@ namespace RaeriharTest
             //TestContext.WriteLine(ar.ToString());
             Assert.IsTrue(ar.ToString("E") == "-6.8718E-4");
             Assert.IsTrue(ar.ToString("D") == "0");
-            Assert.IsTrue(ar.ToString("C") == "-0.00068718");
+            Assert.IsTrue(ar.ToString("F") == "-0.00068718");
             ar = ArNumber.Parse(testStrings[3]);
             Assert.IsTrue(ar.ToString("E") == "3.567894358E+40");
             Assert.IsTrue(ar.ToString("D") == "35678943580000000000000000000000000000000");
 
             ar = ArNumber.Parse(testStrings[4]);
             Assert.IsTrue(ar.ToString("E") == "5.68681E-6");
-            Assert.IsTrue(ar.ToString("C") == "0.00000568681");
+            Assert.IsTrue(ar.ToString("F") == "0.00000568681");
             //TestContext.WriteLine(ar.ToString("C3"));
-            Assert.IsTrue(ar.ToString("C3") == "0.00000568681"); // TO DO
+            Assert.IsTrue(ar.ToString("F3") == "0.00000568681"); // TO DO
             //Assert.IsTrue(sn.ToString("C3") == "0.00");            
             Assert.IsTrue(ar.ToString("D") == "0");
 
@@ -143,10 +189,10 @@ namespace RaeriharTest
             Assert.IsTrue(ar.ToString("E") == "-3.5E-24");
             ar = ArNumber.Parse(testStrings[6]);
             Assert.IsTrue(ar.ToString("E") == "0");
-            Assert.IsTrue(ar.ToString("C") == "0");
+            Assert.IsTrue(ar.ToString("F") == "0");
             ar = ArNumber.Parse(testStrings[7]);
             Assert.IsTrue(ar.ToString("E") == "0");
-            Assert.IsTrue(ar.ToString("C") == "0");
+            Assert.IsTrue(ar.ToString("F") == "0");
             ar = ArNumber.Parse(testStrings[8]);
             Assert.IsTrue(ar.ToString("E") == "3E+2");
             Assert.IsTrue(ar.ToString() == "300");
@@ -171,7 +217,7 @@ namespace RaeriharTest
                 ar = new ArNumber(d);
                 //TestContext.WriteLine(ar.ToString().Length.ToString());
                 //TestContext.WriteLine(ar.ToString());
-                if (s != ar.ToString() && s != ar.ToString("E") && s != ar.ToString("C"))
+                if (s != ar.ToString() && s != ar.ToString("E") && s != ar.ToString("F"))
                     TestContext.WriteLine($"{s}: {ar}");
             }
         }

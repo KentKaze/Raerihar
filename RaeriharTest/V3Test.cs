@@ -15,6 +15,12 @@ namespace RaeriharTest
         {
             ArNumber ar = new ArNumber();
 
+            float c = 5.018483f;
+            TestContext.WriteLine(c.ToString("F4"));
+            TestContext.WriteLine(c.ToString("F1"));
+            TestContext.WriteLine(c.ToString("F2"));
+
+
             int b = 3000;
             TestContext.WriteLine(b.ToString("D2"));
             TestContext.WriteLine(b.ToString("C2"));
