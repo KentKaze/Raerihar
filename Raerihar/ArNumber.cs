@@ -62,6 +62,16 @@ namespace Aritiafel.Organizations.RaeriharUniversity
     //e = -100 = (-100 + 1) % 9 = 0
     //(e + 1) % 9 = 0
 
+
+    //300
+    // 3
+    // e = 2
+
+    //      300
+    //      ---
+
+
+
     //Data =>
     //4     EndDigitsCount
     //4-60  Exponent
@@ -214,9 +224,12 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         private long GetBits(long digitsLength)
         {
             int tail = PostiveRemainder(Exponent + 1, 9);
-            return (tail * 10 + 2) / 3 +
-                (digitsLength - tail) / 9 * 30 +
-                ((digitsLength - tail) % 9 * 10 + 2) / 3 + 1;
+            if (tail <= digitsLength)
+                return (tail * 10 + 2) / 3 +
+                    (digitsLength - tail) / 9 * 30 +
+                    ((digitsLength - tail) % 9 * 10 + 2) / 3 + 1;
+            else
+                return (tail * 10 + 2) / 3 + 1;
         }
 
         private static int PostiveRemainder(long a, int b)
@@ -259,7 +272,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public void SetNumberBlock(int index, uint value, int digitsCount)
         {
             //已使用多少Bit
-            long bitUsed = index == 0 ? 1 : (index - 1) * 30 +
+            long bitUsed = index == 0 ? 1 : (index - 1) * 30 + 
                 ((_Data[_Data.Length - 1] & 15) * 10 + 2) / 3 + 1;
             //從哪個Byte開始
             int j = (int)(bitUsed / 8);
@@ -269,7 +282,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             int writeBits = (digitsCount * 10 + 2) / 3;
             //記一下首位
             if (index == 0)
-                _Data[_Data.Length - 1] = (byte)(_Data[_Data.Length - 1] & 240 | digitsCount);            
+                _Data[_Data.Length - 1] = (byte)(_Data[_Data.Length - 1] & 240 | digitsCount);
             while (writeBits > 0)
             {
                 if (writeBits <= 8 - move)
@@ -461,6 +474,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 numberStringWithSign = numberStringWithSign.Remove(numberStringWithSign.Length - 1, 1);
                 e++;
             }
+            e += numberStringWithSign.Length - 1;
             if (numberStringWithSign == "0")
             {
                 a = new ArNumber();
@@ -470,6 +484,11 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         }
         private static void LoadStandardData(string numberString, ArNumber a, bool isNegative = false, long e = 0)
         {
+            int pr = PostiveRemainder(e + 1, 9);
+            if (pr % 9 != 0)
+                if (pr > numberString.Length)
+                    numberString = $"{numberString}{new string('0', pr - numberString.Length)}";
+
             a._Numbers = new byte[(a.GetBits(numberString.Length) + 7) / 8];
             a.Negative = isNegative;
             a.SetExponent(e);
@@ -480,11 +499,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             for (int i = 0; digitIndex > 0; i++)
             {
                 if (i == 0)
-                {
-                    int pr = PostiveRemainder(e + 1, 9);
-                    if (pr > numberString.Length)
-                        substractedDigits = numberString.Length;
-                    else if ((numberString.Length - pr) % 9 != 0)
+                {   
+                    if ((numberString.Length - pr) % 9 != 0)
                         substractedDigits = (numberString.Length - pr) % 9;
                     else if (numberString.Length < 9)
                         substractedDigits = numberString.Length;
@@ -556,7 +572,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 {
                     if (i == 0)
                     {
-                        digitsA = a._Data[a._Data.Length - 1];
+                        digitsA = a._Data[a._Data.Length - 1] & 15;
                         plusA = a.GetNumberBlock(i, digitsA);
                         if (a_e + 1 - a_digitsCount < 0)
                             plusA *= (uint)Math.Pow(10, 9 - digitsA);
@@ -579,7 +595,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 {
                     if (j == 0)
                     {
-                        digitsB = b._Data[b._Data.Length - 1];
+                        digitsB = b._Data[b._Data.Length - 1] & 15;
                         plusB = b.GetNumberBlock(j, digitsB);
                         if (b_e + 1 - b_digitsCount < 0)
                             plusB *= (uint)Math.Pow(10, 9 - digitsB);
@@ -611,11 +627,11 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             if (carry == 1)
             {
                 sumList.Add(1);
-                e -= 8;
+                e -= 7;
             }   
             else
-                e -= 9 - sum.ToString().Length;            
-            ArNumber result = new ArNumber((int)(e - lastE), lastE, a.Negative);
+                e -= 8 - sum.ToString().Length;            
+            ArNumber result = new ArNumber((int)(e - lastE), e, a.Negative);
             result.SetNumberBlock(0, sumList[0], sumList[0].ToString().Length);
             for (i = 1; i < sumList.Count - 1; i++)
                 result.SetNumberBlock(i, sumList[i], 9);
@@ -628,6 +644,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             StringBuilder numbers = new StringBuilder();
             int tail = PostiveRemainder(Exponent + 1, 9);
             long digitsCount = DigitsCount;
+            
             if (tail > digitsCount)
                 tail = (int)digitsCount;
             else if (tail == 0)
@@ -643,6 +660,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 numbers.Append(GetNumberBlock(0, head).ToString().PadLeft(head, '0'));
             else if (indexCount - 1 != 0)
                 numbers.Append(GetNumberBlock(0, 9).ToString().PadLeft(9, '0'));
+            while (numbers.Length > 1 && numbers[numbers.Length - 1] == '0')
+                numbers.Remove(numbers.Length - 1, 1);
             return numbers.ToString();
         }
         private string ToString(int digitsDisplay, char format, IFormatProvider provider)

@@ -38,6 +38,11 @@ namespace RaeriharTest
             ArNumber ar3 = ArNumber.Add(ar1, ar2);
             TestContext.WriteLine(ar3.ToString());
 
+            ar1 = 300;
+            ar2 = 25;
+            ar3 = ArNumber.Add(ar1, ar2);
+            TestContext.WriteLine(ar3.ToString());
+
             ChaosBox cb = new ChaosBox();
             
             for (int i = 0; i < 30; i++)
@@ -168,7 +173,8 @@ namespace RaeriharTest
             Assert.IsTrue(ar.ToString("D") == "-36118956780000000000000000000000000000000000000000");
             ar = ArNumber.Parse(testStrings[2]);
             //TestContext.WriteLine(ar.ToString("E"));
-            //TestContext.WriteLine(ar.ToString());
+            
+            //-0.000687180
             Assert.IsTrue(ar.ToString("E") == "-6.8718E-4");
             Assert.IsTrue(ar.ToString("D") == "0");
             Assert.IsTrue(ar.ToString("F") == "-0.00068718");
@@ -194,6 +200,7 @@ namespace RaeriharTest
             Assert.IsTrue(ar.ToString("E") == "0");
             Assert.IsTrue(ar.ToString("F") == "0");
             ar = ArNumber.Parse(testStrings[8]);
+            //TestContext.WriteLine(ar.ToString("E"));
             Assert.IsTrue(ar.ToString("E") == "3E+2");
             Assert.IsTrue(ar.ToString() == "300");
             ar = ArNumber.Parse(testStrings[9]);
@@ -213,7 +220,7 @@ namespace RaeriharTest
             for (int i = 0; i < 10000; i++)
             {
                 double d = cb.DrawOutDiversityDouble();
-                string s = d.ToString().Replace("E+0", "E+").Replace("E-0", "E-");
+                string s = d.ToString("G17").Replace("E+0", "E+").Replace("E-0", "E-");
                 ar = new ArNumber(d);
                 //TestContext.WriteLine(ar.ToString().Length.ToString());
                 //TestContext.WriteLine(ar.ToString());
