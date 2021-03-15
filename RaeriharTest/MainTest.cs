@@ -37,10 +37,17 @@ namespace RaeriharTest
         [TestMethod]
         public void GeneralUse()
         {
-            ArNumber a = 9;
-            a++;
+            ArNumber a;
+
+            a = 0.1;
             Console.WriteLine(a);
-            for (ArNumber i = 0; i < 10000; i = i + 0.1)
+            Console.WriteLine(a.DigitsCount);
+            a = 1.1;
+            Console.WriteLine(a.DigitsCount);
+            a = a + 0.1;
+            Console.WriteLine(a.DigitsCount);
+            ArNumber plus = 0.1;
+            for (ArNumber i = 100; i < 10000; i = i + plus)
             {
                 Console.WriteLine(i);
             }
@@ -69,7 +76,8 @@ namespace RaeriharTest
             ar1 = 90;
             ar2 = 90.5;
             ar3 = ar1 + ar2;
-            TestContext.WriteLine(ar3.ToString());
+            Assert.IsTrue(ar3.ToString() == "180.5");
+            //TestContext.WriteLine(ar3.ToString());
             ChaosBox cb = new ChaosBox();
             for(int i = 0; i < 1000; i++)
             {
@@ -154,32 +162,32 @@ namespace RaeriharTest
             }
         }
 
-        [TestMethod]
-        public void GetSetNumberBlockTest()
-        {
-            //ArNumber ar = new ArNumber();
-            //ar = 23988.8799708890817;
-            //TestContext.WriteLine(ar.ToString());
-            //ar.SetNumberBlock(2, 23988, 5);
-            //TestContext.WriteLine(ar.ToString());            
-            //ar.SetNumberBlock(0, 8, 2);
-            //TestContext.WriteLine(ar.ToString());
-            //ar.SetNumberBlock(1, 879970889, 9);
-            //TestContext.WriteLine(ar.ToString());
-            //ar.SetNumberBlock(2, 23988, 5);
-            //TestContext.WriteLine(ar.ToString());
-            //ar.SetNumberBlock(0, 8, 2);
-            //TestContext.WriteLine(ar.ToString());
-            //ar.SetNumberBlock(1, 879970889, 9);
-            //TestContext.WriteLine(ar.ToString());
-            //23988.87997088982
-            //            23988.87997088982
-            //26953.967124785
-            //84553.220800817
-            //ar.GetNumberBlock(1, 9);
-            //ar.GetNumberBlock(2, 5);
-            //ar.GetNumberBlock(0, 3);
-        }
+        //[TestMethod]
+        //public void GetSetNumberBlockTest()
+        //{
+        //    //ArNumber ar = new ArNumber();
+        //    //ar = 23988.8799708890817;
+        //    //TestContext.WriteLine(ar.ToString());
+        //    //ar.SetNumberBlock(2, 23988, 5);
+        //    //TestContext.WriteLine(ar.ToString());            
+        //    //ar.SetNumberBlock(0, 8, 2);
+        //    //TestContext.WriteLine(ar.ToString());
+        //    //ar.SetNumberBlock(1, 879970889, 9);
+        //    //TestContext.WriteLine(ar.ToString());
+        //    //ar.SetNumberBlock(2, 23988, 5);
+        //    //TestContext.WriteLine(ar.ToString());
+        //    //ar.SetNumberBlock(0, 8, 2);
+        //    //TestContext.WriteLine(ar.ToString());
+        //    //ar.SetNumberBlock(1, 879970889, 9);
+        //    //TestContext.WriteLine(ar.ToString());
+        //    //23988.87997088982
+        //    //            23988.87997088982
+        //    //26953.967124785
+        //    //84553.220800817
+        //    //ar.GetNumberBlock(1, 9);
+        //    //ar.GetNumberBlock(2, 5);
+        //    //ar.GetNumberBlock(0, 3);
+        //}
 
         //[TestMethod]
         //public void ExponentGetSetTest()
@@ -325,7 +333,7 @@ namespace RaeriharTest
             for (int i = 0; i < 10000; i++)
             {
                 double d = cb.DrawOutDiversityDouble();
-                string s = d.ToString("G17").Replace("E+0", "E+").Replace("E-0", "E-");
+                string s = d.ToString().Replace("E+0", "E+").Replace("E-0", "E-");
                 ar = new ArNumber(d);
                 //TestContext.WriteLine(ar.ToString().Length.ToString());
                 //TestContext.WriteLine(ar.ToString());
@@ -392,6 +400,7 @@ namespace RaeriharTest
             double a11 = (double)br;
             char a10 = (char)br;
 
+            br = -60;
             Assert.ThrowsException<OverflowException>(() =>
             {
                 br = -60;

@@ -97,7 +97,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
     {
         public const long ExponentMaxValue = 576460752303423487;
         public const long ExponentMinValue = -576460752303423488;
-        public const byte MaximumDisplayedDigitsCount = 17;
+        public const byte MaximumDisplayedDigitsCount = 20;
         private const int MaximumBytesCount = 4166668;
 
         private byte[] _Data;
@@ -485,13 +485,17 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         private static void LoadStandardData(string numberString, ArNumber a, bool isNegative = false, long e = 0)
         {
             int pr = PostiveRemainder(e + 1, 9);
-            if (pr % 9 != 0)
-                if (pr > numberString.Length)
-                    numberString = $"{numberString}{new string('0', pr - numberString.Length)}";
+            if (pr == 0)
+                pr = 9;
+            if(!IsInteger(a) || pr > numberString.Length)
+                numberString = $"{numberString}{new string('0', pr - numberString.Length % 9)}";
+            //if (pr > numberString.Length)
+            //    numberString = $"{numberString}{new string('0', pr - numberString.Length)}";
 
+            a.SetExponent(e);
             a._Numbers = new byte[(a.GetBits(numberString.Length) + 7) / 8];
             a.Negative = isNegative;
-            a.SetExponent(e);
+            
 
             uint v;
             int digitIndex = numberString.Length;
@@ -533,6 +537,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         {
             while (sumList.Count > 1 && sumList[0] == 0)
                 sumList.RemoveAt(0);
+            //while (sumList[0] % 10 == 0)
+            //    sumList[0] /= 10;
             while (sumList.Count > 1 && sumList[sumList.Count - 1] == 0)
             {
                 sumList.RemoveAt(sumList.Count - 1);
@@ -627,6 +633,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                         plusA = (int)a.GetNumberBlock(i, digitsA);
                         if (a_e - a_digitsCount + 1 > e)
                             plusA *= (int)Math.Pow(10, 9 - digitsA);
+                            //plusA = int.Parse(plusA.ToString().PadRight(9 - digitsA, '0'));
                     }
                     else if (i == a_indexCount - 1)
                     {
@@ -649,7 +656,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                         digitsB = b._Data[b._Data.Length - 1] & 15;
                         plusB = (int)b.GetNumberBlock(j, digitsB);
                         if (b_e - b_digitsCount + 1 > e)
-                            plusB *= (int)Math.Pow(10, 9 - digitsB);
+                            plusB *=  (int)Math.Pow(10, 9 - digitsB);
+                            //plusB = int.Parse(plusB.ToString().PadRight(9 - digitsB, '0'));
                     }
                     else if (j == b_indexCount - 1)
                     {
@@ -704,6 +712,17 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             result.SetNumberBlock(sumList.Count - 1, sumList[sumList.Count - 1], sumList[sumList.Count - 1].ToString().Length);
             return result;
         }
+
+        //0.1 1 e = -1
+        //- -
+        //0.56 56 e = -2
+        //- --
+
+        //300  e = 2
+        //---
+
+        //30056 e+2 => 300.56
+
         public string GetNumbersToString()
         {
             StringBuilder numbers = new StringBuilder();
@@ -715,7 +734,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             else if (tail == 0)
                 tail = 9;
             int mid = (int)((digitsCount - tail) / 9);
-            int head = (int)((digitsCount - tail) % 9);
+            int head = PostiveRemainder(digitsCount - tail, 9);
             int indexCount = 1 + mid + (head > 0 ? 1 : 0);
 
             numbers.Append(GetNumberBlock(indexCount - 1, tail));
@@ -778,6 +797,9 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                         result.Insert(0, $"0.{new string('0', Math.Abs((int)e + 1))}");
                 }
             }
+            else if(result.Length > 1)
+                result.Insert(1, '.');
+
             if (Negative)
                 result.Insert(0, '-');
             return result.ToString();
