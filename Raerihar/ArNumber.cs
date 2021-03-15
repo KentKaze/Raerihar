@@ -616,7 +616,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                     {
                         digitsA = a._Data[a._Data.Length - 1] & 15;
                         plusA = (int)a.GetNumberBlock(i, digitsA);
-                        if (a_e + 1 - a_digitsCount < 0)
+                        if (a_e - a_digitsCount + 1 > e)
                             plusA *= (int)Math.Pow(10, 9 - digitsA);
                     }
                     else if (i == a_indexCount - 1)
@@ -626,8 +626,6 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                     }
                     else
                     {
-                        if (i > b_indexCount - 1)
-                            Console.WriteLine("OOOOA");
                         digitsA = 9;
                         plusA = (int)a.GetNumberBlock(i, digitsA);
                     }
@@ -641,7 +639,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                     {
                         digitsB = b._Data[b._Data.Length - 1] & 15;
                         plusB = (int)b.GetNumberBlock(j, digitsB);
-                        if (b_e + 1 - b_digitsCount < 0)
+                        if (b_e - b_digitsCount + 1 > e)
                             plusB *= (int)Math.Pow(10, 9 - digitsB);
                     }
                     else if (j == b_indexCount - 1)
@@ -651,8 +649,6 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                     }
                     else
                     {
-                        if (j > b_indexCount - 1)
-                            Console.WriteLine("OOOOB");
                         digitsB = 9;
                         plusB = (int)b.GetNumberBlock(j, digitsB);
                     }

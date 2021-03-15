@@ -37,11 +37,41 @@ namespace RaeriharTest
         [TestMethod]
         public void AddMinus2()
         {
-            ArNumber ar1 = 90;
-            ArNumber ar2 = 90.5;
-
-            ArNumber ar3 = ar1 + ar2;
+            ArNumber ar1;
+            ArNumber ar2;
+            ArNumber ar3;
+            ar1 = 10.88483022032963E+307;
+            ar2 =  2.3934165709915166E+307;
+            //+  = 1.71705924567000363134E+308
+            //= 1.32782467913211466E+308;
+            //34818995930244796
+            ar3 = ar1 + ar2;
             TestContext.WriteLine(ar3.ToString());
+
+            ar1 = 90;
+            ar2 = 90.5;
+            ar3 = ar1 + ar2;
+            TestContext.WriteLine(ar3.ToString());
+            ChaosBox cb = new ChaosBox();
+            for(int i = 0; i < 1000; i++)
+            {
+                double d1 = cb.DrawOutDouble(true);
+                double d2 = cb.DrawOutDouble(true);
+                double d3 = d1 + d2;
+                ar1 = d1;
+                ar2 = d2;
+                ar3 = ar1 + ar2;
+                if (!double.IsInfinity(d3) && d3.ToString().Substring(0, 17) != ar3.ToString().Substring(0, 17))
+                {
+                    TestContext.WriteLine("");
+                    TestContext.WriteLine($"{d3.ToString().Substring(0, 17)}!={ar3.ToString().Substring(0, 17)}");
+                    //TestContext.WriteLine($"{d1.ToString("G17")}+{d2.ToString("G17")}={ar3}");
+                }
+                else
+                    TestContext.Write("O");
+                
+            }
+            
         }
 
         [TestMethod]
