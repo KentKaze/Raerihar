@@ -589,7 +589,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             else if (a_tail == 0)
                 a_tail = 9;
             int a_mid = (int)((a_digitsCount - a_tail) / 9);
-            int a_head = (int)((a_digitsCount - a_tail) % 9);
+            int a_head = PostiveRemainder(a_digitsCount - a_tail, 9);
             int a_indexCount = 1 + a_mid + (a_head > 0 ? 1 : 0);
 
             long b_e = b.Exponent;
@@ -600,7 +600,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             else if (b_tail == 0)
                 b_tail = 9;
             int b_mid = (int)((b_digitsCount - b_tail) / 9);
-            int b_head = (int)((b_digitsCount - b_tail) % 9);
+            int b_head = PostiveRemainder(b_digitsCount - b_tail, 9);
             int b_indexCount = 1 + b_mid + (b_head > 0 ? 1 : 0);
 
             //1.12
