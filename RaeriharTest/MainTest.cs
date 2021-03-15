@@ -33,10 +33,10 @@ namespace RaeriharTest
         [TestMethod]
         public void AddMinus()
         {
-            ArNumber ar1 = -3;
+            ArNumber ar1 = 3;
             ArNumber ar2 = 5;
             ArNumber ar3 = ar1 + ar2;
-            if(ArNumber.Negate(ar1) > ArNumber.Negate(ar2))
+            if(ArNumber.Negate(ar1) < ArNumber.Negate(ar2))
                 Console.WriteLine("!!?");
             TestContext.WriteLine(ar3.ToString());
             ar3 = ar1 - ar2;
@@ -64,7 +64,7 @@ namespace RaeriharTest
 
 
             ChaosBox cb = new ChaosBox();            
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 10000; i++)
             {
                 long a = cb.DrawOutLong();
                 long b = cb.DrawOutLong();
@@ -72,21 +72,21 @@ namespace RaeriharTest
                 decimal m2 = (decimal)a - (decimal)b;
                 ar1 = a;
                 ar2 = b;
-                //ar3 = ar1 + ar2;
+                ar3 = ar1 + ar2;
             
-                //if (ar1.ToString("D") != a.ToString() || ar2.ToString("D") != b.ToString() ||
-                //   ar3.ToString("D") != m.ToString())
-                //{
-                //    TestContext.WriteLine("Wrong Detected");
-                //    TestContext.WriteLine($"{a}+{b}={m}");
-                //    TestContext.WriteLine($"{ar1.ToString("D")}+{ar2.ToString("D")}={ar3.ToString("D")}");
-                //}
+                if (ar1.ToString("D") != a.ToString() || ar2.ToString("D") != b.ToString() ||
+                   ar3.ToString("D") != m.ToString())
+                {
+                    TestContext.WriteLine("Wrong Detected");
+                    TestContext.WriteLine($"{a}+{b}={m}");
+                    TestContext.WriteLine($"{ar1.ToString("D")}+{ar2.ToString("D")}={ar3.ToString("D")}");
+                }
                 ar3 = ar1 - ar2;
                 if(ar3.ToString("D") != m2.ToString())
                 {
                     TestContext.WriteLine("Wrong Detected");
-                    TestContext.WriteLine($"{a}-{b}={m2}");
-                    TestContext.WriteLine($"{ar1.ToString("D")}-{ar2.ToString("D")}={ar3.ToString("D")}");
+                    TestContext.WriteLine($"{m2}");
+                    TestContext.WriteLine($"{ar3.ToString("D")}");
                 }
             }
         }
@@ -197,7 +197,8 @@ namespace RaeriharTest
                 "0.00681E+98", //10
                 "0.01", //11
                 "0", //12
-                "2170.6907744747728" //13
+                "2170.6907744747728", //13
+                "-0.445064895809216518E+18" //14
             };
 
             ar = ArNumber.Parse(testStrings[0]);
@@ -250,6 +251,10 @@ namespace RaeriharTest
             ar = ArNumber.Parse(testStrings[12]);
             Assert.IsTrue(ar.ToString("E") == "0");
             ar = ArNumber.Parse(testStrings[13]);
+            Assert.IsTrue(ar.ToString("F") == "2170.6907744747728");            
+            ar = ArNumber.Parse(testStrings[14]);
+            Assert.IsTrue(ar.ToString("E") == "-4.45064895809216518E+17");
+            
             //TestContext.WriteLine(ar.ToString());
 
             ChaosBox cb = new ChaosBox();

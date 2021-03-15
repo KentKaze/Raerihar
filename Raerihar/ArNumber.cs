@@ -529,11 +529,16 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public static bool IsInteger(ArNumber a)
             => a.Exponent - a.DigitsCount + 1 >= 0;
 
-        private static long RetouchAndCountBytes(List<uint> sumList)
+        private static long RetouchAndCountBytes(List<uint> sumList, ref long e)
         {
-            while (sumList[0] == 0)
+            while (sumList.Count > 1 && sumList[0] == 0)
                 sumList.RemoveAt(0);
-
+            while (sumList.Count > 1 && sumList[sumList.Count - 1] == 0)
+            {
+                sumList.RemoveAt(sumList.Count - 1);
+                e -= 10 - sumList[sumList.Count - 1].ToString().Length;
+            }
+            
             if (sumList.Count == 1)
                 return ((sumList[0].ToString().Length * 10 + 2) / 3 + 8) / 8;
             else
@@ -548,19 +553,10 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             return result;
         }
 
-        static int loop = 0;
-
         private static ArNumber AddMinus(ArNumber a, ArNumber b, bool isAdd = true)
         {   
-            if (loop > 100)
-            {
-                Console.WriteLine("Loop");
-                return -1;
-            }
-                
             if (isAdd)
             {
-                loop++;
                 if (a.Negative && !b.Negative)
                     return AddMinus(b, Negate(a), false);
                 else if (!a.Negative && b.Negative)
@@ -568,7 +564,6 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             }
             else
             {
-                loop++;
                 if ((a.Negative && !b.Negative) || (!a.Negative && b.Negative))
                     return AddMinus(a, Negate(b), true);
                 else if (b > a && !a.Negative && !b.Negative)
@@ -577,7 +572,6 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                     return AddMinus(Negate(b), Negate(a), false);
             }
             //a will > b when Minus
-            loop = 0;
             long a_e = a.Exponent;
             int a_tail = PostiveRemainder(a_e + 1, 9);
             long a_digitsCount = a.DigitsCount;
@@ -693,7 +687,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             else
                 e -= 10 - sum.ToString().Length;
 
-            ArNumber result = new ArNumber(RetouchAndCountBytes(sumList), e, a.Negative);
+            ArNumber result = new ArNumber(RetouchAndCountBytes(sumList, ref e), e, a.Negative);
             if (sumList.Count == 1)
             {
                 result.SetNumberBlock(0, sumList[0], sumList[0].ToString().Length);
@@ -846,7 +840,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             else if (Exponent < other.Exponent)
                 return result * -1;
             //(To Do - Temp)
-            return GetNumbersToString().CompareTo(other.GetNumbersToString());
+            return GetNumbersToString().CompareTo(other.GetNumbersToString()) * result;
             //int indexCount = GetIndexCount();
             //int otherIndexCount = other.GetIndexCount();
             //for (int i = 0; i < indexCount && i < otherIndexCount; i++)
