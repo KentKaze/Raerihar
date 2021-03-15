@@ -15,19 +15,33 @@ namespace RaeriharTest
         public void CompareTest()
         {
             ChaosBox cb = new ChaosBox();
-            ArNumber ar;
-
-            ArNumber br;
+            ArNumber ar, br;
             for (int i = 0; i < 10000; i++)
             {
-                ar = cb.DrawOutDecimal(true);
-                br = cb.DrawOutDecimal(true);
-                if (ar > br)
-                    TestContext.WriteLine($"{ar}>{br}");
-                else
-                    TestContext.WriteLine($"{ar}<{br}");
+                decimal a = cb.DrawOutDecimal(true);
+                decimal b = cb.DrawOutDecimal(true);
+                ar = a;
+                br = b;
+                if((a > b && !(ar > br)) ||
+                   (a < b && !(ar < br)) ||
+                   (a == b && !(ar == br)))
+                {
+                    TestContext.WriteLine($"Wrong Detected");
+                    TestContext.WriteLine($"{a}>{b}");
+                    TestContext.WriteLine($"! {ar}>{br}");
+                }   
             }
 
+        }
+
+        [TestMethod]
+        public void AddMinus2()
+        {
+            ArNumber ar1 = 90;
+            ArNumber ar2 = 90.5;
+
+            ArNumber ar3 = ar1 + ar2;
+            TestContext.WriteLine(ar3.ToString());
         }
 
         [TestMethod]

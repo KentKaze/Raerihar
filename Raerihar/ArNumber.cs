@@ -591,7 +591,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             else if (b_tail == 0)
                 b_tail = 9;
             int b_mid = (int)((b_digitsCount - b_tail) / 9);
-            int b_head = (int)((a_digitsCount - a_tail) % 9);
+            int b_head = (int)((b_digitsCount - b_tail) % 9);
             int b_indexCount = 1 + b_mid + (b_head > 0 ? 1 : 0);
 
             //1.12
