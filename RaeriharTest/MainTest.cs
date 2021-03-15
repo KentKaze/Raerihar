@@ -35,6 +35,20 @@ namespace RaeriharTest
         }
 
         [TestMethod]
+        public void GeneralUse()
+        {
+            ArNumber a = 9;            
+            a++;
+            Console.WriteLine(a);
+            for (ArNumber i = 0; i < 2000; i++)
+            {
+                Console.WriteLine(i);
+            }
+                
+        }
+
+
+        [TestMethod]
         public void AddMinus2()
         {
             ArNumber ar1;
@@ -79,7 +93,8 @@ namespace RaeriharTest
         {
             ArNumber ar1 = 3;
             ArNumber ar2 = 5;
-            ArNumber ar3 = ar1 + ar2;
+            ArNumber ar3 = ar1 + ar2;    
+
             if(ArNumber.Negate(ar1) < ArNumber.Negate(ar2))
                 Console.WriteLine("!!?");
             TestContext.WriteLine(ar3.ToString());

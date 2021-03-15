@@ -109,7 +109,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             {
                 int lastDigits = _Data[_Data.Length - 1] & 15;
                 int bitUsed = (lastDigits * 10 + 2) / 3 + 1;
-                if (_Numbers.Length == bitUsed / 8 + 1 && (_Numbers[_Numbers.Length - 1] >> (bitUsed % 8) == 0))
+                if (_Numbers.Length == (bitUsed + 7) / 8  && (_Numbers[_Numbers.Length - 1] >> (bitUsed == 8 ? 8 : bitUsed % 8) == 0))
                     return lastDigits;
                 else
                     return lastDigits + PostiveRemainder(Exponent + 1, 9) + (_Numbers.Length * 8 - bitUsed - (PostiveRemainder(Exponent + 1, 9) * 10 + 2) / 3) / 10 * 3;
@@ -968,6 +968,10 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             => AddMinus(a, b);
         public static ArNumber operator -(ArNumber a, ArNumber b)
             => AddMinus(a, b, false);
+        public static ArNumber operator ++(ArNumber a)
+            => AddMinus(a, 1);
+        public static ArNumber operator --(ArNumber a)
+            => AddMinus(a, 1, false);
     }
 }
 
