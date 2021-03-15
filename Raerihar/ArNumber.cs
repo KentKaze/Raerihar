@@ -211,13 +211,13 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             => LoadInteger(value.ToString(), this);
         public ArNumber(decimal value)
             : this()
-            => Parse(value.ToString("F4"), this);
+            => Parse(value.ToString(), this);
         public ArNumber(float value)
             : this()
-            => Parse(value.ToString("G9"), this);
+            => Parse(value.ToString(), this);
         public ArNumber(double value)
             : this()
-            => Parse(value.ToString("G17"), this);
+            => Parse(value.ToString(), this);
 
         //private int GetIndexCount()
         //{
@@ -521,7 +521,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         {
             long e = a.Exponent;
             long l = a.DigitsCount; // Todo
-            if ((e > 0 && e + 1 <= MaximumDisplayedDigitsCount) ||
+            if ((e >= 0 && e + 1 <= MaximumDisplayedDigitsCount) ||
                 (e < 0 && e - l + 3 >= MaximumDisplayedDigitsCount * -1))
                 return false;
             return true;
@@ -539,8 +539,15 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 e -= 10 - sumList[sumList.Count - 1].ToString().Length;
             }
             
-            if (sumList.Count == 1)
+            if(sumList.Count == 1)
+            {
+                //if(sumList[0] == 0)
+                //{
+                //    e = 0;
+                //    return 1;
+                //}
                 return ((sumList[0].ToString().Length * 10 + 2) / 3 + 8) / 8;
+            }
             else
                 return ((sumList[sumList.Count - 1].ToString().Length * 10 + 2) / 3 +
                     30 * (sumList.Count - 1) + 8) / 8;
@@ -570,6 +577,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                     return AddMinus(Negate(b), Negate(a), false);
                 else if (a > b && a.Negative && b.Negative)
                     return AddMinus(Negate(b), Negate(a), false);
+                else if (a == b)
+                    return new ArNumber();
             }
             //a will > b when Minus
             long a_e = a.Exponent;

@@ -37,13 +37,17 @@ namespace RaeriharTest
         [TestMethod]
         public void GeneralUse()
         {
-            ArNumber a = 9;            
+            ArNumber a = 9;
             a++;
             Console.WriteLine(a);
-            for (ArNumber i = 0; i < 2000; i++)
+            for (ArNumber i = 0; i < 10000; i = i + 0.1)
             {
                 Console.WriteLine(i);
             }
+
+            //ArNumber a = 3.87699078E+98;
+            //ArNumber test = a - a;
+            //Console.WriteLine(test);
                 
         }
 
