@@ -597,9 +597,9 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             //1.12
             //- -- e = 2 digits = 3 e+ 1 - digits > 0
             //3 + 5 = 
-            long AlastE = a_e - a_digitsCount + 1 - a_head == 0 ? 0 : 9 - a_head;
-            long BlastE = b_e - b_digitsCount + 1 - b_head == 0 ? 0 : 9 - b_head;
-            long lastE = AlastE > BlastE ? BlastE : AlastE;
+            long aLastE = a_e - a_digitsCount + 1 - (a_head == 0 ? 0 : 9 - a_head);
+            long bLastE = b_e - b_digitsCount + 1 - (b_head == 0 ? 0 : 9 - b_head);
+            long lastE = aLastE > bLastE ? bLastE : aLastE;
             long e = lastE;
             long sum = 0;
             int i = 0, j = 0;
@@ -610,7 +610,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             List<uint> sumList = new List<uint>();
             while (e < a_e + 1 || e < b_e + 1)
             {
-                if (e > a_e - a_digitsCount && e < a_e + 1)
+                if (e >= aLastE && e < a_e + 1)
                 {
                     if (i == 0)
                     {
@@ -635,7 +635,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 }
                 else
                     plusA = 0;
-                if (e > b_e - b_digitsCount && e < b_e + 1)
+                if (e >= bLastE && e < b_e + 1)
                 {
                     if (j == 0)
                     {
