@@ -168,10 +168,10 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             _Numbers = new byte[1];
         }
 
-        private ArNumber(int digitsLength, long e, bool isNegative)
+        private ArNumber(long bytesCount, long e, bool isNegative)
         {   
             SetExponent(e);
-            _Numbers = new byte[(GetBits(digitsLength) + 7) / 8];
+            _Numbers = new byte[bytesCount];
             Negative = isNegative;
         }
 
@@ -463,18 +463,14 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         private static void LoadInteger(string numberStringWithSign, ArNumber a)
         {
             bool isNegative = false;
-            long e = 0;
+            long e = numberStringWithSign.Length - 1;
             if (numberStringWithSign[0] == '-')
             {
                 isNegative = true;
                 numberStringWithSign = numberStringWithSign.Remove(0, 1);
             }
-            while (numberStringWithSign.Length > 1 && numberStringWithSign[numberStringWithSign.Length - 1] == '0')
-            {
-                numberStringWithSign = numberStringWithSign.Remove(numberStringWithSign.Length - 1, 1);
-                e++;
-            }
-            e += numberStringWithSign.Length - 1;
+            while (numberStringWithSign.Length > 9 && numberStringWithSign.Substring(numberStringWithSign.Length - 9, 9) == "000000000")
+                numberStringWithSign = numberStringWithSign.Remove(numberStringWithSign.Length - 9, 9);
             if (numberStringWithSign == "0")
             {
                 a = new ArNumber();
@@ -527,7 +523,17 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             return true;
         }
         public static bool IsInteger(ArNumber a)
-            => a.Exponent - a.DigitsCount + 1 >= 0;     
+            => a.Exponent - a.DigitsCount + 1 >= 0;
+
+        private static long CountBytes(List<uint> sumList)
+        {
+            if (sumList.Count == 1)
+                return ((sumList[0].ToString().Length * 10 + 2) / 3 + 8) / 8;
+            else
+                return ((sumList[sumList.Count - 1].ToString().Length * 10 + 2) / 3 + 
+                    30 * (sumList.Count - 1) + 8) / 8;
+        }
+            
         public static ArNumber Add(ArNumber a, ArNumber b)
         {
             long a_e = a.Exponent;
@@ -568,7 +574,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             List<uint> sumList = new List<uint>();
             while (e < a_e + 1 || e < b_e + 1)
             {
-                if (e <= a_e + 1)
+                if (e < a_e + 1)
                 {
                     if (i == 0)
                     {
@@ -584,6 +590,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                     }
                     else
                     {
+                        if (i > b_indexCount - 1)
+                            Console.WriteLine("OOOOA");
                         digitsA = 9;
                         plusA = a.GetNumberBlock(i, digitsA);
                     }
@@ -591,7 +599,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 }
                 else
                     plusA = 0;
-                if (e <= b_e + 1)
+                if (e < b_e + 1)
                 {
                     if (j == 0)
                     {
@@ -607,6 +615,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                     }
                     else
                     {
+                        if (j > b_indexCount - 1)
+                            Console.WriteLine("OOOOB");
                         digitsB = 9;
                         plusB = b.GetNumberBlock(j, digitsB);
                     }
@@ -621,22 +631,30 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                     sum -= 1000000000;
                     carry = 1;
                 }
+                else
+                    carry = 0;
+                
                 sumList.Add((uint)sum);
                 e += 9;
             }
+
             if (carry == 1)
             {
                 sumList.Add(1);
-                e -= 7;
             }   
             else
-                e -= 8 - sum.ToString().Length;            
-            ArNumber result = new ArNumber((int)(e - lastE), e, a.Negative);
-            result.SetNumberBlock(0, sumList[0], sumList[0].ToString().Length);
+                e -= 10 - sum.ToString().Length;
+
+            ArNumber result = new ArNumber(CountBytes(sumList), e, a.Negative);
+            if(sumList.Count == 1)
+            {
+                result.SetNumberBlock(0, sumList[0], sumList[0].ToString().Length);
+                return result;
+            }
+            result.SetNumberBlock(0, sumList[0], 9);
             for (i = 1; i < sumList.Count - 1; i++)
                 result.SetNumberBlock(i, sumList[i], 9);
-            if (sumList.Count != 1)
-                result.SetNumberBlock(sumList.Count - 1, sumList[sumList.Count - 1], sumList[sumList.Count - 1].ToString().Length);
+            result.SetNumberBlock(sumList.Count - 1, sumList[sumList.Count - 1], sumList[sumList.Count - 1].ToString().Length);
             return result;
         }
         public string GetNumbersToString()

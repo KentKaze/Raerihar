@@ -43,14 +43,34 @@ namespace RaeriharTest
             ar3 = ArNumber.Add(ar1, ar2);
             TestContext.WriteLine(ar3.ToString());
 
-            ChaosBox cb = new ChaosBox();
-            
-            for (int i = 0; i < 30; i++)
+            ar1 = 870000000000;
+            ar2 = 850;
+            ar3 = ArNumber.Add(ar1, ar2);
+            TestContext.WriteLine(ar3.ToString());
+
+
+            ar1 = 1917854895357220849;
+            ar2 = 8593185756644802792;
+            ar3 = ArNumber.Add(ar1, ar2);
+            TestContext.WriteLine(ar3.ToString());
+
+            ChaosBox cb = new ChaosBox();            
+            for (int i = 0; i < 10000; i++)
             {
-                ar1 = cb.DrawOutLong();
-                ar2 = cb.DrawOutLong();
+                long a = cb.DrawOutLong();
+                long b = cb.DrawOutLong();
+                decimal m = (decimal)a + (decimal)b;
+                ar1 = a;
+                ar2 = b;
                 ar3 = ArNumber.Add(ar1, ar2);
-                TestContext.WriteLine($"{ar1}+{ar2}={ar3}");
+                if(ar1.ToString("D") != a.ToString() || ar2.ToString("D") != b.ToString() ||
+                   ar3.ToString("D") != m.ToString())
+                {
+                    TestContext.WriteLine("Wrong Detected");
+                    TestContext.WriteLine($"{a}+{b}={m}");
+                    TestContext.WriteLine($"{ar1.ToString("D")}+{ar2.ToString("D")}={ar3.ToString("D")}");
+                }
+                
             }
         }
 
