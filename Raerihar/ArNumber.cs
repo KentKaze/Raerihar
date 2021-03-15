@@ -574,7 +574,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             List<uint> sumList = new List<uint>();
             while (e < a_e + 1 || e < b_e + 1)
             {
-                if (e < a_e + 1)
+                if (e > a_e - a_digitsCount && e < a_e + 1)
                 {
                     if (i == 0)
                     {
@@ -599,7 +599,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 }
                 else
                     plusA = 0;
-                if (e < b_e + 1)
+                if (e > b_e - b_digitsCount && e < b_e + 1)
                 {
                     if (j == 0)
                     {
@@ -639,9 +639,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             }
 
             if (carry == 1)
-            {
                 sumList.Add(1);
-            }   
             else
                 e -= 10 - sum.ToString().Length;
 
