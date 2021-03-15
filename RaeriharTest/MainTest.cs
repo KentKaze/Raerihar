@@ -31,46 +31,63 @@ namespace RaeriharTest
         }
 
         [TestMethod]
-        public void Add()
+        public void AddMinus()
         {
-            ArNumber ar1 = 3;
+            ArNumber ar1 = -3;
             ArNumber ar2 = 5;
-            ArNumber ar3 = ArNumber.Add(ar1, ar2);
+            ArNumber ar3 = ar1 + ar2;
+            if(ArNumber.Negate(ar1) > ArNumber.Negate(ar2))
+                Console.WriteLine("!!?");
             TestContext.WriteLine(ar3.ToString());
-
+            ar3 = ar1 - ar2;
+            TestContext.WriteLine(ar3.ToString());
             ar1 = 300;
             ar2 = 25;
-            ar3 = ArNumber.Add(ar1, ar2);
+            ar3 = ar1 + ar2;
+            TestContext.WriteLine(ar3.ToString());
+            ar3 = ar1 - ar2;
             TestContext.WriteLine(ar3.ToString());
 
             ar1 = 870000000000;
             ar2 = 850;
-            ar3 = ArNumber.Add(ar1, ar2);
+            ar3 = ar1 + ar2;
             TestContext.WriteLine(ar3.ToString());
-
+            ar3 = ar1 - ar2;
+            TestContext.WriteLine(ar3.ToString());
 
             ar1 = 1917854895357220849;
             ar2 = 8593185756644802792;
-            ar3 = ArNumber.Add(ar1, ar2);
-            TestContext.WriteLine(ar3.ToString());
+            ar3 = ar1 + ar2;
+            TestContext.WriteLine(ar3.ToString("D"));
+            ar3 = ar1 - ar2;
+            TestContext.WriteLine(ar3.ToString("D"));
+
 
             ChaosBox cb = new ChaosBox();            
-            for (int i = 0; i < 10000; i++)
+            for (int i = 0; i < 100; i++)
             {
                 long a = cb.DrawOutLong();
                 long b = cb.DrawOutLong();
                 decimal m = (decimal)a + (decimal)b;
+                decimal m2 = (decimal)a - (decimal)b;
                 ar1 = a;
                 ar2 = b;
-                ar3 = ArNumber.Add(ar1, ar2);
-                if(ar1.ToString("D") != a.ToString() || ar2.ToString("D") != b.ToString() ||
-                   ar3.ToString("D") != m.ToString())
+                //ar3 = ar1 + ar2;
+            
+                //if (ar1.ToString("D") != a.ToString() || ar2.ToString("D") != b.ToString() ||
+                //   ar3.ToString("D") != m.ToString())
+                //{
+                //    TestContext.WriteLine("Wrong Detected");
+                //    TestContext.WriteLine($"{a}+{b}={m}");
+                //    TestContext.WriteLine($"{ar1.ToString("D")}+{ar2.ToString("D")}={ar3.ToString("D")}");
+                //}
+                ar3 = ar1 - ar2;
+                if(ar3.ToString("D") != m2.ToString())
                 {
                     TestContext.WriteLine("Wrong Detected");
-                    TestContext.WriteLine($"{a}+{b}={m}");
-                    TestContext.WriteLine($"{ar1.ToString("D")}+{ar2.ToString("D")}={ar3.ToString("D")}");
+                    TestContext.WriteLine($"{a}-{b}={m2}");
+                    TestContext.WriteLine($"{ar1.ToString("D")}-{ar2.ToString("D")}={ar3.ToString("D")}");
                 }
-                
             }
         }
 

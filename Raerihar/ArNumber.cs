@@ -169,7 +169,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         }
 
         private ArNumber(long bytesCount, long e, bool isNegative)
-        {   
+        {
             SetExponent(e);
             _Numbers = new byte[bytesCount];
             Negative = isNegative;
@@ -220,7 +220,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         //    int tail = PostiveRemainder(Exponent + 1, 9);
         //    return (int)(1 + (DigitsCount - tail) / 9 + ((DigitsCount - tail) % 9 <= 0 ? 0 : 1));
         //}
-   
+
         private long GetBits(long digitsLength)
         {
             int tail = PostiveRemainder(Exponent + 1, 9);
@@ -264,7 +264,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             if (!BitConverter.IsLittleEndian && result.Length != 1)
                 result = Reverse(result);
             result[result.Length - 1] = (byte)(result[result.Length - 1] << 4);
-            if(_Data != null && _Data.Length != 0)
+            if (_Data != null && _Data.Length != 0)
                 result[result.Length - 1] |= (byte)(_Data[_Data.Length - 1] & 15);
             _Data = result;
         }
@@ -272,7 +272,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public void SetNumberBlock(int index, uint value, int digitsCount)
         {
             //已使用多少Bit
-            long bitUsed = index == 0 ? 1 : (index - 1) * 30 + 
+            long bitUsed = index == 0 ? 1 : (index - 1) * 30 +
                 ((_Data[_Data.Length - 1] & 15) * 10 + 2) / 3 + 1;
             //從哪個Byte開始
             int j = (int)(bitUsed / 8);
@@ -380,7 +380,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             ArNumber result = new ArNumber();
             Parse(s, result, style, provider);
             return result;
-        }     
+        }
         private static void Parse(string s, ArNumber a, NumberStyles style = NumberStyles.None, IFormatProvider provider = null)
         {
             if (string.IsNullOrEmpty(s))
@@ -462,13 +462,13 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         }
         private static void LoadInteger(string numberStringWithSign, ArNumber a)
         {
-            bool isNegative = false;
-            long e = numberStringWithSign.Length - 1;
+            bool isNegative = false;            
             if (numberStringWithSign[0] == '-')
             {
                 isNegative = true;
                 numberStringWithSign = numberStringWithSign.Remove(0, 1);
             }
+            long e = numberStringWithSign.Length - 1;
             while (numberStringWithSign.Length > 9 && numberStringWithSign.Substring(numberStringWithSign.Length - 9, 9) == "000000000")
                 numberStringWithSign = numberStringWithSign.Remove(numberStringWithSign.Length - 9, 9);
             if (numberStringWithSign == "0")
@@ -495,7 +495,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             for (int i = 0; digitIndex > 0; i++)
             {
                 if (i == 0)
-                {   
+                {
                     if ((numberString.Length - pr) % 9 != 0)
                         substractedDigits = (numberString.Length - pr) % 9;
                     else if (numberString.Length < 9)
@@ -525,17 +525,55 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public static bool IsInteger(ArNumber a)
             => a.Exponent - a.DigitsCount + 1 >= 0;
 
-        private static long CountBytes(List<uint> sumList)
+        private static long RetouchAndCountBytes(List<uint> sumList)
         {
+            while (sumList[0] == 0)
+                sumList.RemoveAt(0);
+
             if (sumList.Count == 1)
                 return ((sumList[0].ToString().Length * 10 + 2) / 3 + 8) / 8;
             else
-                return ((sumList[sumList.Count - 1].ToString().Length * 10 + 2) / 3 + 
+                return ((sumList[sumList.Count - 1].ToString().Length * 10 + 2) / 3 +
                     30 * (sumList.Count - 1) + 8) / 8;
         }
-            
-        public static ArNumber Add(ArNumber a, ArNumber b)
+
+        public static ArNumber Negate(ArNumber a)
         {
+            ArNumber result = new ArNumber(a);
+            result.Negative = !result.Negative;
+            return result;
+        }
+
+        static int loop = 0;
+
+        private static ArNumber AddMinus(ArNumber a, ArNumber b, bool isAdd = true)
+        {   
+            if (loop > 100)
+            {
+                Console.WriteLine("Loop");
+                return -1;
+            }
+                
+            if (isAdd)
+            {
+                loop++;
+                if (a.Negative && !b.Negative)
+                    return AddMinus(b, Negate(a), false);
+                else if (!a.Negative && b.Negative)
+                    return AddMinus(a, Negate(b), false);
+            }
+            else
+            {
+                loop++;
+                if ((a.Negative && !b.Negative) || (!a.Negative && b.Negative))
+                    return AddMinus(a, Negate(b), true);
+                else if (b > a && !a.Negative && !b.Negative)
+                    return AddMinus(Negate(b), Negate(a), false);
+                else if (a > b && a.Negative && b.Negative)
+                    return AddMinus(Negate(b), Negate(a), false);
+            }
+            //a will > b when Minus
+            loop = 0;
             long a_e = a.Exponent;
             int a_tail = PostiveRemainder(a_e + 1, 9);
             long a_digitsCount = a.DigitsCount;
@@ -567,7 +605,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             long e = lastE;
             long sum = 0;
             int i = 0, j = 0;
-            uint plusA, plusB;
+            int plusA, plusB;
             int carry = 0;
             int digitsA;
             int digitsB;
@@ -579,21 +617,21 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                     if (i == 0)
                     {
                         digitsA = a._Data[a._Data.Length - 1] & 15;
-                        plusA = a.GetNumberBlock(i, digitsA);
+                        plusA = (int)a.GetNumberBlock(i, digitsA);
                         if (a_e + 1 - a_digitsCount < 0)
-                            plusA *= (uint)Math.Pow(10, 9 - digitsA);
+                            plusA *= (int)Math.Pow(10, 9 - digitsA);
                     }
                     else if (i == a_indexCount - 1)
                     {
                         digitsA = a_tail;
-                        plusA = a.GetNumberBlock(i, digitsA);
+                        plusA = (int)a.GetNumberBlock(i, digitsA);
                     }
                     else
                     {
                         if (i > b_indexCount - 1)
                             Console.WriteLine("OOOOA");
                         digitsA = 9;
-                        plusA = a.GetNumberBlock(i, digitsA);
+                        plusA = (int)a.GetNumberBlock(i, digitsA);
                     }
                     i++;
                 }
@@ -604,36 +642,44 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                     if (j == 0)
                     {
                         digitsB = b._Data[b._Data.Length - 1] & 15;
-                        plusB = b.GetNumberBlock(j, digitsB);
+                        plusB = (int)b.GetNumberBlock(j, digitsB);
                         if (b_e + 1 - b_digitsCount < 0)
-                            plusB *= (uint)Math.Pow(10, 9 - digitsB);
+                            plusB *= (int)Math.Pow(10, 9 - digitsB);
                     }
                     else if (j == b_indexCount - 1)
                     {
                         digitsB = b_tail;
-                        plusB = b.GetNumberBlock(j, digitsB);
+                        plusB = (int)b.GetNumberBlock(j, digitsB);
                     }
                     else
                     {
                         if (j > b_indexCount - 1)
                             Console.WriteLine("OOOOB");
                         digitsB = 9;
-                        plusB = b.GetNumberBlock(j, digitsB);
+                        plusB = (int)b.GetNumberBlock(j, digitsB);
                     }
                     j++;
                 }
                 else
                     plusB = 0;
 
-                sum = plusA + plusB + carry;
+                if (isAdd)
+                    sum = plusA + plusB + carry;
+                else
+                    sum = plusA - plusB + carry;
                 if (sum > 999999999)
                 {
                     sum -= 1000000000;
                     carry = 1;
                 }
+                else if (sum < 0)
+                {
+                    sum += 1000000000;
+                    carry = -1;
+                }
                 else
                     carry = 0;
-                
+
                 sumList.Add((uint)sum);
                 e += 9;
             }
@@ -643,8 +689,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             else
                 e -= 10 - sum.ToString().Length;
 
-            ArNumber result = new ArNumber(CountBytes(sumList), e, a.Negative);
-            if(sumList.Count == 1)
+            ArNumber result = new ArNumber(RetouchAndCountBytes(sumList), e, a.Negative);
+            if (sumList.Count == 1)
             {
                 result.SetNumberBlock(0, sumList[0], sumList[0].ToString().Length);
                 return result;
@@ -660,7 +706,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             StringBuilder numbers = new StringBuilder();
             int tail = PostiveRemainder(Exponent + 1, 9);
             long digitsCount = DigitsCount;
-            
+
             if (tail > digitsCount)
                 tail = (int)digitsCount;
             else if (tail == 0)
@@ -754,11 +800,11 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             switch (format[0])
             {
                 // TO DO
-                case 'C':                   
-                case 'D':                   
-                case 'F':                   
+                case 'C':
+                case 'D':
+                case 'F':
                 case 'N':
-                case 'P':                
+                case 'P':
                 case 'X':
                 case 'E':
                 case 'G':
@@ -790,7 +836,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 return 1;
             else if (Negative && !other.Negative)
                 return -1;
-            int result = Negative && Negative ? -1 : 1;
+            int result = Negative && other.Negative ? -1 : 1;
             if (Exponent > other.Exponent)
                 return result;
             else if (Exponent < other.Exponent)
@@ -923,6 +969,11 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             => a.Equals(b);
         public static bool operator !=(ArNumber a, ArNumber b)
             => !a.Equals(b);
+
+        public static ArNumber operator +(ArNumber a, ArNumber b)
+            => AddMinus(a, b);
+        public static ArNumber operator -(ArNumber a, ArNumber b)
+            => AddMinus(a, b, false);
     }
 }
 
