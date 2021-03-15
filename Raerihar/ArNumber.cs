@@ -177,8 +177,12 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 
         public ArNumber(ArNumber a)
         {
-            _Data = a._Data;
-            _Numbers = a._Numbers;
+            _Data = new byte[a._Data.Length];
+            for (int i = 0; i < a._Data.Length; i++)
+                _Data[i] = a._Data[i];
+            _Numbers = new byte[a._Numbers.Length];
+            for (int i = 0; i < a._Numbers.Length; i++)
+                _Numbers[i] = a._Numbers[i];
         }
 
         public ArNumber(sbyte value)

@@ -20,8 +20,8 @@ namespace RaeriharTest
             ArNumber br;
             for (int i = 0; i < 10000; i++)
             {
-                ar = cb.DrawOutDecimal();
-                br = cb.DrawOutDecimal();
+                ar = cb.DrawOutDecimal(true);
+                br = cb.DrawOutDecimal(true);
                 if (ar > br)
                     TestContext.WriteLine($"{ar}>{br}");
                 else
