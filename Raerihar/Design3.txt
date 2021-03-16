@@ -1,0 +1,24 @@
+﻿V4 Design
+
+_Data
+Exponent 4 bit 12bit 28bit 60bit
+Last 4 bit
+0        byte
+1~9      BigNumberHead
+10	     int.int (放置)
+11		 short
+12		 int
+13		 long
+14		 double
+15		 (reserve)
+
+_Numbers 
+0 1 byte
+10 8 bytes
+11 2 bytes
+12 4 bytes
+13 8 bytes
+14 8 bytes
+1~9 first 1 sign 倒序排列
+300存為 => 300 E+2
+0.4存為 => 4   E-1

@@ -47,10 +47,14 @@ namespace RaeriharTest
             a = a + 0.1;
             Console.WriteLine(a.DigitsCount);
             ArNumber plus = 0.1;
-            for (ArNumber i = 100; i < 10000; i = i + plus)
+            ArNumber i;
+            for (i = 100; i < 10000; i = i + plus)
             {
                 Console.WriteLine(i);
             }
+
+            for (i = 0; i < 100; i++)
+                ;
 
             //ArNumber a = 3.87699078E+98;
             //ArNumber test = a - a;

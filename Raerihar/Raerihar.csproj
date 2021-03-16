@@ -17,6 +17,7 @@
   <ItemGroup>
     <None Remove="ArNumber.cs.old" />
     <None Remove="ArNumber2.cs.old" />
+    <None Remove="ArNumber3.cs.old" />
   </ItemGroup>
 
   <ItemGroup>
