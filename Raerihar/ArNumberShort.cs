@@ -1,33 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 
 namespace Aritiafel.Organizations.RaeriharUniversity
 {
-    public sealed class ArNumberByte : ArNumber
+    public sealed class ArNumberShort : ArNumber
     {
-        private byte _Number;        
-        public const byte MaxValue = 255;
-        public const byte MinValue = 0;
-        public ArNumberByte(byte value)
+        private short _Number;        
+        public const short MaxValue = 32767;
+        public const short MinValue = -32768;
+        public ArNumberShort(short value)
             => _Number = value;
-        public static ArNumberByte Parse(string s)
+        public static ArNumberShort Parse(string s)
             => Parse(s, NumberStyles.Number, null);
-        public static ArNumberByte Parse(string s, IFormatProvider provider)
+        public static ArNumberShort Parse(string s, IFormatProvider provider)
             => Parse(s, NumberStyles.Number, provider);
-        public static ArNumberByte Parse(string s, NumberStyles style)
+        public static ArNumberShort Parse(string s, NumberStyles style)
             => Parse(s, style, null);
-        public static ArNumberByte Parse(string s, NumberStyles style, IFormatProvider provider)
-            => new ArNumberByte(byte.Parse(s, style, provider));
-        public static bool TryParse(string s, out ArNumberByte result)
+        public static ArNumberShort Parse(string s, NumberStyles style, IFormatProvider provider)
+            => new ArNumberShort(short.Parse(s, style, provider));
+        public static bool TryParse(string s, out ArNumberShort result)
             => TryParse(s, NumberStyles.Number, null, out result);
-        public static bool TryParse(string s, NumberStyles style, IFormatProvider provider, out ArNumberByte result)
+        public static bool TryParse(string s, NumberStyles style, IFormatProvider provider, out ArNumberShort result)
         {
             result = null;
-            if (!byte.TryParse(s, style, provider, out byte b))
+            if (!short.TryParse(s, style, provider, out short b))
                 return false;
-            result = new ArNumberByte(b);
+            result = new ArNumberShort(b);
             return true;
         }
         public int CompareTo(object value)
@@ -37,9 +35,9 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         }
         public int CompareTo(byte value)
             => _Number.CompareTo(value);
-        public int CompareTo(ArNumberByte value)
+        public int CompareTo(ArNumberShort value)
             => _Number.CompareTo(value._Number);
-        public bool Equals(ArNumberByte value)
+        public bool Equals(ArNumberShort value)
             => _Number.Equals(value._Number);
         public override bool Equals(object value)
         {
@@ -59,9 +57,9 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public string ToString(string format, IFormatProvider provider)
             => _Number.ToString(format, provider);
 
-        public static implicit operator ArNumberByte(byte a)
-            => new ArNumberByte(a);
-        public static implicit operator byte(ArNumberByte a)
+        public static implicit operator ArNumberShort(short a)
+            => new ArNumberShort(a);
+        public static implicit operator short(ArNumberShort a)
             => a._Number;
     }
 }

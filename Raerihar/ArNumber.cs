@@ -49,5 +49,11 @@ namespace Aritiafel.Organizations.RaeriharUniversity
     //        for (int i = 0; i < a._Numbers.Length; i++)
     //            _Numbers[i] = a._Numbers[i];
     //    }
+
+
+        public ArNumber Add(ArNumber b)
+        {
+            //return a;
+        }
     }
 }
