@@ -15,8 +15,15 @@ namespace RaeriharTest
         {
             //ArNumber ar = new ArNumber();
 
-         
-    
+            byte a = 20;
+            byte b = 30;
+            
+            Console.WriteLine(a + b);
+            Console.WriteLine(a - b);
+
+            ArNumberByte ab = new ArNumberByte(a);
+            ArNumberByte ab2 = new ArNumberByte(b);
+            Console.WriteLine( ab.Add(ab2));
         }
 
         //[TestMethod]

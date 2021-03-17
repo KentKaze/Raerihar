@@ -32,28 +32,56 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 {
     public class ArNumber
     {
-    //    private byte[] _Data;
-    //    private byte[] _Numbers;
+        //    private byte[] _Data;
+        //    private byte[] _Numbers;
 
-    //    public ArNumber()
-    //    {
-    //        _Data = new byte[1];            
-    //        _Numbers = new byte[1];
-    //    }
-    //    public ArNumber(ArNumber a)
-    //    {
-    //        _Data = new byte[a._Data.Length];
-    //        for (int i = 0; i < a._Data.Length; i++)
-    //            _Data[i] = a._Data[i];
-    //        _Numbers = new byte[a._Numbers.Length];
-    //        for (int i = 0; i < a._Numbers.Length; i++)
-    //            _Numbers[i] = a._Numbers[i];
-    //    }
+        //    public ArNumber()
+        //    {
+        //        _Data = new byte[1];            
+        //        _Numbers = new byte[1];
+        //    }
+        //    public ArNumber(ArNumber a)
+        //    {
+        //        _Data = new byte[a._Data.Length];
+        //        for (int i = 0; i < a._Data.Length; i++)
+        //            _Data[i] = a._Data[i];
+        //        _Numbers = new byte[a._Numbers.Length];
+        //        for (int i = 0; i < a._Numbers.Length; i++)
+        //            _Numbers[i] = a._Numbers[i];
+        //    }
 
+        public static ArNumber ConvertToArNumber(byte value)
+            => new ArNumberByte(value);
+        public static ArNumber ConvertToArNumber(short value) 
+            => new ArNumberByte((byte)value);             
+        public static ArNumber ConvertToArNumber(int value)
+        {
+            if (value <= byte.MaxValue && value >= byte.MinValue)
+                return new ArNumberByte((byte)value);
+            else if(value <= short.MaxValue && value >= short.MinValue)
+                return new ArNumberShort((short)value);
+            return new ArNumberInt(value);
+        }
+            
+        public static ArNumber ConvertToArNumber(long value)
+        {
+            if (value <= byte.MaxValue && value >= byte.MinValue)
+                return new ArNumberByte((byte)value);
+            else if (value <= short.MaxValue && value >= short.MinValue)
+                return new ArNumberShort((short)value);
+            else if (value <= int.MaxValue && value >= int.MinValue)
+                return new ArNumberInt((int)value);
+            return new ArNumberLong(value);
+        }
+            
+        //public ArNumber ConvertToArNumber(byte value)
+        //    => new ArNumberByte(value);
+        //public ArNumber ConvertToArNumber(byte value)
+        //    => new ArNumberByte(value);
 
         public ArNumber Add(ArNumber b)
         {
-            //return a;
+            return this;
         }
     }
 }

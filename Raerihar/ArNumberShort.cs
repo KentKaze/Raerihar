@@ -47,7 +47,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public override int GetHashCode()
             => _Number.GetHashCode();
         public TypeCode GetTypeCode()
-            => TypeCode.Byte; // Research
+            => TypeCode.Int16; // Research
         public override string ToString()
             => ToString(null, null);
         public string ToString(IFormatProvider provider)

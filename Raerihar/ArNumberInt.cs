@@ -5,29 +5,29 @@ using System.Text;
 
 namespace Aritiafel.Organizations.RaeriharUniversity
 {
-    public sealed class ArNumberByte : ArNumber
+    public sealed class ArNumberInt : ArNumber
     {
-        private byte _Number;        
-        public const byte MaxValue = 255;
-        public const byte MinValue = 0;
-        public ArNumberByte(byte value)
+        private int _Number;        
+        public const int MaxValue = 2147483647;
+        public const int MinValue = -2147483648;
+        public ArNumberInt(int value)
             => _Number = value;
-        public static ArNumberByte Parse(string s)
+        public static ArNumberInt Parse(string s)
             => Parse(s, NumberStyles.Number, null);
-        public static ArNumberByte Parse(string s, IFormatProvider provider)
+        public static ArNumberInt Parse(string s, IFormatProvider provider)
             => Parse(s, NumberStyles.Number, provider);
-        public static ArNumberByte Parse(string s, NumberStyles style)
+        public static ArNumberInt Parse(string s, NumberStyles style)
             => Parse(s, style, null);
-        public static ArNumberByte Parse(string s, NumberStyles style, IFormatProvider provider)
-            => new ArNumberByte(byte.Parse(s, style, provider));
-        public static bool TryParse(string s, out ArNumberByte result)
+        public static ArNumberInt Parse(string s, NumberStyles style, IFormatProvider provider)
+            => new ArNumberInt(byte.Parse(s, style, provider));
+        public static bool TryParse(string s, out ArNumberInt result)
             => TryParse(s, NumberStyles.Number, null, out result);
-        public static bool TryParse(string s, NumberStyles style, IFormatProvider provider, out ArNumberByte result)
+        public static bool TryParse(string s, NumberStyles style, IFormatProvider provider, out ArNumberInt result)
         {
             result = null;
-            if (!byte.TryParse(s, style, provider, out byte b))
+            if (!int.TryParse(s, style, provider, out int i))
                 return false;
-            result = new ArNumberByte(b);
+            result = new ArNumberInt(i);
             return true;
         }
         public int CompareTo(object value)
@@ -35,11 +35,11 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             //To Do
             return 1;
         }
-        public int CompareTo(byte value)
+        public int CompareTo(int value)
             => _Number.CompareTo(value);
-        public int CompareTo(ArNumberByte value)
+        public int CompareTo(ArNumberInt value)
             => _Number.CompareTo(value._Number);
-        public bool Equals(ArNumberByte value)
+        public bool Equals(ArNumberInt value)
             => _Number.Equals(value._Number);
         public override bool Equals(object value)
         {
@@ -58,16 +58,19 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             => ToString(format, null);
         public string ToString(string format, IFormatProvider provider)
             => _Number.ToString(format, provider);
-        private static ArNumber Add(ArNumberByte a, ArNumberByte b)
-            => ConvertToArNumber(a._Number + b._Number);
-        private static ArNumber Minus(ArNumberByte a, ArNumberByte b)
-            => ConvertToArNumber(a._Number - b._Number);
-        public ArNumber Add(ArNumberByte b)
-            => ConvertToArNumber(_Number + b._Number);
 
-        public static implicit operator ArNumberByte(byte a)
-            => new ArNumberByte(a);
-        public static implicit operator byte(ArNumberByte a)
+        private static ArNumber Add(ArNumberInt a, ArNumberInt b)
+            => ConvertToArNumber(a._Number + b._Number);
+        private static ArNumber Minus(ArNumberInt a, ArNumberInt b)
+            => ConvertToArNumber(a._Number + b._Number);
+        public ArNumber Add(ArNumberInt b)
+        {
+            return this;
+        }
+
+        public static implicit operator ArNumberInt(int a)
+            => new ArNumberInt(a);
+        public static implicit operator int(ArNumberInt a)
             => a._Number;
     }
 }
