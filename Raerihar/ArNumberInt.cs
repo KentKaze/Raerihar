@@ -10,6 +10,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         private int _Number;        
         public const int MaxValue = 2147483647;
         public const int MinValue = -2147483648;
+        public override object Integer => _Number;
+        public override object Fraction => 0;
         public ArNumberInt(int value)
             => _Number = value;
         public static ArNumberInt Parse(string s)
@@ -67,6 +69,10 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         {
             return this;
         }
+
+        public override ArNumber Add(ArNumber b)
+            => b.ReverseAdd(this);
+    
 
         public static implicit operator ArNumberInt(int a)
             => new ArNumberInt(a);

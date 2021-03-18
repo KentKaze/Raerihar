@@ -30,26 +30,10 @@ using System.Text;
 
 namespace Aritiafel.Organizations.RaeriharUniversity
 {
-    public class ArNumber
+    public abstract class ArNumber
     {
-        //    private byte[] _Data;
-        //    private byte[] _Numbers;
-
-        //    public ArNumber()
-        //    {
-        //        _Data = new byte[1];            
-        //        _Numbers = new byte[1];
-        //    }
-        //    public ArNumber(ArNumber a)
-        //    {
-        //        _Data = new byte[a._Data.Length];
-        //        for (int i = 0; i < a._Data.Length; i++)
-        //            _Data[i] = a._Data[i];
-        //        _Numbers = new byte[a._Numbers.Length];
-        //        for (int i = 0; i < a._Numbers.Length; i++)
-        //            _Numbers[i] = a._Numbers[i];
-        //    }
-
+        public abstract object Integer { get; }
+        public abstract object Fraction { get; }
         public static ArNumber ConvertToArNumber(byte value)
             => new ArNumberByte(value);
         public static ArNumber ConvertToArNumber(short value) 
@@ -60,7 +44,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 return new ArNumberByte((byte)value);
             else if(value <= short.MaxValue && value >= short.MinValue)
                 return new ArNumberShort((short)value);
-            return new ArNumberInt(value);
+            return new ArNumberInt(value);            
         }
             
         public static ArNumber ConvertToArNumber(long value)
@@ -73,15 +57,70 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 return new ArNumberInt((int)value);
             return new ArNumberLong(value);
         }
-            
+
+        protected abstract ArNumber ReverseAdd(ArNumber b);
+        protected abstract ArNumber ReverseMinus(ArNumber b);
+        protected abstract ArNumber ReverseMultiply(ArNumber b);
+        protected abstract ArNumber ReverseQuotient(ArNumber b);
+        protected abstract ArNumber ReverseDivide(ArNumber b);
+        protected abstract ArNumber ReverseRemainder(ArNumber b);
+        public abstract ArNumber Add(ArNumberByte b);
+        public abstract ArNumber Add(ArNumberShort b);
+        public abstract ArNumber Add(ArNumberInt b);
+        public abstract ArNumber Add(ArNumberLong b);
+        public abstract ArNumber Add(ArNumberDecimal b);
+        public abstract ArNumber Add(ArNumberLongDecimal b);
+        public abstract ArNumber Add(ArNumberScientificNotation b);
+        public abstract ArNumber Minus(ArNumberByte b);
+        public abstract ArNumber Minus(ArNumberShort b);
+        public abstract ArNumber Minus(ArNumberInt b);
+        public abstract ArNumber Minus(ArNumberLong b);
+        public abstract ArNumber Minus(ArNumberDecimal b);
+        public abstract ArNumber Minus(ArNumberLongDecimal b);
+        public abstract ArNumber Minus(ArNumberScientificNotation b);
+        public abstract ArNumber Multiply(ArNumberByte b);
+        public abstract ArNumber Multiply(ArNumberShort b);
+        public abstract ArNumber Multiply(ArNumberInt b);
+        public abstract ArNumber Multiply(ArNumberLong b);
+        public abstract ArNumber Multiply(ArNumberDecimal b);
+        public abstract ArNumber Multiply(ArNumberLongDecimal b);
+        public abstract ArNumber Multiply(ArNumberScientificNotation b);
+        public abstract ArNumber Divide(ArNumberByte b);
+        public abstract ArNumber Divide(ArNumberShort b);
+        public abstract ArNumber Divide(ArNumberInt b);
+        public abstract ArNumber Divide(ArNumberLong b);
+        public abstract ArNumber Divide(ArNumberDecimal b);
+        public abstract ArNumber Divide(ArNumberLongDecimal b);
+        public abstract ArNumber Divide(ArNumberScientificNotation b);
+        public abstract ArNumber Quotient(ArNumberByte b);
+        public abstract ArNumber Quotient(ArNumberShort b);
+        public abstract ArNumber Quotient(ArNumberInt b);
+        public abstract ArNumber Quotient(ArNumberLong b);
+        public abstract ArNumber Quotient(ArNumberDecimal b);
+        public abstract ArNumber Quotient(ArNumberLongDecimal b);
+        public abstract ArNumber Quotient(ArNumberScientificNotation b);
+        public abstract ArNumber Remainder(ArNumberByte b);
+        public abstract ArNumber Remainder(ArNumberShort b);
+        public abstract ArNumber Remainder(ArNumberInt b);
+        public abstract ArNumber Remainder(ArNumberLong b);
+        public abstract ArNumber Remainder(ArNumberDecimal b);
+        public abstract ArNumber Remainder(ArNumberLongDecimal b);
+        public abstract ArNumber Remainder(ArNumberScientificNotation b);
+        public static ArNumber operator +(ArNumber a, ArNumber b)
+            => b.ReverseAdd(a);
+        public static ArNumber operator -(ArNumber a, ArNumber b)
+            => b.ReverseMinus(a);
+        public static ArNumber operator *(ArNumber a, ArNumber b)
+            => b.ReverseMultiply(a);
+        public static ArNumber operator /(ArNumber a, ArNumber b)
+            => b.ReverseQuotient(a);
+        public static ArNumber operator %(ArNumber a, ArNumber b)
+            => b.ReverseRemainder(a);
+
         //public ArNumber ConvertToArNumber(byte value)
         //    => new ArNumberByte(value);
         //public ArNumber ConvertToArNumber(byte value)
         //    => new ArNumberByte(value);
 
-        public ArNumber Add(ArNumber b)
-        {
-            return this;
-        }
     }
 }

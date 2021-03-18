@@ -13,7 +13,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 
         //public const ArNumberDecimal MaxValue = 2147483647.2147483647;
         //public const ArNumberDecimal MinValue = -2147483648.2147483648;
-
+        public override object Integer => _Integer;
+        public override object Fraction => _Fraction;
         public ArNumberLongDecimal()
             : this(0, 0)
         { }

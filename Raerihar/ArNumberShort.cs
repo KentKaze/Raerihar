@@ -8,6 +8,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         private short _Number;        
         public const short MaxValue = 32767;
         public const short MinValue = -32768;
+        public override object Integer => _Number;
+        public override object Fraction => 0;
         public ArNumberShort(short value)
             => _Number = value;
         public static ArNumberShort Parse(string s)

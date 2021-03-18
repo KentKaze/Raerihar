@@ -10,6 +10,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         private long _Number;        
         public const long MaxValue = 9223372036854775807;
         public const long MinValue = -9223372036854775808;
+        public override object Integer => _Number;
+        public override object Fraction => 0;
         public ArNumberLong(long value)
             => _Number = value;
         public static ArNumberLong Parse(string s)
