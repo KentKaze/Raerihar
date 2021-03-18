@@ -58,6 +58,20 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             return new ArNumberLong(value);
         }
 
+        public static ArNumber ConvertToArNumber(long integer, long fraction)
+        {
+            if (integer <= int.MinValue && integer >= int.MaxValue &&
+               fraction >= 0 && fraction <= ArNumberDecimal.MaxFraction)
+                return new ArNumberDecimal((int)integer, (int)fraction);
+            return new ArNumberLongDecimal(integer, fraction);
+        }
+
+        public static ArNumber ConvertToArNumber(ArNumberScientificNotation ansn)
+        {
+            return null;
+            //To Do
+        }
+
         protected abstract ArNumber ReverseAdd(ArNumber b);
         protected abstract ArNumber ReverseMinus(ArNumber b);
         protected abstract ArNumber ReverseMultiply(ArNumber b);

@@ -126,39 +126,68 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         protected override ArNumber ReverseRemainder(ArNumber b)
             => b.Remainder(this);
         public override ArNumber Add(ArNumberByte b)
-            => throw new NotImplementedException();
+            => ConvertToArNumber(_Integer + b, _Fraction);
         public override ArNumber Add(ArNumberShort b)
-            => throw new NotImplementedException();
+            => ConvertToArNumber(_Integer + b, _Fraction);
         public override ArNumber Add(ArNumberInt b)
-            => throw new NotImplementedException();
+            => ConvertToArNumber(_Integer + b, _Fraction);
         public override ArNumber Add(ArNumberLong b)
             => throw new NotImplementedException();
         public override ArNumber Add(ArNumberDecimal b)
-            => throw new NotImplementedException();
+        {   
+            int f = _Fraction + b._Fraction;
+            long i = _Integer + b._Integer;
+            if (f > MaxFraction)
+            {
+                f -= MaxFraction;
+                i++;
+            }
+            else if(f < 0)
+            {
+                f += MaxFraction;
+                i--;
+            }   
+            return ConvertToArNumber(i, f);
+        }
+            
         public override ArNumber Add(ArNumberLongDecimal b)
             => throw new NotImplementedException();
         public override ArNumber Add(ArNumberScientificNotation b)
             => new ArNumberScientificNotation(this) + b;
         public override ArNumber Minus(ArNumberByte b)
-            => throw new NotImplementedException();
+            => ConvertToArNumber(_Integer - b, _Fraction);
         public override ArNumber Minus(ArNumberShort b)
-            => throw new NotImplementedException();
+            => ConvertToArNumber(_Integer - b, _Fraction);
         public override ArNumber Minus(ArNumberInt b)
-            => throw new NotImplementedException();
+            => ConvertToArNumber(_Integer - b, _Fraction);
         public override ArNumber Minus(ArNumberLong b)
             => throw new NotImplementedException();
         public override ArNumber Minus(ArNumberDecimal b)
-            => throw new NotImplementedException();
+        {
+            int f = _Fraction - b._Fraction;
+            long i = _Integer - b._Integer;
+            if (f > MaxFraction)
+            {
+                f -= MaxFraction;
+                i++;
+            }
+            else if (f < 0)
+            {
+                f += MaxFraction;
+                i--;
+            }
+            return ConvertToArNumber(i, f);
+        }
         public override ArNumber Minus(ArNumberLongDecimal b)
             => throw new NotImplementedException();
         public override ArNumber Minus(ArNumberScientificNotation b)
             => new ArNumberScientificNotation(this) - b;
         public override ArNumber Multiply(ArNumberByte b)
-            => throw new NotImplementedException();
+            => ConvertToArNumber(_Integer * b, _Fraction);
         public override ArNumber Multiply(ArNumberShort b)
-            => throw new NotImplementedException();
+            => ConvertToArNumber(_Integer * b, _Fraction);
         public override ArNumber Multiply(ArNumberInt b)
-            => throw new NotImplementedException();
+            => ConvertToArNumber(_Integer * b, _Fraction);
         public override ArNumber Multiply(ArNumberLong b)
             => throw new NotImplementedException();
         public override ArNumber Multiply(ArNumberDecimal b)
