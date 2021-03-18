@@ -60,7 +60,6 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             => ToString(format, null);
         public string ToString(string format, IFormatProvider provider)
             => _Number.ToString(format, provider);
-
         protected override ArNumber ReverseAdd(ArNumber b)
              => b.Add(this);
         protected override ArNumber ReverseMinus(ArNumber b)
