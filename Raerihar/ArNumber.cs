@@ -85,13 +85,6 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public abstract ArNumber Multiply(ArNumberDecimal b);
         public abstract ArNumber Multiply(ArNumberLongDecimal b);
         public abstract ArNumber Multiply(ArNumberScientificNotation b);
-        public abstract ArNumber Divide(ArNumberByte b);
-        public abstract ArNumber Divide(ArNumberShort b);
-        public abstract ArNumber Divide(ArNumberInt b);
-        public abstract ArNumber Divide(ArNumberLong b);
-        public abstract ArNumber Divide(ArNumberDecimal b);
-        public abstract ArNumber Divide(ArNumberLongDecimal b);
-        public abstract ArNumber Divide(ArNumberScientificNotation b);
         public abstract ArNumber Quotient(ArNumberByte b);
         public abstract ArNumber Quotient(ArNumberShort b);
         public abstract ArNumber Quotient(ArNumberInt b);
@@ -99,6 +92,13 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public abstract ArNumber Quotient(ArNumberDecimal b);
         public abstract ArNumber Quotient(ArNumberLongDecimal b);
         public abstract ArNumber Quotient(ArNumberScientificNotation b);
+        public abstract ArNumber Divide(ArNumberByte b);
+        public abstract ArNumber Divide(ArNumberShort b);
+        public abstract ArNumber Divide(ArNumberInt b);
+        public abstract ArNumber Divide(ArNumberLong b);
+        public abstract ArNumber Divide(ArNumberDecimal b);
+        public abstract ArNumber Divide(ArNumberLongDecimal b);
+        public abstract ArNumber Divide(ArNumberScientificNotation b);
         public abstract ArNumber Remainder(ArNumberByte b);
         public abstract ArNumber Remainder(ArNumberShort b);
         public abstract ArNumber Remainder(ArNumberInt b);
