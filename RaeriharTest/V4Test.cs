@@ -17,13 +17,32 @@ namespace RaeriharTest
 
             byte a = 20;
             byte b = 30;
-            
+            long l = long.MaxValue;
             Console.WriteLine(a + b);
             Console.WriteLine(a - b);
 
             ArNumberByte ab = new ArNumberByte(a);
             ArNumberByte ab2 = new ArNumberByte(b);
-            Console.WriteLine( ab.Add(ab2));
+            Console.WriteLine(ab.Add(ab2));
+
+            Console.WriteLine((decimal)l + a);
+        }
+
+        [TestMethod]
+        public void DecimalTest()
+        {
+            ArNumberDecimal and = new ArNumberDecimal(6.6);
+            TestContext.WriteLine(and.ToString());
+            and = new ArNumberDecimal(900006);
+            TestContext.WriteLine(and.ToString());
+            and = new ArNumberDecimal(0.00054984);
+            TestContext.WriteLine(and.ToString());
+            
+            Assert.ThrowsException<FormatException>(() => {
+                and = new ArNumberDecimal(0.0000000009899898899988);
+                and.ToString();
+            });
+            //TestContext.WriteLine(and.ToString());
         }
 
         //[TestMethod]

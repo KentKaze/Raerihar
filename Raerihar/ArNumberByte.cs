@@ -51,7 +51,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 return false;
             if (!(value is ArNumberByte b))
                 return false;
-            return _Number == b._Number;
+            return Equals(b);
         }
         public override int GetHashCode()
             => _Number.GetHashCode();

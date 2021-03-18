@@ -8,11 +8,13 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 
     public class ArNumberLongDecimal : ArNumber
     {
-        private long _IntegralNumber;
-        private long _FractionalNumber;
+        private long _Integer;
+        private long _Fraction;
 
-        //public const ArNumberDecimal MaxValue = 2147483647.2147483647;
-        //public const ArNumberDecimal MinValue = -2147483648.2147483648;
+        public const long MaxFraction = 999999999999999999;
+        public const long MinFraction = 0;
+        public const long MaxInteger = 9223372036854775807;
+        public const long MinInteger = -9223372036854775808;
         public override object Integer => _Integer;
         public override object Fraction => _Fraction;
         public ArNumberLongDecimal()
@@ -21,13 +23,13 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 
         public ArNumberLongDecimal(long integer, long fraction)
         {
-            _IntegralNumber = integer;
-            _FractionalNumber = Math.Abs(fraction);
+            _Integer = integer;
+            _Fraction = Math.Abs(fraction);
         }
         public ArNumberLongDecimal(ArNumberLongDecimal and)
         {
-            _IntegralNumber = and._IntegralNumber;
-            _FractionalNumber = and._FractionalNumber;
+            _Integer = and._Integer;
+            _Fraction = and._Fraction;
         }
         public static ArNumberLongDecimal Parse(string s)
             => Parse(s, NumberStyles.Number, null);
@@ -36,19 +38,24 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public static ArNumberLongDecimal Parse(string s, NumberStyles style)
             => Parse(s, style, null);
         public static ArNumberLongDecimal Parse(string s, NumberStyles style, IFormatProvider provider)
+            => Parse(new ArNumberLongDecimal(), s, style, provider);
+        private static ArNumberLongDecimal Parse(ArNumberLongDecimal anld, string s)
+            => Parse(anld, s, NumberStyles.Number, null);
+        private static ArNumberLongDecimal Parse(ArNumberLongDecimal anld, string s, NumberStyles style, IFormatProvider provider)
         {
-            ArNumberLongDecimal and = new ArNumberLongDecimal();
+            anld._Integer = 0;
+            anld._Fraction = 0;
             if (s.Contains("."))
             {
-                string[] splited = s.Split('.');
-                and._IntegralNumber = long.Parse(splited[0]);
-                and._FractionalNumber = long.Parse(splited[1]);
-                return and;
+                string[] split = s.Split('.');
+                anld._Integer = long.Parse(split[0]);
+                anld._Fraction = Math.Abs(long.Parse(split[1].PadRight(18, '0').Substring(0, 18))); //To Do: Round
+                return anld;
             }
             else
             {
-                and._IntegralNumber = long.Parse(s, style, provider);
-                return and;
+                anld._Integer = int.Parse(s, style, provider);
+                return anld;
             }
         }
 
@@ -69,20 +76,25 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         }
         public int CompareTo(ArNumberLongDecimal value)
         {
-            int c = _IntegralNumber.CompareTo(value._IntegralNumber);
+            int c = _Integer.CompareTo(value._Integer);
             if (c != 0)
                 return c;
-            return _FractionalNumber.CompareTo(value._FractionalNumber;
+            return _Fraction.CompareTo(value._Fraction);
         }
         public bool Equals(ArNumberLongDecimal value)
-            => _IntegralNumber == value._IntegralNumber && _FractionalNumber == value._FractionalNumber;
+            => _Integer == value._Integer && _Fraction == value._Fraction;
         public override bool Equals(object value)
         {
-            //To Do
-            return false;
+            if (ReferenceEquals(this, value))
+                return true;
+            if (value is null)
+                return false;
+            if (!(value is ArNumberLongDecimal b))
+                return false;
+            return Equals(b);
         }
         public override int GetHashCode()
-            => _IntegralNumber.GetHashCode() ^ _FractionalNumber.GetHashCode();
+            => _Integer.GetHashCode() ^ _Fraction.GetHashCode();
         public TypeCode GetTypeCode()
             => TypeCode.Object;
         public override string ToString()
@@ -93,10 +105,10 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             => ToString(format, null);
         public string ToString(string format, IFormatProvider provider)
         {
-            if (_FractionalNumber != 0)
-                return $"{_IntegralNumber.ToString(format, provider)}.{_FractionalNumber.ToString(format, provider)}";
+            if (_Fraction != 0)
+                return $"{_Integer.ToString(format, provider)}.{_Fraction.ToString(format, provider).PadLeft(18, '0').TrimEnd('0')}";
             else
-                return _IntegralNumber.ToString(format, provider);
+                return _Integer.ToString(format, provider);
         }
 
         protected override ArNumber ReverseAdd(ArNumber b)
