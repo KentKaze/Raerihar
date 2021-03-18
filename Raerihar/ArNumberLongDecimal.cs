@@ -5,7 +5,6 @@ using System.Text;
 
 namespace Aritiafel.Organizations.RaeriharUniversity
 {
-
     public class ArNumberLongDecimal : ArNumber
     {
         private long _Integer;
@@ -207,6 +206,15 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             => throw new NotImplementedException();
         public override ArNumber Remainder(ArNumberScientificNotation b)
             => new ArNumberScientificNotation(this).Remainder(b);
+
+        public static implicit operator ArNumberLongDecimal(float a)
+            => new ArNumberLongDecimal(a);
+        public static implicit operator ArNumberLongDecimal(double a)
+            => new ArNumberLongDecimal(a);
+        public static implicit operator float(ArNumberLongDecimal a)
+            => float.Parse(a.ToString());
+        public static implicit operator double(ArNumberLongDecimal a)
+            => double.Parse(a.ToString());
     }
 }
 

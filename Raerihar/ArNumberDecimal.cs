@@ -20,9 +20,9 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             : this (0, 0)
         { }
         public ArNumberDecimal(double value)
-            => Parse(this, value.ToString("G16"));
+            => Parse(this, value.ToString("F16"));
         public ArNumberDecimal(float value)
-            => Parse(this, value.ToString("G7"));
+            => Parse(this, value.ToString("F7"));
         public ArNumberDecimal(int integer, int fraction)
         {
             _Integer = integer;
