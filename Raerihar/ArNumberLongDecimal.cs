@@ -123,55 +123,55 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         protected override ArNumber ReverseRemainder(ArNumber b)
             => b.Remainder(this);
         public override ArNumber Add(ArNumberByte b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this) + new ArNumberScientificNotation(b);
         public override ArNumber Add(ArNumberShort b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this) + new ArNumberScientificNotation(b);
         public override ArNumber Add(ArNumberInt b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this) + new ArNumberScientificNotation(b);
         public override ArNumber Add(ArNumberLong b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this) + new ArNumberScientificNotation(b);            
         public override ArNumber Add(ArNumberDecimal b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this) + new ArNumberScientificNotation(b);
         public override ArNumber Add(ArNumberLongDecimal b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this) + new ArNumberScientificNotation(b);
         public override ArNumber Add(ArNumberScientificNotation b)
             => new ArNumberScientificNotation(this) + b;
         public override ArNumber Minus(ArNumberByte b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this) - new ArNumberScientificNotation(b);
         public override ArNumber Minus(ArNumberShort b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this) - new ArNumberScientificNotation(b);
         public override ArNumber Minus(ArNumberInt b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this) - new ArNumberScientificNotation(b);
         public override ArNumber Minus(ArNumberLong b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this) - new ArNumberScientificNotation(b);
         public override ArNumber Minus(ArNumberDecimal b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this) - new ArNumberScientificNotation(b);
         public override ArNumber Minus(ArNumberLongDecimal b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this) - new ArNumberScientificNotation(b);
         public override ArNumber Minus(ArNumberScientificNotation b)
             => new ArNumberScientificNotation(this) - b;
         public override ArNumber Multiply(ArNumberByte b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this) * new ArNumberScientificNotation(b);
         public override ArNumber Multiply(ArNumberShort b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this) * new ArNumberScientificNotation(b);
         public override ArNumber Multiply(ArNumberInt b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this) * new ArNumberScientificNotation(b);
         public override ArNumber Multiply(ArNumberLong b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this) * new ArNumberScientificNotation(b);
         public override ArNumber Multiply(ArNumberDecimal b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this) * new ArNumberScientificNotation(b);
         public override ArNumber Multiply(ArNumberLongDecimal b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this) * new ArNumberScientificNotation(b);
         public override ArNumber Multiply(ArNumberScientificNotation b)
             => new ArNumberScientificNotation(this) * b;
         public override ArNumber Quotient(ArNumberByte b)
-            => throw new NotImplementedException();
+            => ConvertToArNumber(_Integer / b, 0);
         public override ArNumber Quotient(ArNumberShort b)
-            => throw new NotImplementedException();
+            => ConvertToArNumber(_Integer / b, 0);
         public override ArNumber Quotient(ArNumberInt b)
-            => throw new NotImplementedException();
+            => ConvertToArNumber(_Integer / b, 0);
         public override ArNumber Quotient(ArNumberLong b)
-            => throw new NotImplementedException();
+            => ConvertToArNumber(_Integer / b, 0);
         public override ArNumber Quotient(ArNumberDecimal b)
             => throw new NotImplementedException();
         public override ArNumber Quotient(ArNumberLongDecimal b)

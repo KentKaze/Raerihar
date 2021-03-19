@@ -72,6 +72,11 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             //To Do
         }
 
+        //public static ArNumber LongDecimalAddLong(ArNumberLongDecimal anld, ArNumberLong anl)
+        //{
+
+        //}
+
         protected abstract ArNumber ReverseAdd(ArNumber b);
         protected abstract ArNumber ReverseMinus(ArNumber b);
         protected abstract ArNumber ReverseMultiply(ArNumber b);

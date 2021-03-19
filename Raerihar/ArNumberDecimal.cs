@@ -149,7 +149,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             }   
             return ConvertToArNumber(i, f);
         }
-            
+
         public override ArNumber Add(ArNumberLongDecimal b)
             => throw new NotImplementedException();
         public override ArNumber Add(ArNumberScientificNotation b)

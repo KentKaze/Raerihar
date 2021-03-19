@@ -54,6 +54,11 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public ArNumberScientificNotation(ArNumberLongDecimal value)
         { }
 
+        public ArNumberScientificNotation(int exponent, byte[] numbers)
+        {
+
+        }
+
         //TO DO
         public static ArNumber Divide(ArNumberScientificNotation a, ArNumberScientificNotation b)
             => throw new NotImplementedException();
