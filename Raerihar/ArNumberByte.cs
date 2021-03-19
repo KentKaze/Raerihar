@@ -86,9 +86,9 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public override ArNumber Add(ArNumberLong b)
             => ConvertToArNumber(_Number + (long)b.Integer);
         public override ArNumber Add(ArNumberDecimal b)
-            => throw new NotImplementedException();
+            => b.Add(this);
         public override ArNumber Add(ArNumberLongDecimal b)
-            => throw new NotImplementedException();
+            => b.Add(this);
         public override ArNumber Add(ArNumberScientificNotation b)
             => new ArNumberScientificNotation(this) + b;
         public override ArNumber Minus(ArNumberByte b)

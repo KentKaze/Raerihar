@@ -173,37 +173,37 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public override ArNumber Quotient(ArNumberLong b)
             => ConvertToArNumber(_Integer / b, 0);
         public override ArNumber Quotient(ArNumberDecimal b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this) / new ArNumberScientificNotation(b);
         public override ArNumber Quotient(ArNumberLongDecimal b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this) / new ArNumberScientificNotation(b);
         public override ArNumber Quotient(ArNumberScientificNotation b)
             => new ArNumberScientificNotation(this) / b;
         public override ArNumber Divide(ArNumberByte b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this).Divide(new ArNumberScientificNotation(b));            
         public override ArNumber Divide(ArNumberShort b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this).Divide(new ArNumberScientificNotation(b));
         public override ArNumber Divide(ArNumberInt b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this).Divide(new ArNumberScientificNotation(b));
         public override ArNumber Divide(ArNumberLong b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this).Divide(new ArNumberScientificNotation(b));
         public override ArNumber Divide(ArNumberDecimal b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this).Divide(new ArNumberScientificNotation(b));
         public override ArNumber Divide(ArNumberLongDecimal b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this).Divide(new ArNumberScientificNotation(b));
         public override ArNumber Divide(ArNumberScientificNotation b)
             => new ArNumberScientificNotation(this).Divide(b);
         public override ArNumber Remainder(ArNumberByte b)
-            => throw new NotImplementedException();
+            => ConvertToArNumber(_Integer % b, _Fraction);
         public override ArNumber Remainder(ArNumberShort b)
-            => throw new NotImplementedException();
+            => ConvertToArNumber(_Integer % b, _Fraction);
         public override ArNumber Remainder(ArNumberInt b)
-            => throw new NotImplementedException();
+            => ConvertToArNumber(_Integer % b, _Fraction);
         public override ArNumber Remainder(ArNumberLong b)
-            => throw new NotImplementedException();
+            => ConvertToArNumber(_Integer % b, _Fraction);
         public override ArNumber Remainder(ArNumberDecimal b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this).Remainder(new ArNumberScientificNotation(b));
         public override ArNumber Remainder(ArNumberLongDecimal b)
-            => throw new NotImplementedException();
+            => new ArNumberScientificNotation(this).Remainder(new ArNumberScientificNotation(b));
         public override ArNumber Remainder(ArNumberScientificNotation b)
             => new ArNumberScientificNotation(this).Remainder(b);
 
