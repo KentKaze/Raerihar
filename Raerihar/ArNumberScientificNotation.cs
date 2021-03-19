@@ -10,7 +10,12 @@ namespace Aritiafel.Organizations.RaeriharUniversity
     public class ArNumberScientificNotation : ArNumber
     {
         public bool Negative { get; set; }
-        private int _Exponent;
+        public long Exponent 
+        {
+            get => (_Numbers.Length + _BlockE - 1) * 9 
+                + _Numbers[_Numbers.Length - 1].ToString().Length - 1;            
+        }
+        private int _BlockE;
         private int[] _Numbers;
 
         public const int BlockMaxValue = 999999999;
@@ -27,7 +32,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public ArNumberScientificNotation(ArNumberScientificNotation value)
         {
             Negative = value.Negative;
-            _Exponent = value._Exponent;
+            _BlockE = value._BlockE;
             _Numbers = new int[value._Numbers.LongLength];
             for (long i = 0; i < value._Numbers.Length; i++)
                 _Numbers[i] = value._Numbers[i];
@@ -89,7 +94,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 
         internal ArNumberScientificNotation(int exponent, int[] numbers)
         {
-            _Exponent = exponent;
+            _BlockE = exponent;
             _Numbers = numbers;
         }
 
@@ -130,7 +135,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         {
             if (string.IsNullOrEmpty(s))
                 throw new ArgumentNullException(nameof(s));
-            bool isNegative = false;
+            an.Negative = false;
             long e;
 
             string numberString = s;
@@ -143,11 +148,10 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 numberString = numberString.Remove(0, 1);
             else if (numberString[0] == '-')
             {
-                isNegative = true;
+                an.Negative = true;
                 numberString = numberString.Remove(0, 1);
             }
-            while (numberString.Length > 1 && numberString[0] == '0')
-                numberString = numberString.Remove(0, 1);
+            numberString = numberString.TrimStart('0');
 
             for (int i = 0; i < numberString.Length; i++)
             {
@@ -187,7 +191,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 if (numberString.Length == 0)
                 {
                     an._Numbers = new int[1];
-                    an._Exponent = 0;
+                    an._BlockE = 0;
                     an.Negative = false;
                     return;
                 }
