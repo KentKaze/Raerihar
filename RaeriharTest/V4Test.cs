@@ -29,6 +29,81 @@ namespace RaeriharTest
         }
 
         [TestMethod]
+        public void SNTest()
+        {
+            ArNumberScientificNotation ar = new ArNumberScientificNotation();
+            string[] testStrings = {
+                    "-0.00589662145E-103", //0
+                    "-0.03611895678E+51", //1
+                    "-0000.0006871800", //2
+                    "35678943580000000000000000000000000000000", //3
+                    "+568.68100E-8", //4
+                    "-.00035E-20", //5
+                    "0.00", //6
+                    "-0.000", //7
+                    "+300", //8
+                    "-0.008", //9
+                    "0.00681E+98", //10
+                    "0.01", //11
+                    "0", //12
+                    "2170.6907744747728", //13
+                    "-0.445064895809216518E+18" //14
+                };
+
+            ar = ArNumberScientificNotation.Parse(testStrings[0]);
+            //TestContext.WriteLine(ar.ToString("E"));
+            //Assert.IsTrue(ar.ToString("E") == "-5.89662145E-106");
+            //ar = ArNumberScientificNotation.Parse(testStrings[1]);
+            ////TestContext.WriteLine(ar.ToString());
+            //Assert.IsTrue(ar.ToString("E") == "-3.611895678E+49");
+            ////TestContext.WriteLine(ar.ToString("D"));
+            //Assert.IsTrue(ar.ToString("D") == "-36118956780000000000000000000000000000000000000000");
+            //ar = ArNumberScientificNotation.Parse(testStrings[2]);
+            ////TestContext.WriteLine(ar.ToString("E"));
+
+            ////-0.000687180
+            //Assert.IsTrue(ar.ToString("E") == "-6.8718E-4");
+            //Assert.IsTrue(ar.ToString("D") == "0");
+            //Assert.IsTrue(ar.ToString("F") == "-0.00068718");
+            //ar = ArNumberScientificNotation.Parse(testStrings[3]);
+            //Assert.IsTrue(ar.ToString("E") == "3.567894358E+40");
+            //Assert.IsTrue(ar.ToString("D") == "35678943580000000000000000000000000000000");
+
+            //ar = ArNumberScientificNotation.Parse(testStrings[4]);
+            //Assert.IsTrue(ar.ToString("E") == "5.68681E-6");
+            //Assert.IsTrue(ar.ToString("F") == "0.00000568681");
+            ////TestContext.WriteLine(ar.ToString("C3"));
+            //Assert.IsTrue(ar.ToString("F3") == "0.00000568681"); // TO DO
+            //                                                     //Assert.IsTrue(sn.ToString("C3") == "0.00");            
+            //Assert.IsTrue(ar.ToString("D") == "0");
+            //ar = ArNumberScientificNotation.Parse(testStrings[5]);
+            //Assert.IsTrue(ar.ToString("E") == "-3.5E-24");
+            //ar = ArNumberScientificNotation.Parse(testStrings[6]);
+            //Assert.IsTrue(ar.ToString("E") == "0");
+            //Assert.IsTrue(ar.ToString("F") == "0");
+            //ar = ArNumberScientificNotation.Parse(testStrings[7]);
+            //Assert.IsTrue(ar.ToString("E") == "0");
+            //Assert.IsTrue(ar.ToString("F") == "0");
+            //ar = ArNumber.Parse(testStrings[8]);
+            ////TestContext.WriteLine(ar.ToString("E"));
+            //Assert.IsTrue(ar.ToString("E") == "3E+2");
+            //Assert.IsTrue(ar.ToString() == "300");
+            //ar = ArNumberScientificNotation.Parse(testStrings[9]);
+            //Assert.IsTrue(ar.ToString("E") == "-8E-3");
+            //Assert.IsTrue(ar.ToString() == "-0.008");
+            //ar = ArNumberScientificNotation.Parse(testStrings[10]);
+            //Assert.IsTrue(ar.ToString("E") == "6.81E+95");
+            //ar = ArNumberScientificNotation.Parse(testStrings[11]);
+            //Assert.IsTrue(ar.ToString("E") == "1E-2");
+            //ar = ArNumberScientificNotation.Parse(testStrings[12]);
+            //Assert.IsTrue(ar.ToString("E") == "0");
+            //ar = ArNumberScientificNotation.Parse(testStrings[13]);
+            //Assert.IsTrue(ar.ToString("F") == "2170.6907744747728");
+            //ar = ArNumberScientificNotation.Parse(testStrings[14]);
+            //Assert.IsTrue(ar.ToString("E") == "-4.45064895809216518E+17");
+        }
+
+        [TestMethod]
         public void DecimalTest()
         {
             ArNumberDecimal and = new ArNumberDecimal(6.6);

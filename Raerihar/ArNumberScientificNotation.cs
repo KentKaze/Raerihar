@@ -12,10 +12,10 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public bool Negative { get; set; }
         public long Exponent 
         {
-            get => (_Numbers.Length + _BlockE - 1) * 9 
+            get => (_Numbers.Length + _LastBlockE - 1) * 9 
                 + _Numbers[_Numbers.Length - 1].ToString().Length - 1;            
         }
-        private int _BlockE;
+        private int _LastBlockE;
         private int[] _Numbers;
 
         public const int BlockMaxValue = 999999999;
@@ -32,7 +32,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public ArNumberScientificNotation(ArNumberScientificNotation value)
         {
             Negative = value.Negative;
-            _BlockE = value._BlockE;
+            _LastBlockE = value._LastBlockE;
             _Numbers = new int[value._Numbers.LongLength];
             for (long i = 0; i < value._Numbers.Length; i++)
                 _Numbers[i] = value._Numbers[i];
@@ -92,10 +92,16 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             : this()
             => Parse(this, value.ToString());
 
-        internal ArNumberScientificNotation(int exponent, int[] numbers)
+        internal ArNumberScientificNotation(int lastE, int[] numbers)
         {
-            _BlockE = exponent;
+            _LastBlockE = lastE;
             _Numbers = numbers;
+        }
+
+        private static int PostiveRemainder(long a, int b)
+        {
+            int result = (int)(a % b);
+            return result >= 0 ? result : result + b;
         }
 
         public static bool TryParse(string s, out ArNumberScientificNotation result)
@@ -191,22 +197,42 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 if (numberString.Length == 0)
                 {
                     an._Numbers = new int[1];
-                    an._BlockE = 0;
+                    an._LastBlockE = 0;
                     an.Negative = false;
                     return;
                 }
-                e += pointIndex - 1;
-                while (numberString[0] == '0')
-                {
-                    numberString = numberString.Remove(0, 1);
-                    e--;
-                }
+                //e += pointIndex - 1;
+                e -= numberString.Length - pointIndex;
+                numberString = numberString.TrimStart('0');
+                //while (numberString[0] == '0')
+                //{
+                //    numberString = numberString.Remove(0, 1);
+                //    e--;
+                //}
             }
-            else
-                e += numberString.Length - 1;
-
+            //else
+            //    e += numberString.Length - 1;
+            //3.698783E+103
+            //3698783E+97
+            //36987 830000000E+90 => LastBlockE = E+90
             numberString = numberString.TrimEnd('0');
+            Read(numberString, an, e);
             //LoadStandardData(numberString, an, isNegative, e);
+        }
+
+        private static void Read(string numberString, ArNumberScientificNotation ansn, long lastE)
+        {
+            int r9 = PostiveRemainder(lastE, 9);
+            numberString = $"{numberString}{new string('0', r9)}";
+            lastE -= r9;
+            ansn._LastBlockE = (int)(lastE / 9);
+            ansn._Numbers = new int[(numberString.Length + 8) / 9];
+            for (int i = 0; i < ansn._Numbers.Length; i++)
+                if (i == ansn._Numbers.Length - 1)
+                    ansn._Numbers[i] = int.Parse(numberString.Substring(0, numberString.Length % 9 == 0 ? 9 : numberString.Length % 9));
+                else
+                    ansn._Numbers[i] = int.Parse(numberString.Substring(numberString.Length - 9 * i - 9, 9));
+                    
         }
         //private static void LoadInteger(string numberStringWithSign, ArNumber a)
         //{

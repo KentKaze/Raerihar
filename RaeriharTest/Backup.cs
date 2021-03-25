@@ -10,15 +10,9 @@ namespace RaeriharTest
         public TestContext TestContext { get; set; }
 
         [TestMethod]
-        public void BackupTest()
+        public void BackupMethod()
         {
-            string sourceDir = @"C:\Programs\Standard\Raerihar";
-            string targetDir = @"E:\Backup";
-
-            Residence rs = new Residence(targetDir);
-            rs.SaveVSSolution(sourceDir, false);
-
-            //Tina.SaveProject(ProjectChoice.Aritiafel);
+            Tina.SaveProject(ProjectChoice.RaeriharUniversity);            
         }
     }
 }
