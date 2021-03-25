@@ -10,7 +10,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
     public class ArNumberScientificNotation : ArNumber
     {
         public bool Negative { get; set; }
-        public long Exponent 
+        public int Exponent 
         {
             get => (_Numbers.Length + _LastBlockE - 1) * 9 
                 + _Numbers[_Numbers.Length - 1].ToString().Length - 1;            
@@ -157,7 +157,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 an.Negative = true;
                 numberString = numberString.Remove(0, 1);
             }
-            numberString = numberString.TrimStart('0');
+            if(numberString.Length > 1)
+                numberString = numberString.TrimStart('0');
 
             for (int i = 0; i < numberString.Length; i++)
             {
@@ -215,7 +216,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             //3.698783E+103
             //3698783E+97
             //36987 830000000E+90 => LastBlockE = E+90
-            numberString = numberString.TrimEnd('0');
+            //numberString = numberString.TrimEnd('0');
             Read(numberString, an, e);
             //LoadStandardData(numberString, an, isNegative, e);
         }
@@ -252,45 +253,127 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         //    }
         //    LoadStandardData(numberStringWithSign, a, isNegative, e);
         //}
-        //private static void LoadStandardData(string numberString, ArNumber a, bool isNegative = false, long e = 0)
-        //{
-        //    int pr = PostiveRemainder(e + 1, 9);
-        //    if (pr == 0)
-        //        pr = 9;
-        //    if (!IsInteger(a) || pr > numberString.Length)
-        //        numberString = $"{numberString}{new string('0', pr - numberString.Length % 9)}";
-        //    //if (pr > numberString.Length)
-        //    //    numberString = $"{numberString}{new string('0', pr - numberString.Length)}";
 
-        //    a.SetExponent(e);
-        //    a._Numbers = new byte[(a.GetBits(numberString.Length) + 7) / 8];
-        //    a.Negative = isNegative;
+        public string GetNumbersToString()
+        {
+            StringBuilder numbers = new StringBuilder();
+            for (int i = _Numbers.Length - 1; i >= 0; i--)
+                numbers.Append(_Numbers[i]);
+            if (numbers.Length > 1)
+                return numbers.ToString().TrimEnd('0');
+            else
+                return numbers.ToString();
+            //int tail = PostiveRemainder(Exponent + 1, 9);
+            //long digitsCount = DigitsCount;
 
+            //if (tail > digitsCount)
+            //    tail = (int)digitsCount;
+            //else if (tail == 0)
+            //    tail = 9;
+            //int mid = (int)((digitsCount - tail) / 9);
+            //int head = PostiveRemainder(digitsCount - tail, 9);
+            //int indexCount = 1 + mid + (head > 0 ? 1 : 0);
 
-        //    uint v;
-        //    int digitIndex = numberString.Length;
-        //    int substractedDigits;
-        //    for (int i = 0; digitIndex > 0; i++)
-        //    {
-        //        if (i == 0)
-        //        {
-        //            if ((numberString.Length - pr) % 9 != 0)
-        //                substractedDigits = (numberString.Length - pr) % 9;
-        //            else if (numberString.Length < 9)
-        //                substractedDigits = numberString.Length;
-        //            else
-        //                substractedDigits = 9;
-        //        }
-        //        else if (digitIndex < 9)
-        //            substractedDigits = PostiveRemainder(e + 1, 9);
-        //        else
-        //            substractedDigits = 9;
-        //        digitIndex -= substractedDigits;
-        //        v = uint.Parse(numberString.Substring(digitIndex, substractedDigits));
-        //        a.SetNumberBlock(i, v, substractedDigits);
-        //    }
-        //}
+            //numbers.Append(GetNumberBlock(indexCount - 1, tail));
+            //for (int i = indexCount - 2; i >= 1; i--)
+            //    numbers.Append(GetNumberBlock(i, 9).ToString().PadLeft(9, '0'));
+            //if (head > 0)
+            //    numbers.Append(GetNumberBlock(0, head).ToString().PadLeft(head, '0'));
+            //else if (indexCount - 1 != 0)
+            //    numbers.Append(GetNumberBlock(0, 9).ToString().PadLeft(9, '0'));
+            //while (numbers.Length > 1 && numbers[numbers.Length - 1] == '0')
+            //    numbers.Remove(numbers.Length - 1, 1);
+            //return numbers.ToString();
+        }
+        private string ToString(int digitsDisplay, char format, IFormatProvider provider)
+        {
+            string numbers = GetNumbersToString();
+            if (digitsDisplay < 0)
+                throw new ArgumentOutOfRangeException(nameof(digitsDisplay));
+            else if (digitsDisplay == 0 || digitsDisplay > numbers.Length)
+                digitsDisplay = numbers.Length;            
+            int e = Exponent;
+            if (format == 'G')
+                if (e < -30 || e > 30)
+                    format = 'E';
+                else if (e >= 0)
+                    format = 'D';
+                else
+                    format = 'F';
 
+            //if(format == 'C' && format == 'N' && format == 'P')
+            //CDFNPXEG
+            StringBuilder result = new StringBuilder();
+            result.Append(numbers);
+            if (result.Length != 1 && format == 'E')
+                result.Insert(1, '.');
+            if (e != 0)
+            {
+                if (format == 'E')
+                    result.AppendFormat("E{0}{1}", e > 0 ? "+" : "", e);
+                else if (format == 'D')
+                {
+                    if (e > digitsDisplay - 1)
+                        result.Append(new string('0', (int)e - digitsDisplay + 1));
+                    else
+                    {
+                        if (e > 0)
+                            result.Remove((int)e + 1, result.Length - (int)e - 1);
+                        else
+                            return "0";
+                    }
+                }
+                else if (format == 'F')
+                {
+                    if (e > digitsDisplay - 1)
+                        result.Append(new string('0', (int)e - digitsDisplay + 1));
+                    else if (e > 0)
+                        result.Insert((int)e + 1, '.');
+                    else
+                        result.Insert(0, $"0.{new string('0', Math.Abs((int)e + 1))}");
+                }
+            }
+            else if (result.Length > 1)
+                result.Insert(1, '.');
+
+            if (Negative)
+                result.Insert(0, '-');
+            return result.ToString();
+        }
+
+        public override string ToString()
+            => ToString(null, null);
+        public string ToString(string format)
+            => ToString(format, null);
+        public string ToString(IFormatProvider provider)
+            => ToString(null, provider);
+        public string ToString(string format, IFormatProvider provider)
+        {
+            int length = 0;
+            if (string.IsNullOrEmpty(format))
+                format = "G";
+            format = format.Trim().ToUpperInvariant();
+            if (provider == null)
+                provider = NumberFormatInfo.CurrentInfo;
+            if (format.Length > 1 && !int.TryParse(format.Substring(1), out length))
+                throw new FormatException($"{nameof(format)}:{format}");
+
+            switch (format[0])
+            {
+                // TO DO
+                case 'C':
+                case 'D':
+                case 'F':
+                case 'N':
+                case 'P':
+                case 'X':
+                case 'E':
+                case 'G':
+                    return ToString(length, format[0], provider);
+                default:
+                    throw new FormatException(string.Format("The '{0}' format string is not supported.", format));
+            }
+        }
 
         //TO DO
         public static ArNumber Divide(ArNumberScientificNotation a, ArNumberScientificNotation b)

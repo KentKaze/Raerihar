@@ -52,55 +52,56 @@ namespace RaeriharTest
 
             ar = ArNumberScientificNotation.Parse(testStrings[0]);
             //TestContext.WriteLine(ar.ToString("E"));
-            //Assert.IsTrue(ar.ToString("E") == "-5.89662145E-106");
-            //ar = ArNumberScientificNotation.Parse(testStrings[1]);
-            ////TestContext.WriteLine(ar.ToString());
-            //Assert.IsTrue(ar.ToString("E") == "-3.611895678E+49");
-            ////TestContext.WriteLine(ar.ToString("D"));
-            //Assert.IsTrue(ar.ToString("D") == "-36118956780000000000000000000000000000000000000000");
-            //ar = ArNumberScientificNotation.Parse(testStrings[2]);
-            ////TestContext.WriteLine(ar.ToString("E"));
+            Assert.IsTrue(ar.ToString("E") == "-5.89662145E-106");
+            ar = ArNumberScientificNotation.Parse(testStrings[1]);
+            //TestContext.WriteLine(ar.ToString());
+            Assert.IsTrue(ar.ToString("E") == "-3.611895678E+49");
+            //TestContext.WriteLine(ar.ToString("D"));
+            Assert.IsTrue(ar.ToString("D") == "-36118956780000000000000000000000000000000000000000");
+            ar = ArNumberScientificNotation.Parse(testStrings[2]);
+            //TestContext.WriteLine(ar.ToString("E"));
 
-            ////-0.000687180
-            //Assert.IsTrue(ar.ToString("E") == "-6.8718E-4");
-            //Assert.IsTrue(ar.ToString("D") == "0");
-            //Assert.IsTrue(ar.ToString("F") == "-0.00068718");
-            //ar = ArNumberScientificNotation.Parse(testStrings[3]);
-            //Assert.IsTrue(ar.ToString("E") == "3.567894358E+40");
-            //Assert.IsTrue(ar.ToString("D") == "35678943580000000000000000000000000000000");
+            //-0.000687180
+            Assert.IsTrue(ar.ToString("E") == "-6.8718E-4");
+            Assert.IsTrue(ar.ToString("D") == "0");
+            Assert.IsTrue(ar.ToString("F") == "-0.00068718");
+            ar = ArNumberScientificNotation.Parse(testStrings[3]);
+            //TestContext.WriteLine(ar.ToString("E"));
+            Assert.IsTrue(ar.ToString("E") == "3.567894358E+40");
+            Assert.IsTrue(ar.ToString("D") == "35678943580000000000000000000000000000000");
 
-            //ar = ArNumberScientificNotation.Parse(testStrings[4]);
-            //Assert.IsTrue(ar.ToString("E") == "5.68681E-6");
-            //Assert.IsTrue(ar.ToString("F") == "0.00000568681");
-            ////TestContext.WriteLine(ar.ToString("C3"));
-            //Assert.IsTrue(ar.ToString("F3") == "0.00000568681"); // TO DO
-            //                                                     //Assert.IsTrue(sn.ToString("C3") == "0.00");            
-            //Assert.IsTrue(ar.ToString("D") == "0");
-            //ar = ArNumberScientificNotation.Parse(testStrings[5]);
-            //Assert.IsTrue(ar.ToString("E") == "-3.5E-24");
-            //ar = ArNumberScientificNotation.Parse(testStrings[6]);
-            //Assert.IsTrue(ar.ToString("E") == "0");
-            //Assert.IsTrue(ar.ToString("F") == "0");
-            //ar = ArNumberScientificNotation.Parse(testStrings[7]);
-            //Assert.IsTrue(ar.ToString("E") == "0");
-            //Assert.IsTrue(ar.ToString("F") == "0");
-            //ar = ArNumber.Parse(testStrings[8]);
-            ////TestContext.WriteLine(ar.ToString("E"));
-            //Assert.IsTrue(ar.ToString("E") == "3E+2");
-            //Assert.IsTrue(ar.ToString() == "300");
-            //ar = ArNumberScientificNotation.Parse(testStrings[9]);
-            //Assert.IsTrue(ar.ToString("E") == "-8E-3");
-            //Assert.IsTrue(ar.ToString() == "-0.008");
-            //ar = ArNumberScientificNotation.Parse(testStrings[10]);
-            //Assert.IsTrue(ar.ToString("E") == "6.81E+95");
-            //ar = ArNumberScientificNotation.Parse(testStrings[11]);
-            //Assert.IsTrue(ar.ToString("E") == "1E-2");
-            //ar = ArNumberScientificNotation.Parse(testStrings[12]);
-            //Assert.IsTrue(ar.ToString("E") == "0");
-            //ar = ArNumberScientificNotation.Parse(testStrings[13]);
-            //Assert.IsTrue(ar.ToString("F") == "2170.6907744747728");
-            //ar = ArNumberScientificNotation.Parse(testStrings[14]);
-            //Assert.IsTrue(ar.ToString("E") == "-4.45064895809216518E+17");
+            ar = ArNumberScientificNotation.Parse(testStrings[4]);
+            Assert.IsTrue(ar.ToString("E") == "5.68681E-6");
+            Assert.IsTrue(ar.ToString("F") == "0.00000568681");
+            //TestContext.WriteLine(ar.ToString("C3"));
+            Assert.IsTrue(ar.ToString("F3") == "0.00000568681"); // TO DO
+                                                                 //Assert.IsTrue(sn.ToString("C3") == "0.00");            
+            Assert.IsTrue(ar.ToString("D") == "0");
+            ar = ArNumberScientificNotation.Parse(testStrings[5]);
+            Assert.IsTrue(ar.ToString("E") == "-3.5E-24");
+            ar = ArNumberScientificNotation.Parse(testStrings[6]);
+            Assert.IsTrue(ar.ToString("E") == "0");
+            Assert.IsTrue(ar.ToString("F") == "0");
+            ar = ArNumberScientificNotation.Parse(testStrings[7]);
+            Assert.IsTrue(ar.ToString("E") == "0");
+            Assert.IsTrue(ar.ToString("F") == "0");
+            ar = ArNumberScientificNotation.Parse(testStrings[8]);
+            //TestContext.WriteLine(ar.ToString("E"));
+            Assert.IsTrue(ar.ToString("E") == "3E+2");
+            Assert.IsTrue(ar.ToString() == "300");
+            ar = ArNumberScientificNotation.Parse(testStrings[9]);
+            Assert.IsTrue(ar.ToString("E") == "-8E-3");
+            Assert.IsTrue(ar.ToString() == "-0.008");
+            ar = ArNumberScientificNotation.Parse(testStrings[10]);
+            Assert.IsTrue(ar.ToString("E") == "6.81E+95");
+            ar = ArNumberScientificNotation.Parse(testStrings[11]);
+            Assert.IsTrue(ar.ToString("E") == "1E-2");
+            ar = ArNumberScientificNotation.Parse(testStrings[12]);
+            Assert.IsTrue(ar.ToString("E") == "0");
+            ar = ArNumberScientificNotation.Parse(testStrings[13]);
+            Assert.IsTrue(ar.ToString("F") == "2170.6907744747728");
+            ar = ArNumberScientificNotation.Parse(testStrings[14]);
+            Assert.IsTrue(ar.ToString("E") == "-4.45064895809216518E+17");
         }
 
         [TestMethod]
