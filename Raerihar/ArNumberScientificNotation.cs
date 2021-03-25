@@ -258,32 +258,10 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         {
             StringBuilder numbers = new StringBuilder();
             for (int i = _Numbers.Length - 1; i >= 0; i--)
-                numbers.Append(_Numbers[i]);
-            if (numbers.Length > 1)
-                return numbers.ToString().TrimEnd('0');
-            else
-                return numbers.ToString();
-            //int tail = PostiveRemainder(Exponent + 1, 9);
-            //long digitsCount = DigitsCount;
-
-            //if (tail > digitsCount)
-            //    tail = (int)digitsCount;
-            //else if (tail == 0)
-            //    tail = 9;
-            //int mid = (int)((digitsCount - tail) / 9);
-            //int head = PostiveRemainder(digitsCount - tail, 9);
-            //int indexCount = 1 + mid + (head > 0 ? 1 : 0);
-
-            //numbers.Append(GetNumberBlock(indexCount - 1, tail));
-            //for (int i = indexCount - 2; i >= 1; i--)
-            //    numbers.Append(GetNumberBlock(i, 9).ToString().PadLeft(9, '0'));
-            //if (head > 0)
-            //    numbers.Append(GetNumberBlock(0, head).ToString().PadLeft(head, '0'));
-            //else if (indexCount - 1 != 0)
-            //    numbers.Append(GetNumberBlock(0, 9).ToString().PadLeft(9, '0'));
-            //while (numbers.Length > 1 && numbers[numbers.Length - 1] == '0')
-            //    numbers.Remove(numbers.Length - 1, 1);
-            //return numbers.ToString();
+                numbers.Append(_Numbers[i].ToString().PadLeft(9, '0'));
+            if (numbers.ToString() == "000000000")
+                return "0";
+            return numbers.ToString().Trim('0');
         }
         private string ToString(int digitsDisplay, char format, IFormatProvider provider)
         {
@@ -296,7 +274,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             if (format == 'G')
                 if (e < -30 || e > 30)
                     format = 'E';
-                else if (e >= 0)
+                else if (e - numbers.Length + 1 >= 0)
                     format = 'D';
                 else
                     format = 'F';
@@ -314,11 +292,11 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 else if (format == 'D')
                 {
                     if (e > digitsDisplay - 1)
-                        result.Append(new string('0', (int)e - digitsDisplay + 1));
+                        result.Append(new string('0', e - digitsDisplay + 1));
                     else
                     {
                         if (e > 0)
-                            result.Remove((int)e + 1, result.Length - (int)e - 1);
+                            result.Remove(e + 1, result.Length - e - 1);
                         else
                             return "0";
                     }
@@ -326,11 +304,11 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 else if (format == 'F')
                 {
                     if (e > digitsDisplay - 1)
-                        result.Append(new string('0', (int)e - digitsDisplay + 1));
+                        result.Append(new string('0', e - digitsDisplay + 1));
                     else if (e > 0)
-                        result.Insert((int)e + 1, '.');
+                        result.Insert(e + 1, '.');
                     else
-                        result.Insert(0, $"0.{new string('0', Math.Abs((int)e + 1))}");
+                        result.Insert(0, $"0.{new string('0', Math.Abs(e + 1))}");
                 }
             }
             else if (result.Length > 1)

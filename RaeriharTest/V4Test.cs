@@ -47,16 +47,16 @@ namespace RaeriharTest
                     "0.01", //11
                     "0", //12
                     "2170.6907744747728", //13
-                    "-0.445064895809216518E+18" //14
+                    "-0.445064895809216518E+18", //14
+                    "-1.6523221914791807E-283", //15
+                    "32.135752223080374" //16
                 };
 
             ar = ArNumberScientificNotation.Parse(testStrings[0]);
             //TestContext.WriteLine(ar.ToString("E"));
             Assert.IsTrue(ar.ToString("E") == "-5.89662145E-106");
             ar = ArNumberScientificNotation.Parse(testStrings[1]);
-            //TestContext.WriteLine(ar.ToString());
             Assert.IsTrue(ar.ToString("E") == "-3.611895678E+49");
-            //TestContext.WriteLine(ar.ToString("D"));
             Assert.IsTrue(ar.ToString("D") == "-36118956780000000000000000000000000000000000000000");
             ar = ArNumberScientificNotation.Parse(testStrings[2]);
             //TestContext.WriteLine(ar.ToString("E"));
@@ -66,7 +66,6 @@ namespace RaeriharTest
             Assert.IsTrue(ar.ToString("D") == "0");
             Assert.IsTrue(ar.ToString("F") == "-0.00068718");
             ar = ArNumberScientificNotation.Parse(testStrings[3]);
-            //TestContext.WriteLine(ar.ToString("E"));
             Assert.IsTrue(ar.ToString("E") == "3.567894358E+40");
             Assert.IsTrue(ar.ToString("D") == "35678943580000000000000000000000000000000");
 
@@ -79,7 +78,7 @@ namespace RaeriharTest
             Assert.IsTrue(ar.ToString("D") == "0");
             ar = ArNumberScientificNotation.Parse(testStrings[5]);
             Assert.IsTrue(ar.ToString("E") == "-3.5E-24");
-            ar = ArNumberScientificNotation.Parse(testStrings[6]);
+            ar = ArNumberScientificNotation.Parse(testStrings[6]);            
             Assert.IsTrue(ar.ToString("E") == "0");
             Assert.IsTrue(ar.ToString("F") == "0");
             ar = ArNumberScientificNotation.Parse(testStrings[7]);
@@ -102,7 +101,27 @@ namespace RaeriharTest
             Assert.IsTrue(ar.ToString("F") == "2170.6907744747728");
             ar = ArNumberScientificNotation.Parse(testStrings[14]);
             Assert.IsTrue(ar.ToString("E") == "-4.45064895809216518E+17");
+            ar = ArNumberScientificNotation.Parse(testStrings[15]);
+            Assert.IsTrue(ar.ToString("E") == "-1.6523221914791807E-283");
+            ar = ArNumberScientificNotation.Parse(testStrings[16]);
+            TestContext.WriteLine(ar.ToString());
+            //3.2135752223080374E+1
+            Assert.IsTrue(ar.ToString() == "32.135752223080374");
+
+            ChaosBox cb = new ChaosBox();
+
+            for (int i = 0; i < 10000; i++)
+            {
+                double d = cb.DrawOutDiversityDouble();
+                string s = d.ToString().Replace("E+0", "E+").Replace("E-0", "E-");
+                ar = new ArNumberScientificNotation(d);
+                //TestContext.WriteLine(ar.ToString().Length.ToString());
+                //TestContext.WriteLine(ar.ToString());
+                if (s != ar.ToString() && s != ar.ToString("E") && s != ar.ToString("F"))
+                    TestContext.WriteLine($"{s}: {ar}");
+            }
         }
+    
 
         [TestMethod]
         public void DecimalTest()
