@@ -76,6 +76,9 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 _Numbers = numberList.ToArray();
             }
         }
+        public ArNumberScientificNotation(ulong value)
+            : this()
+            => Parse(this, value.ToString());
         public ArNumberScientificNotation(decimal value)
            : this()
             => Parse(this, value.ToString());
@@ -235,24 +238,6 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                     ansn._Numbers[i] = int.Parse(numberString.Substring(numberString.Length - 9 * i - 9, 9));
                     
         }
-        //private static void LoadInteger(string numberStringWithSign, ArNumber a)
-        //{
-        //    bool isNegative = false;
-        //    if (numberStringWithSign[0] == '-')
-        //    {
-        //        isNegative = true;
-        //        numberStringWithSign = numberStringWithSign.Remove(0, 1);
-        //    }
-        //    long e = numberStringWithSign.Length - 1;
-        //    while (numberStringWithSign.Length > 9 && numberStringWithSign.Substring(numberStringWithSign.Length - 9, 9) == "000000000")
-        //        numberStringWithSign = numberStringWithSign.Remove(numberStringWithSign.Length - 9, 9);
-        //    if (numberStringWithSign == "0")
-        //    {
-        //        a = new ArNumber();
-        //        return;
-        //    }
-        //    LoadStandardData(numberStringWithSign, a, isNegative, e);
-        //}
 
         public string GetNumbersToString()
         {
@@ -263,6 +248,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 return "0";
             return numbers.ToString().Trim('0');
         }
+
         private string ToString(int digitsDisplay, char format, IFormatProvider provider)
         {
             string numbers = GetNumbersToString();
@@ -303,8 +289,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 }
                 else if (format == 'F')
                 {
-                    if (e > digitsDisplay - 1)
-                        result.Append(new string('0', e - digitsDisplay + 1));
+                    if (e >= digitsDisplay - 1)
+                        result.Append(new string('0', e - digitsDisplay + 1));                    
                     else if (e > 0)
                         result.Insert(e + 1, '.');
                     else
@@ -353,6 +339,37 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             }
         }
 
+        public static ArNumberScientificNotation Negate(ArNumberScientificNotation a)
+        {
+            ArNumberScientificNotation result = new ArNumberScientificNotation(a);
+            result.Negative = !result.Negative;
+            return result;
+        }
+
+        private static ArNumberScientificNotation AddMinus(ArNumberScientificNotation a, ArNumberScientificNotation b, bool isAdd = true)
+        {
+            if (isAdd)
+            {
+                if (a.Negative && !b.Negative)
+                    return AddMinus(b, Negate(a), false);
+                else if (!a.Negative && b.Negative)
+                    return AddMinus(a, Negate(b), false);
+            }
+            else
+            {
+                if ((a.Negative && !b.Negative) || (!a.Negative && b.Negative))
+                    return AddMinus(a, Negate(b), true);
+                else if (b > a && !a.Negative && !b.Negative)
+                    return AddMinus(Negate(b), Negate(a), false);
+                else if (a > b && a.Negative && b.Negative)
+                    return AddMinus(Negate(b), Negate(a), false);
+                else if (a == b)
+                    return new ArNumberScientificNotation();
+            }
+
+            return null;
+        }
+        
         //TO DO
         public static ArNumber Divide(ArNumberScientificNotation a, ArNumberScientificNotation b)
             => throw new NotImplementedException();
@@ -369,33 +386,33 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         protected override ArNumber ReverseRemainder(ArNumber b)
             => b.Remainder(this);
         public override ArNumber Add(ArNumberByte b)
-            => throw new NotImplementedException();
+            => AddMinus(this, new ArNumberScientificNotation(b));
         public override ArNumber Add(ArNumberShort b)
-            => throw new NotImplementedException();
+            => AddMinus(this, new ArNumberScientificNotation(b));
         public override ArNumber Add(ArNumberInt b)
-            => throw new NotImplementedException();
+            => AddMinus(this, new ArNumberScientificNotation(b));
         public override ArNumber Add(ArNumberLong b)
-            => throw new NotImplementedException();
+            => AddMinus(this, new ArNumberScientificNotation(b));
         public override ArNumber Add(ArNumberDecimal b)
-            => throw new NotImplementedException();
+            => AddMinus(this, new ArNumberScientificNotation(b));
         public override ArNumber Add(ArNumberLongDecimal b)
-            => throw new NotImplementedException();
+            => AddMinus(this, new ArNumberScientificNotation(b));
         public override ArNumber Add(ArNumberScientificNotation b)
-            => throw new NotImplementedException();
+            => AddMinus(this, b);
         public override ArNumber Minus(ArNumberByte b)
-            => throw new NotImplementedException();
+            => AddMinus(this, new ArNumberScientificNotation(b), false);
         public override ArNumber Minus(ArNumberShort b)
-            => throw new NotImplementedException();
+            => AddMinus(this, new ArNumberScientificNotation(b), false);
         public override ArNumber Minus(ArNumberInt b)
-            => throw new NotImplementedException();
+            => AddMinus(this, new ArNumberScientificNotation(b), false);
         public override ArNumber Minus(ArNumberLong b)
-            => throw new NotImplementedException();
+            => AddMinus(this, new ArNumberScientificNotation(b), false);
         public override ArNumber Minus(ArNumberDecimal b)
-            => throw new NotImplementedException();
+            => AddMinus(this, new ArNumberScientificNotation(b), false);
         public override ArNumber Minus(ArNumberLongDecimal b)
-            => throw new NotImplementedException();
+            => AddMinus(this, new ArNumberScientificNotation(b), false);
         public override ArNumber Minus(ArNumberScientificNotation b)
-            => throw new NotImplementedException();
+            => AddMinus(this, b, false);
         public override ArNumber Multiply(ArNumberByte b)
             => throw new NotImplementedException();
         public override ArNumber Multiply(ArNumberShort b)
@@ -454,13 +471,167 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             => throw new NotImplementedException();
         public static ArNumber operator +(ArNumberScientificNotation a, ArNumberScientificNotation b)
             => a.Add(b);
+        //public static ArNumberScientificNotation operator ++(ArNumberScientificNotation a)
+        //    => new ArNumberScientificNotation(a + 1);
         public static ArNumber operator -(ArNumberScientificNotation a, ArNumberScientificNotation b)
             => a.Minus(b);
+        //public static ArNumberScientificNotation operator --(ArNumberScientificNotation a)
+        //    => new ArNumberScientificNotation(a - 1);
         public static ArNumber operator *(ArNumberScientificNotation a, ArNumberScientificNotation b)
             => a.Multiply(b);
         public static ArNumber operator /(ArNumberScientificNotation a, ArNumberScientificNotation b)
             => a.Quotient(b);
         public static ArNumber operator %(ArNumberScientificNotation a, ArNumberScientificNotation b)
             => a.Remainder(b);
+
+        public int CompareTo(ArNumberScientificNotation other)
+        {
+            if (Equals(other))
+                return 0;            
+            else if (!Negative && other.Negative)
+                return 1;
+            else if (Negative && !other.Negative)
+                return -1;
+            int result = Negative && other.Negative ? -1 : 1;
+            if (Exponent > other.Exponent)
+                return result;
+            else if (Exponent < other.Exponent)
+                return result * -1;
+            //(To Do - Temp)
+            return GetNumbersToString().CompareTo(other.GetNumbersToString()) * result;
+            //int indexCount = GetIndexCount();
+            //int otherIndexCount = other.GetIndexCount();
+            //for (int i = 0; i < indexCount && i < otherIndexCount; i++)
+            //    if (GetNumberBlock(indexCount - i, i == 0) > other.GetNumberBlock(otherIndexCount - i, i == 0))
+            //        return result;
+            //if (indexCount > otherIndexCount)
+            //    return result;
+            //else if (indexCount < otherIndexCount)
+            //    return result * -1;
+            //throw new NotImplementedException();
+        }
+
+        public override int GetHashCode()
+        {
+            int result = _LastBlockE.GetHashCode() ^ Negative.GetHashCode();
+            for (int i = 0; i < _Numbers.Length; i++)
+                result ^= _Numbers.GetHashCode();
+            return result;
+        }
+        public override bool Equals(object obj)
+        {
+            ArNumberScientificNotation ar = obj as ArNumberScientificNotation;
+            if (ar == null)
+                return false;
+            return Equals(ar);
+        }
+        public int CompareTo(object obj)
+           => CompareTo((ArNumberScientificNotation)obj);
+        public object Clone()
+            => new ArNumberScientificNotation(this);
+        public TypeCode GetTypeCode()
+            => TypeCode.Object;
+        public bool ToBoolean(IFormatProvider provider)
+            => throw new InvalidCastException();
+        public byte ToByte(IFormatProvider provider)
+            => (byte)this;
+        public char ToChar(IFormatProvider provider)
+            => (char)this;
+        public DateTime ToDateTime(IFormatProvider provider)
+            => throw new InvalidCastException();
+        public decimal ToDecimal(IFormatProvider provider)
+            => (decimal)this;
+        public double ToDouble(IFormatProvider provider)
+            => (double)this;
+        public short ToInt16(IFormatProvider provider)
+            => (short)this;
+        public int ToInt32(IFormatProvider provider)
+            => (int)this;
+        public long ToInt64(IFormatProvider provider)
+            => (long)this;
+        public sbyte ToSByte(IFormatProvider provider)
+            => (sbyte)this;
+        public float ToSingle(IFormatProvider provider)
+            => (float)this;
+        public object ToType(Type conversionType, IFormatProvider provider)
+            => Convert.ChangeType(this, conversionType, provider);
+        public ushort ToUInt16(IFormatProvider provider)
+            => (ushort)this;
+        public uint ToUInt32(IFormatProvider provider)
+            => (uint)this;
+        public ulong ToUInt64(IFormatProvider provider)
+            => (ulong)this;
+
+        public static implicit operator ArNumberScientificNotation(sbyte a)
+            => new ArNumberScientificNotation(a);
+        public static implicit operator ArNumberScientificNotation(byte a)
+            => new ArNumberScientificNotation(a);
+        public static implicit operator ArNumberScientificNotation(short a)
+            => new ArNumberScientificNotation(a);
+        public static implicit operator ArNumberScientificNotation(ushort a)
+            => new ArNumberScientificNotation(a);
+        public static implicit operator ArNumberScientificNotation(char a)
+            => new ArNumberScientificNotation(a);
+        public static implicit operator ArNumberScientificNotation(int a)
+            => new ArNumberScientificNotation(a);
+        public static implicit operator ArNumberScientificNotation(uint a)
+            => new ArNumberScientificNotation(a);
+        public static implicit operator ArNumberScientificNotation(long a)
+            => new ArNumberScientificNotation(a);
+        public static implicit operator ArNumberScientificNotation(ulong a)
+            => new ArNumberScientificNotation(a);
+        public static implicit operator ArNumberScientificNotation(decimal a)
+            => new ArNumberScientificNotation(a);
+        public static implicit operator ArNumberScientificNotation(float a)
+            => new ArNumberScientificNotation(a);
+        public static implicit operator ArNumberScientificNotation(double a)
+            => new ArNumberScientificNotation(a);
+        public static explicit operator sbyte(ArNumberScientificNotation a)
+            => sbyte.Parse(a.ToString());
+        public static explicit operator byte(ArNumberScientificNotation a)
+            => byte.Parse(a.ToString());
+        public static explicit operator short(ArNumberScientificNotation a)
+            => short.Parse(a.ToString());
+        public static explicit operator ushort(ArNumberScientificNotation a)
+            => ushort.Parse(a.ToString());
+        public static explicit operator char(ArNumberScientificNotation a)
+            => (char)int.Parse(a.ToString());
+        public static explicit operator int(ArNumberScientificNotation a)
+            => int.Parse(a.ToString());
+        public static explicit operator uint(ArNumberScientificNotation a)
+            => uint.Parse(a.ToString());
+        public static explicit operator long(ArNumberScientificNotation a)
+            => long.Parse(a.ToString());
+        public static explicit operator ulong(ArNumberScientificNotation a)
+            => ulong.Parse(a.ToString());
+        public static explicit operator float(ArNumberScientificNotation a)
+            => float.Parse(a.ToString());
+        public static explicit operator double(ArNumberScientificNotation a)
+            => double.Parse(a.ToString());
+        public static explicit operator decimal(ArNumberScientificNotation a)
+            => decimal.Parse(a.ToString());
+
+
+        public static bool operator >(ArNumberScientificNotation a, ArNumberScientificNotation b)
+            => a.CompareTo(b) == 1;
+        public static bool operator >=(ArNumberScientificNotation a, ArNumberScientificNotation b)
+            => a.CompareTo(b) != -1;
+        public static bool operator <(ArNumberScientificNotation a, ArNumberScientificNotation b)
+            => a.CompareTo(b) == -1;
+        public static bool operator <=(ArNumberScientificNotation a, ArNumberScientificNotation b)
+            => a.CompareTo(b) != 1;
+        public static bool operator ==(ArNumberScientificNotation a, ArNumberScientificNotation b)
+            => a.Equals(b);
+        public static bool operator !=(ArNumberScientificNotation a, ArNumberScientificNotation b)
+            => !a.Equals(b);
+
+        //public static ArNumberScientificNotation operator +(ArNumberScientificNotation a, ArNumberScientificNotation b)
+        //    => AddMinus(a, b);
+        //public static ArNumberScientificNotation operator -(ArNumberScientificNotation a, ArNumberScientificNotation b)
+        //    => AddMinus(a, b, false);
+        //public static ArNumberScientificNotation operator ++(ArNumberScientificNotation a)
+        //    => AddMinus(a, 1);
+        //public static ArNumberScientificNotation operator --(ArNumberScientificNotation a)
+        //    => AddMinus(a, 1, false);
     }
 }
