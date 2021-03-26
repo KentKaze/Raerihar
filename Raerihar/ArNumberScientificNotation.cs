@@ -421,20 +421,27 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 
             if (carry == 1)
                 sumList.Add(1);
-            else
-                e--;
+            //else
+            //    e--;
+
+            while (sumList[0] == 0)
+            {
+                sumList.RemoveAt(0);
+                lastlastBlockE++;
+            }
+
+            while (sumList[sumList.Count - 1] == 0)
+                sumList.RemoveAt(sumList.Count - 1);
 
             ArNumberScientificNotation result = new ArNumberScientificNotation();
-            //RetouchAndCountBytes(sumList, ref e), e, a.Negative);
-            //if (sumList.Count == 1)
-            //{
-            //    result.SetNumberBlock(0, sumList[0], sumList[0].ToString().Length);
-            //    return result;
-            //}
-            //result.SetNumberBlock(0, sumList[0], 9);
-            //for (i = 1; i < sumList.Count - 1; i++)
-            //    result.SetNumberBlock(i, sumList[i], 9);
-            //result.SetNumberBlock(sumList.Count - 1, sumList[sumList.Count - 1], sumList[sumList.Count - 1].ToString().Length);
+            if (sumList.Count == 0)
+                return result;
+
+            result._Numbers = new int[sumList.Count];
+            for (i = 0; i < sumList.Count; i++)
+                result._Numbers[i] = sumList[i];
+            result._LastBlockE = lastlastBlockE;
+            result.Negative = a.Negative;
             return result;
         }
         
@@ -588,8 +595,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         }
         public override bool Equals(object obj)
         {
-            ArNumberScientificNotation ar = obj as ArNumberScientificNotation;
-            if (ar == null)
+            if (!(obj is ArNumberScientificNotation ar))
                 return false;
             return Equals(ar);
         }
@@ -653,7 +659,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public static implicit operator ArNumberScientificNotation(float a)
             => new ArNumberScientificNotation(a);
         public static implicit operator ArNumberScientificNotation(double a)
-            => new ArNumberScientificNotation(a);
+            => new ArNumberScientificNotation(a);        
         public static explicit operator sbyte(ArNumberScientificNotation a)
             => sbyte.Parse(a.ToString());
         public static explicit operator byte(ArNumberScientificNotation a)

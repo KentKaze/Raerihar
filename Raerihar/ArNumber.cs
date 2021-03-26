@@ -65,7 +65,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 return new ArNumberDecimal((int)integer, (int)fraction);
             return new ArNumberLongDecimal(integer, fraction);
         }
-
+        
         public static ArNumber ConvertToArNumber(ArNumberScientificNotation ansn)
         {
             return null;
@@ -136,6 +136,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public static ArNumber operator %(ArNumber a, ArNumber b)
             => b.ReverseRemainder(a);
 
+        
         //public ArNumber ConvertToArNumber(byte value)
         //    => new ArNumberByte(value);
         //public ArNumber ConvertToArNumber(byte value)
