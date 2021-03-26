@@ -152,57 +152,61 @@ namespace RaeriharTest
 
             if (ArNumberScientificNotation.Negate(ar1) < ArNumberScientificNotation.Negate(ar2))
                 Console.WriteLine("!!?");
-            TestContext.WriteLine(ar3.ToString());
+            Assert.IsTrue(ar3.ToString() == "8");
             ar3 = (ArNumberScientificNotation)(ar1 - ar2);
-            TestContext.WriteLine(ar3.ToString());
+            Assert.IsTrue(ar3.ToString() == "-2");
             ar1 = 300;
             ar2 = 25;
             ar3 = (ArNumberScientificNotation)(ar1 + ar2);
-            TestContext.WriteLine(ar3.ToString());
+            Assert.IsTrue(ar3.ToString() == "325");
             ar3 = (ArNumberScientificNotation)(ar1 - ar2);
-            TestContext.WriteLine(ar3.ToString());
+            Assert.IsTrue(ar3.ToString() == "275");
 
+            //To Do
             ar1 = 870000000000;
             ar2 = 850;
             ar3 = (ArNumberScientificNotation)(ar1 + ar2);
-            TestContext.WriteLine(ar3.ToString());
+            Assert.IsTrue(ar3.ToString() == "870000000850");            
             ar3 = (ArNumberScientificNotation)(ar1 - ar2);
-            TestContext.WriteLine(ar3.ToString());
+            Assert.IsTrue(ar3.ToString() == "869999999150");
+            
 
             ar1 = 1917854895357220849;
             ar2 = 8593185756644802792;
             ar3 = (ArNumberScientificNotation)(ar1 + ar2);
-            TestContext.WriteLine(ar3.ToString("D"));
+            Assert.IsTrue(ar3.ToString("D") == "10511040652002023641");
+            //TestContext.WriteLine(ar3.ToString("D"));
             ar3 = (ArNumberScientificNotation)(ar1 - ar2);
-            TestContext.WriteLine(ar3.ToString("D"));
+            Assert.IsTrue(ar3.ToString("D") == "-6675330861287581943");
+            //TestContext.WriteLine(ar3.ToString("D"));
 
 
-            //ChaosBox cb = new ChaosBox();
-            //for (int i = 0; i < 10000; i++)
-            //{
-            //    long a = cb.DrawOutLong();
-            //    long b = cb.DrawOutLong();
-            //    decimal m = (decimal)a + (decimal)b;
-            //    decimal m2 = (decimal)a - (decimal)b;
-            //    ar1 = a;
-            //    ar2 = b;
-            //    ar3 = ar1 + ar2;
+            ChaosBox cb = new ChaosBox();
+            for (int i = 0; i < 10000; i++)
+            {
+                long a = cb.DrawOutLong();
+                long b = cb.DrawOutLong();
+                decimal m = (decimal)a + (decimal)b;
+                decimal m2 = (decimal)a - (decimal)b;
+                ar1 = a;
+                ar2 = b;
+                ar3 = (ArNumberScientificNotation)(ar1 + ar2);
 
-            //    if (ar1.ToString("D") != a.ToString() || ar2.ToString("D") != b.ToString() ||
-            //       ar3.ToString("D") != m.ToString())
-            //    {
-            //        TestContext.WriteLine("Wrong Detected");
-            //        TestContext.WriteLine($"{a}+{b}={m}");
-            //        TestContext.WriteLine($"{ar1.ToString("D")}+{ar2.ToString("D")}={ar3.ToString("D")}");
-            //    }
-            //    ar3 = ar1 - ar2;
-            //    if (ar3.ToString("D") != m2.ToString())
-            //    {
-            //        TestContext.WriteLine("Wrong Detected");
-            //        TestContext.WriteLine($"{m2}");
-            //        TestContext.WriteLine($"{ar3.ToString("D")}");
-            //    }
-            //}
+                if (ar1.ToString("D") != a.ToString() || ar2.ToString("D") != b.ToString() ||
+                   ar3.ToString("D") != m.ToString())
+                {
+                    TestContext.WriteLine("Wrong Detected");
+                    TestContext.WriteLine($"{a}+{b}={m}");
+                    TestContext.WriteLine($"{ar1.ToString("D")}+{ar2.ToString("D")}={ar3.ToString("D")}");
+                }
+                ar3 = (ArNumberScientificNotation)(ar1 - ar2);
+                if (ar3.ToString("D") != m2.ToString())
+                {
+                    TestContext.WriteLine("Wrong Detected");
+                    TestContext.WriteLine($"{m2}");
+                    TestContext.WriteLine($"{ar3.ToString("D")}");
+                }
+            }
         }
 
 

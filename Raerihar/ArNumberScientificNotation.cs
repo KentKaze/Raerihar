@@ -385,7 +385,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             int i = 0, j = 0;
             List<int> sumList = new List<int>();
             int plusA, plusB, sum, carry = 0;
-            while (i != a._Numbers.Length && j != b._Numbers.Length)
+            while (i != a._Numbers.Length || j != b._Numbers.Length)
             {
                 if (e >= a._LastBlockE && i != a._Numbers.Length)
                     plusA = a._Numbers[i++];
@@ -593,6 +593,20 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 result ^= _Numbers.GetHashCode();
             return result;
         }
+        public bool Equals(ArNumberScientificNotation other)
+        {
+            if (_LastBlockE != other._LastBlockE)
+                return false;
+            if (Negative != other.Negative)
+                return false;
+            if (_Numbers.Length != other._Numbers.Length)
+                return false;
+            for (int i = 0; i < _Numbers.Length; i++)
+                if (_Numbers[i] != other._Numbers[i])
+                    return false;
+            return true;
+        }
+
         public override bool Equals(object obj)
         {
             if (!(obj is ArNumberScientificNotation ar))
