@@ -254,8 +254,6 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             string numbers = GetNumbersToString();
             if (digitsDisplay < 0)
                 throw new ArgumentOutOfRangeException(nameof(digitsDisplay));
-            else if (digitsDisplay == 0 || digitsDisplay > numbers.Length)
-                digitsDisplay = numbers.Length;            
             int e = Exponent;
             if (format == 'G')
                 if (e < -30 || e > 30)
@@ -277,20 +275,20 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                     result.AppendFormat("E{0}{1}", e > 0 ? "+" : "", e);
                 else if (format == 'D')
                 {
-                    if (e > digitsDisplay - 1)
-                        result.Append(new string('0', e - digitsDisplay + 1));
+                    if (e > numbers.Length - 1)
+                        result.Append(new string('0', e - numbers.Length + 1));
                     else
                     {
                         if (e > 0)
                             result.Remove(e + 1, result.Length - e - 1);
                         else
-                            return "0";
+                            return "0".PadLeft(digitsDisplay, '0');
                     }
                 }
                 else if (format == 'F')
                 {
-                    if (e >= digitsDisplay - 1)
-                        result.Append(new string('0', e - digitsDisplay + 1));                    
+                    if (e >= numbers.Length - 1)
+                        result.Append(new string('0', e - numbers.Length + 1));                    
                     else if (e > 0)
                         result.Insert(e + 1, '.');
                     else
@@ -302,7 +300,22 @@ namespace Aritiafel.Organizations.RaeriharUniversity
 
             if (Negative)
                 result.Insert(0, '-');
-            return result.ToString();
+
+            string s = result.ToString();
+            if (format == 'F' && digitsDisplay != 0)
+            {
+                int pIndex = s.IndexOf('.');
+                if (pIndex != 0)
+                    s = $"{s.Substring(0, pIndex)}{s.Substring(pIndex).PadRight(digitsDisplay + 1, '0').Substring(0, digitsDisplay + 1)}";
+                else
+                    s = $"{s}{new string('0', digitsDisplay)}";
+            }
+            else if(format == 'D' && digitsDisplay != 0)
+                s = s.PadLeft(digitsDisplay, '0');
+                
+            //else if(format == 'E' && digitsDisplay != 0)
+
+            return s;
         }
 
         public override string ToString()
@@ -367,7 +380,62 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                     return new ArNumberScientificNotation();
             }
 
-            return null;
+            int lastlastBlockE = a._LastBlockE <= b._LastBlockE ? a._LastBlockE : b._LastBlockE;
+            int e = lastlastBlockE;
+            int i = 0, j = 0;
+            List<int> sumList = new List<int>();
+            int plusA, plusB, sum, carry = 0;
+            while (i != a._Numbers.Length && j != b._Numbers.Length)
+            {
+                if (e >= a._LastBlockE && i != a._Numbers.Length)
+                    plusA = a._Numbers[i++];
+                else
+                    plusA = 0;
+
+                if (e >= b._LastBlockE && j != b._Numbers.Length)
+                    plusB = b._Numbers[j++];
+                else
+                    plusB = 0;
+
+                if (isAdd)
+                    sum = plusA + plusB + carry;
+                else
+                    sum = plusA - plusB + carry;
+
+                if (sum > BlockMaxValue)
+                {
+                    sum -= 1000000000;
+                    carry = 1;
+                }
+                else if (sum < BlockMinValue)
+                {
+                    sum += 1000000000;
+                    carry = -1;
+                }
+                else
+                    carry = 0;
+
+                sumList.Add(sum);
+                e++;
+            }
+
+            if (carry == 1)
+                sumList.Add(1);
+            else
+                e--;
+
+            ArNumberScientificNotation result = new ArNumberScientificNotation();
+            //RetouchAndCountBytes(sumList, ref e), e, a.Negative);
+            //if (sumList.Count == 1)
+            //{
+            //    result.SetNumberBlock(0, sumList[0], sumList[0].ToString().Length);
+            //    return result;
+            //}
+            //result.SetNumberBlock(0, sumList[0], 9);
+            //for (i = 1; i < sumList.Count - 1; i++)
+            //    result.SetNumberBlock(i, sumList[i], 9);
+            //result.SetNumberBlock(sumList.Count - 1, sumList[sumList.Count - 1], sumList[sumList.Count - 1].ToString().Length);
+            return result;
         }
         
         //TO DO

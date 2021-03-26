@@ -66,15 +66,14 @@ namespace RaeriharTest
             ar = ArNumberScientificNotation.Parse(testStrings[3]);            
             Assert.IsTrue(ar.ToString("E") == "3.567894358E+40");
             Assert.IsTrue(ar.ToString("D") == "35678943580000000000000000000000000000000");
-
-            ar = ArNumberScientificNotation.Parse(testStrings[4]);
-            TestContext.WriteLine(ar.ToString("F"));
+            ar = ArNumberScientificNotation.Parse(testStrings[4]);            
             Assert.IsTrue(ar.ToString("E") == "5.68681E-6");
             Assert.IsTrue(ar.ToString("F") == "0.00000568681");
             //TestContext.WriteLine(ar.ToString("C3"));            
-            Assert.IsTrue(ar.ToString("F3") == "0.00000568681"); // TO DO
-                                                                 //Assert.IsTrue(sn.ToString("C3") == "0.00");            
+            //TestContext.WriteLine(ar.ToString("F3"));
+            Assert.IsTrue(ar.ToString("F3") == "0.000");
             Assert.IsTrue(ar.ToString("D") == "0");            
+            Assert.IsTrue(ar.ToString("D3") == "000");
             ar = ArNumberScientificNotation.Parse(testStrings[5]);
             Assert.IsTrue(ar.ToString("E") == "-3.5E-24");            
             ar = ArNumberScientificNotation.Parse(testStrings[6]);            
@@ -86,7 +85,8 @@ namespace RaeriharTest
             ar = ArNumberScientificNotation.Parse(testStrings[8]);
             //TestContext.WriteLine(ar.ToString("E"));
             Assert.IsTrue(ar.ToString("E") == "3E+2");            
-            Assert.IsTrue(ar.ToString() == "300");
+            Assert.IsTrue(ar.ToString() == "300");            
+            Assert.IsTrue(ar.ToString("D5") == "00300");
             ar = ArNumberScientificNotation.Parse(testStrings[9]);
             Assert.IsTrue(ar.ToString("E") == "-8E-3");
             Assert.IsTrue(ar.ToString() == "-0.008");            
@@ -100,7 +100,8 @@ namespace RaeriharTest
             Assert.IsTrue(ar.ToString("F") == "2170.6907744747728");            
             ar = ArNumberScientificNotation.Parse(testStrings[14]);
             Assert.IsTrue(ar.ToString("E") == "-4.45064895809216518E+17");
-            Assert.IsTrue(ar.ToString("F") == "-445064895809216518");            
+            Assert.IsTrue(ar.ToString("F") == "-445064895809216518");
+            Assert.IsTrue(ar.ToString("D7") == "-445064895809216518");
             ar = ArNumberScientificNotation.Parse(testStrings[15]);
             Assert.IsTrue(ar.ToString("E") == "-1.6523221914791807E-283");            
             ar = ArNumberScientificNotation.Parse(testStrings[16]);            
@@ -142,6 +143,34 @@ namespace RaeriharTest
             //TestContext.WriteLine(and.ToString());
         }
 
+        [TestMethod]
+        public void GeneralUse()
+        {
+            ArNumberScientificNotation a;
+
+            //a = 0.1;
+            //Console.WriteLine(a);
+            //Console.WriteLine(a.DigitsCount);
+            //a = 1.1;
+            //Console.WriteLine(a.DigitsCount);
+            //a = (ArNumberScientificNotation)a + 0.1;
+            //Console.WriteLine(a.DigitsCount);
+            //ArNumber plus = 0.1;
+            //ArNumber i;
+            //for (i = 100; i < 10000; i = i + plus)
+            //{
+            //    Console.WriteLine(i);
+            //}
+
+            //for (i = 0; i < 100; i++)
+            //    ;
+
+            //ArNumber a = 3.87699078E+98;
+            //ArNumber test = a - a;
+            //Console.WriteLine(test);
+
+        }
+
         //[TestMethod]
         //public void GetSetTest()
         //{
@@ -156,7 +185,7 @@ namespace RaeriharTest
         //    ar.SetNumberBlock(0, 1);
         //    TestContext.WriteLine(ar.GetNumberBlock(0).ToString());
         //    TestContext.WriteLine(ar.DigitsCount.ToString());
-            
+
         //    ar.SetNumberBlock(0, 2);
         //    TestContext.WriteLine(ar.GetNumberBlock(0).ToString());
         //    TestContext.WriteLine(ar.DigitsCount.ToString());
@@ -263,6 +292,6 @@ namespace RaeriharTest
         //    //TestContext.WriteLine(ar.GetNumberBlock(0));
         //}
 
-       
+
     }
 }
