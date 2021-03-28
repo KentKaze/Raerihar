@@ -107,6 +107,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             return result >= 0 ? result : result + b;
         }
 
+        public static bool IsInteger(ArNumberScientificNotation ansn)
+            => ansn._LastBlockE >= 0;
         public static bool TryParse(string s, out ArNumberScientificNotation result)
            => TryParse(s, NumberStyles.None, null, out result);
         public static bool TryParse(string s, NumberStyles style, out ArNumberScientificNotation result)
@@ -258,7 +260,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             if (format == 'G')
                 if (e < -30 || e > 30)
                     format = 'E';
-                else if (e - numbers.Length + 1 >= 0)
+                else if (IsInteger(this))// e - numbers.Length + 1 >= 0
                     format = 'D';
                 else
                     format = 'F';
@@ -481,6 +483,46 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             result._LastBlockE = lastlastBlockE;
             result.Negative = a.Negative ^ b.Negative;
             return result;
+        }
+
+        public static ArNumber ConvertToArNumber(ArNumberScientificNotation ansn)
+        {
+            if (IsInteger(ansn))
+            {
+                if (ansn <= ArNumberByte.MaxValue && ansn >= ArNumberByte.MinValue)
+                    return new ArNumberByte((byte)ansn);
+                else if (ansn <= ArNumberShort.MaxValue && ansn >= ArNumberShort.MinValue)
+                    return new ArNumberShort((short)ansn);
+                else if (ansn <= ArNumberInt.MaxValue && ansn >= ArNumberInt.MinValue)
+                    return new ArNumberInt((int)ansn);
+                else if (ansn <= ArNumberLong.MaxValue && ansn >= ArNumberLong.MinValue)
+                    return new ArNumberLong((long)ansn);
+                else
+                    return ansn;
+            }
+            else
+            {
+                if (ansn._LastBlockE == -1 && ansn._Numbers.Length <= 2)
+                    if (ansn._Numbers.Length == 1)
+                        return new ArNumberDecimal(0, ansn._Numbers[0]);
+                    else
+                        return new ArNumberDecimal(ansn._Numbers[1], ansn._Numbers[0]);
+                else if(ansn._LastBlockE == -1 && ansn._Numbers.Length == 3)
+                    return new ArNumberLongDecimal((long)ansn._Numbers[1] + (long)ansn._Numbers[2] * 1000000000, ansn._Numbers[0]);
+                else if (ansn._LastBlockE == -2 && ansn._Numbers.Length <= 4)
+                {
+                    if (ansn._Numbers.Length == 1)
+                        return new ArNumberLongDecimal(0, ansn._Numbers[0]);
+                    else if(ansn._Numbers.Length == 2)
+                        return new ArNumberLongDecimal(0, (long)ansn._Numbers[0] + (long)ansn._Numbers[1] * 1000000000);
+                    else if(ansn._Numbers.Length == 3)
+                        return new ArNumberLongDecimal(ansn._Numbers[2], (long)ansn._Numbers[0] + (long)ansn._Numbers[1] * 1000000000);
+                    else
+                        return new ArNumberLongDecimal((long)ansn._Numbers[2] + (long)ansn._Numbers[3] * 1000000000, (long)ansn._Numbers[0] + (long)ansn._Numbers[1] * 1000000000);
+                }
+                else
+                    return ansn;
+            }
         }
 
         //TO DO

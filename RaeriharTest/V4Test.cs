@@ -301,7 +301,7 @@ namespace RaeriharTest
         public void GeneralUse()
         {
             ArNumberScientificNotation a;
-
+            //a++;
             //a = 0.1;
             //Console.WriteLine(a);
             //Console.WriteLine(a.DigitsCount);

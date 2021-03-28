@@ -65,12 +65,6 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 return new ArNumberDecimal((int)integer, (int)fraction);
             return new ArNumberLongDecimal(integer, fraction);
         }
-        
-        public static ArNumber ConvertToArNumber(ArNumberScientificNotation ansn)
-        {
-            return null;
-            //To Do
-        }
 
         //public static ArNumber LongDecimalAddLong(ArNumberLongDecimal anld, ArNumberLong anl)
         //{
