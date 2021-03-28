@@ -10,10 +10,10 @@ namespace Aritiafel.Organizations.RaeriharUniversity
     public class ArNumberScientificNotation : ArNumber
     {
         public bool Negative { get; set; }
-        public int Exponent 
+        public int Exponent
         {
-            get => (_Numbers.Length + _LastBlockE - 1) * 9 
-                + _Numbers[_Numbers.Length - 1].ToString().Length - 1;            
+            get => (_Numbers.Length + _LastBlockE - 1) * 9
+                + _Numbers[_Numbers.Length - 1].ToString().Length - 1;
         }
         private int _LastBlockE;
         private int[] _Numbers;
@@ -68,8 +68,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             else
             {
                 List<int> numberList = new List<int>();
-                while(value != 0)
-                {   
+                while (value != 0)
+                {
                     numberList.Add((int)(value % (BlockMaxValue + 1)));
                     value = value / (BlockMaxValue + 1);
                 }
@@ -160,7 +160,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 an.Negative = true;
                 numberString = numberString.Remove(0, 1);
             }
-            if(numberString.Length > 1)
+            if (numberString.Length > 1)
                 numberString = numberString.TrimStart('0');
 
             for (int i = 0; i < numberString.Length; i++)
@@ -236,7 +236,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                     ansn._Numbers[i] = int.Parse(numberString.Substring(0, numberString.Length % 9 == 0 ? 9 : numberString.Length % 9));
                 else
                     ansn._Numbers[i] = int.Parse(numberString.Substring(numberString.Length - 9 * i - 9, 9));
-                    
+
         }
 
         public string GetNumbersToString()
@@ -288,7 +288,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 else if (format == 'F')
                 {
                     if (e >= numbers.Length - 1)
-                        result.Append(new string('0', e - numbers.Length + 1));                    
+                        result.Append(new string('0', e - numbers.Length + 1));
                     else if (e > 0)
                         result.Insert(e + 1, '.');
                     else
@@ -310,9 +310,9 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 else
                     s = $"{s}{new string('0', digitsDisplay)}";
             }
-            else if(format == 'D' && digitsDisplay != 0)
+            else if (format == 'D' && digitsDisplay != 0)
                 s = s.PadLeft(digitsDisplay, '0');
-                
+
             //else if(format == 'E' && digitsDisplay != 0)
 
             return s;
@@ -444,7 +444,45 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             result.Negative = a.Negative;
             return result;
         }
-        
+
+        private static ArNumberScientificNotation Multiply(ArNumberScientificNotation a, ArNumberScientificNotation b)
+        {
+            //Last E計算
+            //Negative計算
+            int lastlastBlockE = a._LastBlockE + b._LastBlockE;            
+            List<long> sumList = new List<long>();
+            sumList.AddRange(new long[a._Numbers.Length + b._Numbers.Length + 1]);
+            for (int i = 0; i < a._Numbers.Length; i++)
+            {
+                for (int j = 0; j < b._Numbers.Length; j++)
+                {   
+                    sumList[i + j] += (long)a._Numbers[i] * b._Numbers[j];
+                    if(sumList[i + j] > BlockMaxValue)
+                    {
+                        sumList[i + j + 1] += sumList[i + j] / 1000000000;
+                        sumList[i + j] %= 1000000000;
+                    }
+                }
+            }
+
+            while (sumList[0] == 0)
+            {
+                sumList.RemoveAt(0);
+                lastlastBlockE++;
+            }
+
+            while (sumList[sumList.Count - 1] == 0)
+                sumList.RemoveAt(sumList.Count - 1);
+
+            ArNumberScientificNotation result = new ArNumberScientificNotation();
+            result._Numbers = new int[sumList.Count];
+            for (int i = 0; i < sumList.Count; i++)
+                result._Numbers[i] = (int)sumList[i];
+            result._LastBlockE = lastlastBlockE;
+            result.Negative = a.Negative ^ b.Negative;
+            return result;
+        }
+
         //TO DO
         public static ArNumber Divide(ArNumberScientificNotation a, ArNumberScientificNotation b)
             => throw new NotImplementedException();
@@ -489,19 +527,19 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public override ArNumber Minus(ArNumberScientificNotation b)
             => AddMinus(this, b, false);
         public override ArNumber Multiply(ArNumberByte b)
-            => throw new NotImplementedException();
+            => Multiply(this, new ArNumberScientificNotation(b));
         public override ArNumber Multiply(ArNumberShort b)
-            => throw new NotImplementedException();
+            => Multiply(this, new ArNumberScientificNotation(b));
         public override ArNumber Multiply(ArNumberInt b)
-            => throw new NotImplementedException();
+            => Multiply(this, new ArNumberScientificNotation(b));
         public override ArNumber Multiply(ArNumberLong b)
-            => throw new NotImplementedException();
+            => Multiply(this, new ArNumberScientificNotation(b));
         public override ArNumber Multiply(ArNumberDecimal b)
-            => throw new NotImplementedException();
+            => Multiply(this, new ArNumberScientificNotation(b));
         public override ArNumber Multiply(ArNumberLongDecimal b)
-            => throw new NotImplementedException();
+            => Multiply(this, new ArNumberScientificNotation(b));
         public override ArNumber Multiply(ArNumberScientificNotation b)
-            => throw new NotImplementedException();
+            => Multiply(this, b);
         public override ArNumber Quotient(ArNumberByte b)
             => throw new NotImplementedException();
         public override ArNumber Quotient(ArNumberShort b)
@@ -562,7 +600,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public int CompareTo(ArNumberScientificNotation other)
         {
             if (Equals(other))
-                return 0;            
+                return 0;
             else if (!Negative && other.Negative)
                 return 1;
             else if (Negative && !other.Negative)
@@ -673,7 +711,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public static implicit operator ArNumberScientificNotation(float a)
             => new ArNumberScientificNotation(a);
         public static implicit operator ArNumberScientificNotation(double a)
-            => new ArNumberScientificNotation(a);        
+            => new ArNumberScientificNotation(a);
         public static explicit operator sbyte(ArNumberScientificNotation a)
             => sbyte.Parse(a.ToString());
         public static explicit operator byte(ArNumberScientificNotation a)

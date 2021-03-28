@@ -250,6 +250,52 @@ namespace RaeriharTest
 
         }
 
+        [TestMethod]
+        public void Multiply()
+        {
+            ArNumberScientificNotation ar1;
+            ArNumberScientificNotation ar2;
+            ArNumberScientificNotation ar3;
+
+            ar1 = 20;
+            ar2 = 30;
+            ar3 = (ArNumberScientificNotation)(ar1 * ar2);
+            Assert.IsTrue(ar3.ToString() == "600");
+
+            ar1 = 0.2;
+            ar2 = 30;
+            ar3 = (ArNumberScientificNotation)(ar1 * ar2);
+            Assert.IsTrue(ar3.ToString() == "6");
+
+            ar1 = 1.2;
+            ar2 = 3.5;
+            ar3 = (ArNumberScientificNotation)(ar1 * ar2);
+            Assert.IsTrue(ar3.ToString() == "4.2");
+
+            ar1 = 0.000000002;
+            ar2 = 500;
+            ar3 = (ArNumberScientificNotation)(ar1 * ar2);
+            Assert.IsTrue(ar3.ToString() == "0.000001");
+
+            ChaosBox cb = new ChaosBox();
+            for (int i = 0; i < 10000; i++)
+            {
+                int a = cb.DrawOutInteger(true);
+                int b = cb.DrawOutInteger(true);
+                long c = (long)a * b;
+                ar1 = a;
+                ar2 = b;
+                ar3 = (ArNumberScientificNotation)(ar1 * ar2);
+                if (c.ToString() != ar3.ToString())
+                {
+                    TestContext.WriteLine("WrongDetected:");
+                    TestContext.WriteLine($"{a} * {b} = {c}");
+                    TestContext.WriteLine($"{ar3}");
+                    //TestContext.WriteLine($"{d1.ToString("G17")}+{d2.ToString("G17")}={ar3}");
+                } 
+            }
+
+        }
 
         [TestMethod]
         public void GeneralUse()
