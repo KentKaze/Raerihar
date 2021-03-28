@@ -127,8 +127,12 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public abstract ArNumber Remainder(ArNumberScientificNotation b);
         public static ArNumber operator +(ArNumber a, ArNumber b)
             => b.ReverseAdd(a);
+        public static ArNumber operator ++(ArNumber a)
+            => a.ReverseAdd(new ArNumberByte(1));
         public static ArNumber operator -(ArNumber a, ArNumber b)
             => b.ReverseMinus(a);
+        public static ArNumber operator --(ArNumber a)
+            => a.ReverseMinus(new ArNumberByte(1));
         public static ArNumber operator *(ArNumber a, ArNumber b)
             => b.ReverseMultiply(a);
         public static ArNumber operator /(ArNumber a, ArNumber b)
