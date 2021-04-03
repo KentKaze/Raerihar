@@ -492,23 +492,42 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public static ArNumberScientificNotation QuotientAndRemainder(ArNumberScientificNotation a, ArNumberScientificNotation b, out ArNumberScientificNotation remainder)
         {
             long divisor, dividend, quotient;
-            remainder = a;
+            int carry = 0;
+            remainder = a;            
+            bool isBNegative = b.Negative;
+            bool isANegative = a.Negative;
+            b.Negative = false;
+            remainder.Negative = false;                        
             List<long> sumList = new List<long>();
-            sumList.AddRange(new long[a._Numbers.Length]);
+            sumList.AddRange(new long[a._Numbers.Length + 2]); // To DO
             if (b._Numbers.Length > 1 && b._Numbers[b._Numbers.Length - 1] < 100)
-                divisor = b._Numbers[b._Numbers.Length - 1] * 1000000000 + b._Numbers[b._Numbers.Length - 2];
+                divisor = (long)b._Numbers[b._Numbers.Length - 1] * 1000000000 + b._Numbers[b._Numbers.Length - 2];
             else
                 divisor = b._Numbers[b._Numbers.Length - 1];
 
             while(remainder >= b)
             {
                 if (remainder._Numbers.Length > 1)
-                    dividend = remainder._Numbers[remainder._Numbers.Length - 1] * 1000000000 + remainder._Numbers[remainder._Numbers.Length - 2];
+                    dividend = (long)remainder._Numbers[remainder._Numbers.Length - 1] * 1000000000 + remainder._Numbers[remainder._Numbers.Length - 2];
                 else
                     dividend = remainder._Numbers[remainder._Numbers.Length - 1];
+                if (dividend < divisor)
+                {
+                    dividend *= 1000000000;
+                    carry = 1;
+                }
+                    
                 quotient = dividend / divisor;
-                remainder = AddMinus(remainder, Multiply(b, new ArNumberScientificNotation(quotient)), false);
-                sumList[remainder._Numbers.Length - 1] += quotient;
+                ArNumberScientificNotation number = new ArNumberScientificNotation(quotient);
+                number._LastBlockE += (remainder.Exponent - b.Exponent) / 9;
+                remainder = AddMinus(remainder, Multiply(b, number), false);
+                if(quotient > BlockMaxValue)
+                {
+                    sumList[remainder._Numbers.Length - 1] += quotient / 1000000000;
+                    sumList[remainder._Numbers.Length - 2] += quotient % 1000000000;
+                }   
+                else
+                    sumList[remainder._Numbers.Length - 1] += quotient;
             }
 
             while (sumList.Count != 1 && sumList[0] == 0)
@@ -520,9 +539,12 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             ArNumberScientificNotation result = new ArNumberScientificNotation();
             result._Numbers = new int[sumList.Count];
             for (int i = 0; i < sumList.Count; i++)
-                result._Numbers[i] = (int)sumList[i];
-            result.Negative = a.Negative ^ b.Negative;
-            result._LastBlockE = a._LastBlockE - b._LastBlockE;
+                result._Numbers[i] = (int)sumList[i];            
+            if (result._Numbers[0] == 0)
+                result.Negative = false;
+            else
+                result.Negative = isANegative ^ isBNegative;
+            result._LastBlockE = 0;
             return result;
         }
 
@@ -716,6 +738,8 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             else if (Negative && !other.Negative)
                 return -1;
             int result = Negative && other.Negative ? -1 : 1;
+            if (_Numbers[0] == 0)
+                return result * -1;
             if (Exponent > other.Exponent)
                 return result;
             else if (Exponent < other.Exponent)

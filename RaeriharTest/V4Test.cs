@@ -310,28 +310,33 @@ namespace RaeriharTest
             ar3 = (ArNumberScientificNotation)(ar1 / ar2);
             Assert.IsTrue(ar3.ToString() == "2");
 
+            ar1 = 8646464.78498;
+            ar2 = 399;
+            ar3 = (ArNumberScientificNotation)(ar1 / ar2);
+            Assert.IsTrue(ar3.ToString() == "21670");
+
             ar1 = 6898465726746.54698;
             ar2 = 512;
             ar3 = (ArNumberScientificNotation)(ar1 / ar2);
             Assert.IsTrue(ar3.ToString() == "13473565872");
 
-            //ChaosBox cb = new ChaosBox();
-            //for (int i = 0; i < 10000; i++)
-            //{
-            //    int a = cb.DrawOutInteger(true);
-            //    int b = cb.DrawOutInteger(true);
-            //    long c = (long)a * b;
-            //    ar1 = a;
-            //    ar2 = b;
-            //    ar3 = (ArNumberScientificNotation)(ar1 * ar2);
-            //    if (c.ToString() != ar3.ToString())
-            //    {
-            //        TestContext.WriteLine("WrongDetected:");
-            //        TestContext.WriteLine($"{a} * {b} = {c}");
-            //        TestContext.WriteLine($"{ar3}");
-            //        //TestContext.WriteLine($"{d1.ToString("G17")}+{d2.ToString("G17")}={ar3}");
-            //    }
-            //}
+            ChaosBox cb = new ChaosBox();
+            for (int i = 0; i < 10000; i++)
+            {
+                long a = cb.DrawOutLong(true);
+                int b = cb.DrawOutInteger(true);
+                long c = (long)a / b;
+                ar1 = a;
+                ar2 = b;
+                ar3 = (ArNumberScientificNotation)(ar1 / ar2);
+                if (c.ToString() != ar3.ToString())
+                {
+                    TestContext.WriteLine("WrongDetected:");
+                    TestContext.WriteLine($"{a} / {b} = {c}");
+                    TestContext.WriteLine($"{ar3}");
+                    //TestContext.WriteLine($"{d1.ToString("G17")}+{d2.ToString("G17")}={ar3}");
+                }
+            }
 
         }
 
