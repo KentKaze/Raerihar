@@ -251,6 +251,91 @@ namespace RaeriharTest
         }
 
         [TestMethod]
+        public void CastTest()
+        {
+            byte b = 3;
+            ArNumberScientificNotation ar = new ArNumberScientificNotation(3);
+            ArNumberScientificNotation br = ar.Clone() as ArNumberScientificNotation;
+            br.Negative = true;
+            TestContext.WriteLine(ar.ToString());
+            TestContext.WriteLine(br.ToString());
+            sbyte c = (sbyte)ar;
+            TestContext.WriteLine(c.ToString());
+            br = 200;
+            Assert.ThrowsException<OverflowException>(() =>
+            {
+                sbyte d = (sbyte)br;
+            });
+            //TestContext.WriteLine(d.ToString());
+
+            byte a1 = (byte)br;
+            short a2 = (short)br;
+            ushort a3 = (ushort)br;
+            int a4 = (int)br;
+            uint a5 = (uint)br;
+            long a6 = (long)br;
+            ulong a7 = (ulong)br;
+            decimal a8 = (decimal)br;
+            float a9 = (float)br;
+            double a11 = (double)br;
+            char a10 = (char)br;
+
+            br = -60;
+            Assert.ThrowsException<OverflowException>(() =>
+            {
+                br = -60;
+                byte aa1 = (byte)br;
+            });
+        }
+
+        [TestMethod]
+        public void Quotient()
+        {
+            ArNumberScientificNotation ar1;
+            ArNumberScientificNotation ar2;
+            ArNumberScientificNotation ar3;
+
+            ar1 = 300;
+            ar2 = 30;
+            ar3 = (ArNumberScientificNotation)(ar1 / ar2);
+            Assert.IsTrue(ar3.ToString() == "10");
+
+            ar1 = 30;
+            ar2 = 0.2;
+            ar3 = (ArNumberScientificNotation)(ar1 / ar2);
+            Assert.IsTrue(ar3.ToString() == "150");
+
+            ar1 = 8;
+            ar2 = 3;
+            ar3 = (ArNumberScientificNotation)(ar1 / ar2);
+            Assert.IsTrue(ar3.ToString() == "2");
+
+            ar1 = 6898465726746.54698;
+            ar2 = 512;
+            ar3 = (ArNumberScientificNotation)(ar1 / ar2);
+            Assert.IsTrue(ar3.ToString() == "13473565872");
+
+            //ChaosBox cb = new ChaosBox();
+            //for (int i = 0; i < 10000; i++)
+            //{
+            //    int a = cb.DrawOutInteger(true);
+            //    int b = cb.DrawOutInteger(true);
+            //    long c = (long)a * b;
+            //    ar1 = a;
+            //    ar2 = b;
+            //    ar3 = (ArNumberScientificNotation)(ar1 * ar2);
+            //    if (c.ToString() != ar3.ToString())
+            //    {
+            //        TestContext.WriteLine("WrongDetected:");
+            //        TestContext.WriteLine($"{a} * {b} = {c}");
+            //        TestContext.WriteLine($"{ar3}");
+            //        //TestContext.WriteLine($"{d1.ToString("G17")}+{d2.ToString("G17")}={ar3}");
+            //    }
+            //}
+
+        }
+
+        [TestMethod]
         public void Multiply()
         {
             ArNumberScientificNotation ar1;
@@ -271,6 +356,11 @@ namespace RaeriharTest
             ar2 = 3.5;
             ar3 = (ArNumberScientificNotation)(ar1 * ar2);
             Assert.IsTrue(ar3.ToString() == "4.2");
+
+            ar1 = 579645;
+            ar2 = 0;
+            ar3 = (ArNumberScientificNotation)(ar1 * ar2);
+            Assert.IsTrue(ar3.ToString() == "0");
 
             ar1 = 0.000000002;
             ar2 = 500;
