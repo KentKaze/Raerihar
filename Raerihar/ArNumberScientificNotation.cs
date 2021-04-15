@@ -470,7 +470,7 @@ namespace Aritiafel.Organizations.RaeriharUniversity
                 sumList.RemoveAt(0);
                 lastlastBlockE++;
             }
-
+            
             while (sumList.Count != 1 && sumList[sumList.Count - 1] == 0)
                 sumList.RemoveAt(sumList.Count - 1);
 
@@ -489,37 +489,53 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             return result;
         }
 
-        public static ArNumberScientificNotation QuotientAndRemainder(ArNumberScientificNotation a, ArNumberScientificNotation b, out ArNumberScientificNotation remainder)
+        public static ArNumberScientificNotation Divide(ArNumberScientificNotation a, ArNumberScientificNotation b, out ArNumberScientificNotation remainder, int divideToLastBlockE = 0)
         {
             long divisor, dividend, quotient;
-            int carry = 0;
+            int EDifference, carry = 0;
             remainder = a;            
             bool isBNegative = b.Negative;
             bool isANegative = a.Negative;
             b.Negative = false;
             remainder.Negative = false;                        
             List<long> sumList = new List<long>();
-            sumList.AddRange(new long[a._Numbers.Length + 2]); // To DO
-            if (b._Numbers.Length > 1 && b._Numbers[b._Numbers.Length - 1] < 100)
-                divisor = (long)b._Numbers[b._Numbers.Length - 1] * 1000000000 + b._Numbers[b._Numbers.Length - 2];
-            else
-                divisor = b._Numbers[b._Numbers.Length - 1];
+            sumList.AddRange(new long[a._Numbers.Length + 10]); // To DO
 
-            while(remainder >= b)
+            //if (b._Numbers.Length > 1 && b._Numbers[b._Numbers.Length - 1] < 100)
+            //    divisor = (long)b._Numbers[b._Numbers.Length - 1] * 1000000000 + b._Numbers[b._Numbers.Length - 2];
+            //else
+            //{
+            //    divisor = (long)b._Numbers[b._Numbers.Length - 1];
+            //    carry = 1;
+            //}
+            
+            while(remainder != 0)// 2可能， 1.整除 2.非整除
             {
-                if (remainder._Numbers.Length > 1)
-                    dividend = (long)remainder._Numbers[remainder._Numbers.Length - 1] * 1000000000 + remainder._Numbers[remainder._Numbers.Length - 2];
-                else
-                    dividend = remainder._Numbers[remainder._Numbers.Length - 1];
-                if (dividend < divisor)
+                //比較首位，被除數較除數小時進位
+                if(b._Numbers[b._Numbers.Length - 1] < remainder._Numbers[remainder._Numbers.Length - 1])
                 {
-                    dividend *= 1000000000;
-                    carry = 1;
+                    quotient = remainder._Numbers[remainder._Numbers.Length - 1] / (b._Numbers[b._Numbers.Length - 1] + 1);
                 }
-                    
-                quotient = dividend / divisor;
+                else
+                {
+                    if (remainder._Numbers.Length > 1)
+                        dividend = (long)remainder._Numbers[remainder._Numbers.Length - 1] * 1000000000 + remainder._Numbers[remainder._Numbers.Length - 2];
+                    else
+                        dividend = (long)remainder._Numbers[remainder._Numbers.Length - 1] * 1000000000;
+                    quotient = dividend / (b._Numbers[b._Numbers.Length - 1] + 1);
+                }
+
                 ArNumberScientificNotation number = new ArNumberScientificNotation(quotient);
-                number._LastBlockE += (remainder.Exponent - b.Exponent) / 9;
+                EDifference = remainder._Numbers.Length + remainder._LastBlockE - b._Numbers.Length - b._LastBlockE;
+                if (b._Numbers[b._Numbers.Length - 1] > remainder._Numbers[remainder._Numbers.Length - 1])
+                    EDifference -= 1;
+                
+                number._LastBlockE += EDifference - carry;
+                //remainder.Exponent - b.Exponent Key
+                //50 / 6  = 8...2  e = 1 , 0
+                //0.0005 / 6 = 0.....0.0005   e = -4, 0
+                //0.0005 / 0.0000007 = 714...0.0000003 e = -4, -7
+
                 remainder = AddMinus(remainder, Multiply(b, number), false);
                 if(quotient > BlockMaxValue)
                 {
@@ -646,19 +662,19 @@ namespace Aritiafel.Organizations.RaeriharUniversity
         public override ArNumber Multiply(ArNumberScientificNotation b)
             => Multiply(this, b);
         public override ArNumber Quotient(ArNumberByte b)
-            => QuotientAndRemainder(this, new ArNumberScientificNotation(b), out _);
+            => Divide(this, new ArNumberScientificNotation(b), out _);
         public override ArNumber Quotient(ArNumberShort b)
-            => QuotientAndRemainder(this, new ArNumberScientificNotation(b), out _);
+            => Divide(this, new ArNumberScientificNotation(b), out _);
         public override ArNumber Quotient(ArNumberInt b)
-            => QuotientAndRemainder(this, new ArNumberScientificNotation(b), out _);
+            => Divide(this, new ArNumberScientificNotation(b), out _);
         public override ArNumber Quotient(ArNumberLong b)
-            => QuotientAndRemainder(this, new ArNumberScientificNotation(b), out _);
+            => Divide(this, new ArNumberScientificNotation(b), out _);
         public override ArNumber Quotient(ArNumberDecimal b)
-            => QuotientAndRemainder(this, new ArNumberScientificNotation(b), out _);
+            => Divide(this, new ArNumberScientificNotation(b), out _);
         public override ArNumber Quotient(ArNumberLongDecimal b)
-            => QuotientAndRemainder(this, new ArNumberScientificNotation(b), out _);
+            => Divide(this, new ArNumberScientificNotation(b), out _);
         public override ArNumber Quotient(ArNumberScientificNotation b)
-            => QuotientAndRemainder(this, b, out _);
+            => Divide(this, b, out _);
         public override ArNumber Divide(ArNumberByte b)
             => throw new NotImplementedException();
         public override ArNumber Divide(ArNumberShort b)
@@ -675,42 +691,42 @@ namespace Aritiafel.Organizations.RaeriharUniversity
             => throw new NotImplementedException();
         public override ArNumber Remainder(ArNumberByte b)
         {
-            QuotientAndRemainder(this, new ArNumberScientificNotation(b), out ArNumberScientificNotation result);
+            Divide(this, new ArNumberScientificNotation(b), out ArNumberScientificNotation result);
             return result;
         }            
         public override ArNumber Remainder(ArNumberShort b)
         {
-            QuotientAndRemainder(this, new ArNumberScientificNotation(b), out ArNumberScientificNotation result);
+            Divide(this, new ArNumberScientificNotation(b), out ArNumberScientificNotation result);
             return result;
         }
 
         public override ArNumber Remainder(ArNumberInt b)
         {
-            QuotientAndRemainder(this, new ArNumberScientificNotation(b), out ArNumberScientificNotation result);
+            Divide(this, new ArNumberScientificNotation(b), out ArNumberScientificNotation result);
             return result;
         }
 
         public override ArNumber Remainder(ArNumberLong b)
         {
-            QuotientAndRemainder(this, new ArNumberScientificNotation(b), out ArNumberScientificNotation result);
+            Divide(this, new ArNumberScientificNotation(b), out ArNumberScientificNotation result);
             return result;
         }
 
         public override ArNumber Remainder(ArNumberDecimal b)
         {
-            QuotientAndRemainder(this, new ArNumberScientificNotation(b), out ArNumberScientificNotation result);
+            Divide(this, new ArNumberScientificNotation(b), out ArNumberScientificNotation result);
             return result;
         }
 
         public override ArNumber Remainder(ArNumberLongDecimal b)
         {
-            QuotientAndRemainder(this, new ArNumberScientificNotation(b), out ArNumberScientificNotation result);
+            Divide(this, new ArNumberScientificNotation(b), out ArNumberScientificNotation result);
             return result;
         }
 
         public override ArNumber Remainder(ArNumberScientificNotation b)
         {
-            QuotientAndRemainder(this, b, out ArNumberScientificNotation result);
+            Divide(this, b, out ArNumberScientificNotation result);
             return result;
         }
 
